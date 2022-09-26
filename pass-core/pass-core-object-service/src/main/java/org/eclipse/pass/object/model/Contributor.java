@@ -400,7 +400,7 @@ public class Contributor extends PassEntity {
         return result;
     }
 
-    private static class RoleListToStringConverter implements AttributeConverter<List<ContributorRole>, String> {
+    public static class RoleListToStringConverter implements AttributeConverter<List<ContributorRole>, String> {
         @Override
         public String convertToDatabaseColumn(List<ContributorRole> attribute) {
             return attribute == null ? null

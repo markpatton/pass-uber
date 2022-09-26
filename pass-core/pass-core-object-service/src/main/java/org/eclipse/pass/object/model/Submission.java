@@ -225,6 +225,10 @@ public class Submission {
             return result;
         }
 
+        public String getValue() {
+            return value;
+        }
+
         /**
          * Determine if submitted.
          *
@@ -235,7 +239,7 @@ public class Submission {
         }
     }
 
-    private static class SubmissionStatusToStringConverter implements AttributeConverter<SubmissionStatus, String> {
+    public static class SubmissionStatusToStringConverter implements AttributeConverter<SubmissionStatus, String> {
         @Override
         public String convertToDatabaseColumn(SubmissionStatus attribute) {
             return attribute == null ? null : attribute.value;
@@ -305,9 +309,13 @@ public class Submission {
             }
             return result;
         }
+
+        public String getValue() {
+            return value;
+        }
     }
 
-    private static class AggregatedDepositStatusToStringConverter implements AttributeConverter<AggregatedDepositStatus, String> {
+    public static class AggregatedDepositStatusToStringConverter implements AttributeConverter<AggregatedDepositStatus, String> {
         @Override
         public String convertToDatabaseColumn(AggregatedDepositStatus attribute) {
             return attribute == null ? null : attribute.value;
@@ -355,9 +363,13 @@ public class Submission {
 
             throw new IllegalArgumentException("Invalid performer role: " + s);
         }
+
+        public String getValue() {
+            return value;
+        }
     }
 
-    private static class SourceToStringConverter implements AttributeConverter<Source, String> {
+    public static class SourceToStringConverter implements AttributeConverter<Source, String> {
         @Override
         public String convertToDatabaseColumn(Source attribute) {
             return attribute == null ? null : attribute.value;

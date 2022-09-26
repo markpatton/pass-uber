@@ -142,10 +142,14 @@ public class SubmissionEvent {
             }
             return result;
         }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     @Converter
-    private static class EventTypeToStringConverter implements AttributeConverter<EventType, String> {
+    public static class EventTypeToStringConverter implements AttributeConverter<EventType, String> {
         @Override
         public String convertToDatabaseColumn(EventType attribute) {
             return attribute == null ? null : attribute.value;
@@ -185,10 +189,14 @@ public class SubmissionEvent {
 
             throw new IllegalArgumentException("Invalid performer role: " + s);
         }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     @Converter
-    private static class PerformerRoleToStringConverter implements AttributeConverter<PerformerRole, String> {
+    public static class PerformerRoleToStringConverter implements AttributeConverter<PerformerRole, String> {
         @Override
         public String convertToDatabaseColumn(PerformerRole attribute) {
             return attribute == null ? null : attribute.value;

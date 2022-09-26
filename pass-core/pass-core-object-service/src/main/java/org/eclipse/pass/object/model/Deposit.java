@@ -126,9 +126,13 @@ public class Deposit {
             }
             return result;
         }
+
+        public String getValue() {
+            return value;
+        }
     }
 
-    private static class DepositStatusToStringConverter implements AttributeConverter<DepositStatus, String> {
+    public static class DepositStatusToStringConverter implements AttributeConverter<DepositStatus, String> {
         @Override
         public String convertToDatabaseColumn(DepositStatus attribute) {
             return attribute == null ? null : attribute.value;

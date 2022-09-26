@@ -137,9 +137,13 @@ public class Repository {
             }
             return result;
         }
+
+        public String getValue() {
+            return value;
+        }
     }
 
-    private static class IntegrationTypeToStringConverter implements AttributeConverter<IntegrationType, String> {
+    public static class IntegrationTypeToStringConverter implements AttributeConverter<IntegrationType, String> {
         @Override
         public String convertToDatabaseColumn(IntegrationType attribute) {
             return attribute == null ? null : attribute.value;

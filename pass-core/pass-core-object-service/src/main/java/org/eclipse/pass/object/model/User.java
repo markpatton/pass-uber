@@ -158,7 +158,7 @@ public class User {
         }
     }
 
-    private static class RoleListToStringConverter implements AttributeConverter<List<UserRole>, String> {
+    public static class RoleListToStringConverter implements AttributeConverter<List<UserRole>, String> {
         @Override
         public String convertToDatabaseColumn(List<UserRole> attribute) {
             return attribute == null || attribute.isEmpty() ? null
