@@ -35,12 +35,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.eclipse.pass</groupId>
-      <artifactId>pass-core-doi-service</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jetty</artifactId>
     </dependency>
@@ -79,7 +73,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <mainClass>org.eclipse.pass.main.Main</mainClass>
-	  <finalName>pass-core-main</finalName>
+	        <finalName>pass-core-main</finalName>
         </configuration>
         <executions>
           <execution>
