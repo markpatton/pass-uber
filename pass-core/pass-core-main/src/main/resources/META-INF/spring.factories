@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+ org.eclipse.pass.main.SecurityConfigProperties
