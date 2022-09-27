@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Convert;
 import javax.persistence.Converter;
@@ -30,9 +29,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.eclipse.pass.object.converter.ListToStringConverter;
-
 import com.yahoo.elide.annotation.Include;
+import org.eclipse.pass.object.converter.ListToStringConverter;
 
 /**
  * A Repository Copy represents a copy of a Publication that exists in a target Repository.
@@ -44,7 +42,7 @@ import com.yahoo.elide.annotation.Include;
 @Table(name = "pass_repository_copy")
 public class RepositoryCopy {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**

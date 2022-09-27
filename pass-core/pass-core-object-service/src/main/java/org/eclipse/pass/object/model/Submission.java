@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -45,7 +44,7 @@ import com.yahoo.elide.annotation.Include;
 @Table(name = "pass_submission")
 public class Submission {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**
@@ -315,7 +314,8 @@ public class Submission {
         }
     }
 
-    public static class AggregatedDepositStatusToStringConverter implements AttributeConverter<AggregatedDepositStatus, String> {
+    public static class AggregatedDepositStatusToStringConverter implements
+        AttributeConverter<AggregatedDepositStatus, String> {
         @Override
         public String convertToDatabaseColumn(AggregatedDepositStatus attribute) {
             return attribute == null ? null : attribute.value;

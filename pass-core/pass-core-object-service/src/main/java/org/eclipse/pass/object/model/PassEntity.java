@@ -33,7 +33,7 @@ public abstract class PassEntity {
      * Unique id for the resource.
      */
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**

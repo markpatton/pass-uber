@@ -18,7 +18,6 @@ package org.eclipse.pass.object.model;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Convert;
 import javax.persistence.Converter;
@@ -42,7 +41,7 @@ import com.yahoo.elide.annotation.Include;
 @Table(name = "pass_submission_event")
 public class SubmissionEvent {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**

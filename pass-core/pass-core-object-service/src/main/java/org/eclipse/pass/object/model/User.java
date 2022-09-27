@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -33,10 +32,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.yahoo.elide.annotation.Include;
 import org.eclipse.pass.object.converter.ListToStringConverter;
 import org.eclipse.pass.object.converter.SetToStringConverter;
-
-import com.yahoo.elide.annotation.Include;
 
 /**
  * User model for users logging into PASS
@@ -49,7 +47,7 @@ import com.yahoo.elide.annotation.Include;
 @Table(name = "pass_user")
 public class User {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**
@@ -167,7 +165,9 @@ public class User {
 
         @Override
         public List<UserRole> convertToEntityAttribute(String dbData) {
-            return dbData == null || dbData.isEmpty() ? Collections.emptyList() : Stream.of(dbData.split(",")).map(UserRole::of).collect(Collectors.toList());
+            return dbData == null || dbData.isEmpty() ?
+                    Collections.emptyList() :
+                        Stream.of(dbData.split(",")).map(UserRole::of).collect(Collectors.toList());
         }
     }
 }

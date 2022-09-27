@@ -24,19 +24,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.eclipse.pass.object.converter.SetToStringConverter;
-
 import com.yahoo.elide.annotation.Include;
+import org.eclipse.pass.object.converter.SetToStringConverter;
 
 /**
  * A Contributor is a person who contributed to a Publication. The contributor
@@ -50,10 +45,6 @@ import com.yahoo.elide.annotation.Include;
 @Entity
 @Table(name = "pass_contributor")
 public class Contributor extends PassEntity {
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
-
     /**
      * First name(s) of person
      */
@@ -111,7 +102,6 @@ public class Contributor extends PassEntity {
      */
     @ManyToOne
     private User user;
-
 
     /**
      * Contributor constructor
@@ -195,7 +185,6 @@ public class Contributor extends PassEntity {
             return value;
         }
     }
-
 
     /**
      * @return the firstName
@@ -409,7 +398,8 @@ public class Contributor extends PassEntity {
 
         @Override
         public List<ContributorRole> convertToEntityAttribute(String dbData) {
-            return dbData == null ? Collections.emptyList() : Stream.of(dbData.split(",")).map(ContributorRole::of).collect(Collectors.toList());
+            return dbData == null ? Collections.emptyList() :
+                Stream.of(dbData.split(",")).map(ContributorRole::of).collect(Collectors.toList());
         }
     }
 }

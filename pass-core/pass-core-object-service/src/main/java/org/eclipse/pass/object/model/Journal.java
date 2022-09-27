@@ -17,7 +17,6 @@ package org.eclipse.pass.object.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,9 +24,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.yahoo.elide.annotation.Include;
 import org.eclipse.pass.object.converter.ListToStringConverter;
 
-import com.yahoo.elide.annotation.Include;
 
 /**
  * Describes a Journal and the path of it's participation in PubMedCentral

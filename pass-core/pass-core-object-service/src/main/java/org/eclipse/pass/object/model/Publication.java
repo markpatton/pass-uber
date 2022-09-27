@@ -35,7 +35,7 @@ import com.yahoo.elide.annotation.Include;
 @Table(name = "pass_publication")
 public class Publication {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**

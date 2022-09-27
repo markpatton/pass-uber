@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -29,9 +28,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.eclipse.pass.object.converter.ListToStringConverter;
-
 import com.yahoo.elide.annotation.Include;
+import org.eclipse.pass.object.converter.ListToStringConverter;
 
 /**
  * Describes a Repository. A Repository is the target of a Deposit.
@@ -44,7 +42,7 @@ import com.yahoo.elide.annotation.Include;
 @Table(name = "pass_repository")
 public class Repository {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**
