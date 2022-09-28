@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.eclipse.pass.object.serde;
+package org.eclipse.pass.object.converter;
 
-import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
-import com.yahoo.elide.core.utils.coerce.converters.Serde;
-import org.eclipse.pass.object.model.PerformerRole;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-@ElideTypeConverter(type = PerformerRole.class, name = "PerformerRole")
-public class SubmissionEventPerformerRoleSerde implements Serde<String, PerformerRole> {
+import org.eclipse.pass.object.model.EventType;
 
+@Converter
+public class EventTypeToStringConverter implements AttributeConverter<EventType, String> {
     @Override
-    public PerformerRole deserialize(String val) {
-        return PerformerRole.of(val);
+    public String convertToDatabaseColumn(EventType attribute) {
+        return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public String serialize(PerformerRole val) {
-        return val.getValue();
+    public EventType convertToEntityAttribute(String dbData) {
+        return dbData == null ? null : EventType.of(dbData);
     }
 }

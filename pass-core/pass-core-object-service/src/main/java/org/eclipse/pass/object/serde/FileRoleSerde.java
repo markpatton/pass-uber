@@ -17,7 +17,7 @@ package org.eclipse.pass.object.serde;
 
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
-import org.eclipse.pass.object.model.File.FileRole;
+import org.eclipse.pass.object.model.FileRole;
 
 @ElideTypeConverter(type = FileRole.class, name = "FileRole")
 public class FileRoleSerde implements Serde<String, FileRole> {

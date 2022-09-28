@@ -15,20 +15,27 @@
  */
 package org.eclipse.pass.object.serde;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import com.yahoo.elide.core.exceptions.InvalidValueException;
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
-import org.eclipse.pass.object.model.PerformerRole;
 
-@ElideTypeConverter(type = PerformerRole.class, name = "PerformerRole")
-public class SubmissionEventPerformerRoleSerde implements Serde<String, PerformerRole> {
+@ElideTypeConverter(type = URI.class, name = "URI")
+public class URISerde implements Serde<String, URI> {
 
     @Override
-    public PerformerRole deserialize(String val) {
-        return PerformerRole.of(val);
+    public URI deserialize(String val) {
+        try {
+            return new URI(val);
+        } catch (URISyntaxException e) {
+            throw new InvalidValueException("Invalid URI " + val);
+        }
     }
 
     @Override
-    public String serialize(PerformerRole val) {
-        return val.getValue();
+    public String serialize(URI val) {
+        return val.toString();
     }
 }

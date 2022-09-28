@@ -17,7 +17,7 @@ package org.eclipse.pass.object.serde;
 
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
-import org.eclipse.pass.object.model.RepositoryCopy.CopyStatus;
+import org.eclipse.pass.object.model.CopyStatus;
 
 @ElideTypeConverter(type = CopyStatus.class, name = "CopyStatus")
 public class CopyStatusSerde implements Serde<String, CopyStatus> {

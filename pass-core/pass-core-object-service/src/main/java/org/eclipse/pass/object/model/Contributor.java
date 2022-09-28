@@ -16,21 +16,16 @@
 package org.eclipse.pass.object.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.persistence.AttributeConverter;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
+import org.eclipse.pass.object.converter.ContributorRoleListToStringConverter;
 import org.eclipse.pass.object.converter.SetToStringConverter;
 
 /**
@@ -87,17 +82,17 @@ public class Contributor extends PassEntity {
      * One or more roles that this Contributor performed for the associated
      * Publication
      */
-    @Convert(converter = RoleListToStringConverter.class)
+    @Convert(converter = ContributorRoleListToStringConverter.class)
     private List<ContributorRole> roles = new ArrayList<ContributorRole>();
 
     /**
-     * URI of the publication that this contributor is associated with
+     * the publication that this contributor is associated with
      */
     @ManyToOne
     private Publication publication;
 
     /**
-     * URI of the user that represents the same person as this Contributor, where
+     * the user that represents the same person as this Contributor, where
      * relevant
      */
     @ManyToOne
@@ -126,64 +121,6 @@ public class Contributor extends PassEntity {
         this.roles = new ArrayList<ContributorRole>(contributor.roles);
         this.publication = contributor.publication;
         this.user = contributor.user;
-    }
-
-    /**
-     * list of possible contributor Roles
-     */
-    public enum ContributorRole {
-
-        /**
-         * Author role
-         */
-        AUTHOR("author"),
-
-        /**
-         * First author role
-         */
-        FIRST_AUTHOR("first-author"),
-
-        /**
-         * Last author role
-         */
-        LAST_AUTHOR("last-author"),
-
-        /**
-         * Corresponding author role
-         */
-        CORRESPONDING_AUTHOR("corresponding-author");
-
-        private static final Map<String, ContributorRole> map = new HashMap<>(values().length, 1);
-
-        static {
-            for (ContributorRole r : values()) {
-                map.put(r.value, r);
-            }
-        }
-
-        private String value;
-
-        private ContributorRole(String value) {
-            this.value = value;
-        }
-
-        /**
-         * Parse the role.
-         *
-         * @param role Serialized role string
-         * @return The parsed value.
-         */
-        public static ContributorRole of(String role) {
-            ContributorRole result = map.get(role);
-            if (result == null) {
-                throw new IllegalArgumentException("Invalid Role: " + role);
-            }
-            return result;
-        }
-
-        public String getValue() {
-            return value;
-        }
     }
 
     /**
@@ -387,19 +324,5 @@ public class Contributor extends PassEntity {
         result = 31 * result + (publication != null ? publication.hashCode() : 0);
         result = 31 * result + (user != null ? user.hashCode() : 0);
         return result;
-    }
-
-    public static class RoleListToStringConverter implements AttributeConverter<List<ContributorRole>, String> {
-        @Override
-        public String convertToDatabaseColumn(List<ContributorRole> attribute) {
-            return attribute == null ? null
-                    : String.join(",", attribute.stream().map(ContributorRole::getValue).collect(Collectors.toList()));
-        }
-
-        @Override
-        public List<ContributorRole> convertToEntityAttribute(String dbData) {
-            return dbData == null ? Collections.emptyList() :
-                Stream.of(dbData.split(",")).map(ContributorRole::of).collect(Collectors.toList());
-        }
     }
 }

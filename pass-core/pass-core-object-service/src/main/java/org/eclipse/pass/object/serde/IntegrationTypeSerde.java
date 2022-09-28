@@ -17,7 +17,7 @@ package org.eclipse.pass.object.serde;
 
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
-import org.eclipse.pass.object.model.Repository.IntegrationType;
+import org.eclipse.pass.object.model.IntegrationType;
 
 @ElideTypeConverter(type = IntegrationType.class, name = "IntegrationType")
 public class IntegrationTypeSerde implements Serde<String, IntegrationType> {

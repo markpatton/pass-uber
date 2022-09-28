@@ -17,7 +17,7 @@ package org.eclipse.pass.object.serde;
 
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
-import org.eclipse.pass.object.model.Deposit.DepositStatus;
+import org.eclipse.pass.object.model.DepositStatus;
 
 @ElideTypeConverter(type = DepositStatus.class, name = "DepositStatus")
 public class DepositStatusSerde implements Serde<String, DepositStatus> {

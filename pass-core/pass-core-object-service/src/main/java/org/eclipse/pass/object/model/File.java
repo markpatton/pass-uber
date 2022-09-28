@@ -15,18 +15,14 @@
  */
 package org.eclipse.pass.object.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.persistence.AttributeConverter;
+import java.net.URI;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
+import org.eclipse.pass.object.converter.FileRoleToStringConverter;
 
 /**
  * Files are associated with a Submissions to be used to form Deposits into Repositories
@@ -37,10 +33,7 @@ import com.yahoo.elide.annotation.Include;
 @Include
 @Entity
 @Table(name = "pass_file")
-public class File {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class File extends PassEntity {
 
     /**
      * Name of file, defaults to filesystem.name
@@ -50,7 +43,7 @@ public class File {
     /**
      * URI to the bytestream that Deposit services will use to retrieve the bytestream for Deposit
      */
-    private String uri;
+    private URI uri;
 
     /**
      * Description of file provided by User
@@ -69,77 +62,160 @@ public class File {
     private String mimeType;
 
     /**
-     * URI of the Submission the File is a part of
+     * the Submission the File is a part of
      */
     @ManyToOne
     private Submission submission;
 
     /**
-     * list of possible File Roles
+     * File constructor
      */
-    public enum FileRole {
-        /**
-         * Author accepted manuscript
-         */
-        MANUSCRIPT("manuscript"),
-
-        /**
-         * Supplemental material for the Publication
-         */
-        SUPPLEMENTAL("supplemental"),
-
-        /**
-         * An image, data plot, map, or schematic
-         */
-        FIGURE("figure"),
-
-        /**
-         * Tabular data
-         */
-        TABLE("table");
-
-        private static final Map<String, FileRole> map = new HashMap<>(values().length, 1);
-
-        static {
-            for (FileRole r : values()) {
-                map.put(r.value, r);
-            }
-        }
-
-        private String value;
-
-        private FileRole(String value) {
-            this.value = value;
-        }
-
-        /**
-         * Parse file role.
-         *
-         * @param role Role string
-         * @return parsed file role.
-         */
-        public static FileRole of(String role) {
-            FileRole result = map.get(role);
-            if (result == null) {
-                throw new IllegalArgumentException("Invalid File Role: " + role);
-            }
-            return result;
-        }
-
-        public String getValue() {
-            return value;
-        }
+    public File() {
     }
 
-    public static class FileRoleToStringConverter implements AttributeConverter<FileRole, String> {
-        @Override
-        public String convertToDatabaseColumn(FileRole attribute) {
-            return attribute == null ? null : attribute.value;
+    /**
+     * Copy constructor, this will copy the values of the object provided into the new object
+     *
+     * @param file the file to copy
+     */
+    public File(File file) {
+        super(file);
+        this.name = file.name;
+        this.uri = file.uri;
+        this.description = file.description;
+        this.fileRole = file.fileRole;
+        this.mimeType = file.mimeType;
+        this.submission = file.submission;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the uri
+     */
+    public URI getUri() {
+        return uri;
+    }
+
+    /**
+     * @param uri the uri to set
+     */
+    public void setUri(URI uri) {
+        this.uri = uri;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * @return the fileRole
+     */
+    public FileRole getFileRole() {
+        return fileRole;
+    }
+
+    /**
+     * @param fileRole the fileRole to set
+     */
+    public void setFileRole(FileRole fileRole) {
+        this.fileRole = fileRole;
+    }
+
+    /**
+     * @return the mimeType
+     */
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    /**
+     * @param mimeType the mimeType to set
+     */
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    /**
+     * @return the submission
+     */
+    public Submission getSubmission() {
+        return submission;
+    }
+
+    /**
+     * @param submission the submission to set
+     */
+    public void setSubmission(Submission submission) {
+        this.submission = submission;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
         }
 
-        @Override
-        public FileRole convertToEntityAttribute(String dbData) {
-            return dbData == null ? null : FileRole.of(dbData);
+        File that = (File) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) {
+            return false;
         }
+        if (uri != null ? !uri.equals(that.uri) : that.uri != null) {
+            return false;
+        }
+        if (description != null ? !description.equals(that.description) : that.description != null) {
+            return false;
+        }
+        if (fileRole != null ? !fileRole.equals(that.fileRole) : that.fileRole != null) {
+            return false;
+        }
+        if (mimeType != null ? !mimeType.equals(that.mimeType) : that.mimeType != null) {
+            return false;
+        }
+        if (submission != null ? !submission.equals(that.submission) : that.submission != null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (uri != null ? uri.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (fileRole != null ? fileRole.hashCode() : 0);
+        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
+        result = 31 * result + (submission != null ? submission.hashCode() : 0);
+        return result;
     }
 }

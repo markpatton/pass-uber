@@ -17,7 +17,7 @@ package org.eclipse.pass.object.serde;
 
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
-import org.eclipse.pass.object.model.SubmissionEvent.EventType;
+import org.eclipse.pass.object.model.EventType;
 
 @ElideTypeConverter(type = EventType.class, name = "EventType")
 public class SubmissionEventTypeSerde implements Serde<String, EventType> {

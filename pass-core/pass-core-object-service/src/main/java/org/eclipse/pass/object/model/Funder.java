@@ -15,10 +15,8 @@
  */
 package org.eclipse.pass.object.model;
 
+import java.net.URI;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -33,10 +31,7 @@ import com.yahoo.elide.annotation.Include;
 @Include
 @Entity
 @Table(name = "pass_funder")
-public class Funder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class Funder extends PassEntity {
 
     /**
      * Funder name
@@ -46,10 +41,10 @@ public class Funder {
     /**
      * Funder URL
      */
-    private String url;
+    private URI url;
 
     /**
-     * URI of the Policy associated with funder
+     * the Policy associated with funder
      */
     @ManyToOne
     private Policy policy;
@@ -59,4 +54,118 @@ public class Funder {
      * PASS and a local system. In the case of JHU this is the key assigned in COEUS
      */
     private String localKey;
+
+    /**
+     * Funder constructor
+     */
+    public Funder() {
+    }
+
+    /**
+     * Copy constructor, this will copy the values of the object provided into the new object
+     *
+     * @param funder the funder to copy
+     */
+    public Funder(Funder funder) {
+        super(funder);
+        this.name = funder.name;
+        this.url = funder.url;
+        this.policy = funder.policy;
+        this.localKey = funder.localKey;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the url
+     */
+    public URI getUrl() {
+        return url;
+    }
+
+    /**
+     * @param url the url to set
+     */
+    public void setUrl(URI url) {
+        this.url = url;
+    }
+
+    /**
+     * @return the the policy
+     */
+    public Policy getPolicy() {
+        return policy;
+    }
+
+    /**
+     * @param policy the policy to set
+     */
+    public void setPolicy(Policy policy) {
+        this.policy = policy;
+    }
+
+    /**
+     * @return the localKey
+     */
+    public String getLocalKey() {
+        return localKey;
+    }
+
+    /**
+     * @param localKey the localKey to set
+     */
+    public void setLocalKey(String localKey) {
+        this.localKey = localKey;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        Funder that = (Funder) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) {
+            return false;
+        }
+        if (url != null ? !url.equals(that.url) : that.url != null) {
+            return false;
+        }
+        if (policy != null ? !policy.equals(that.policy) : that.policy != null) {
+            return false;
+        }
+        if (localKey != null ? !localKey.equals(that.localKey) : that.localKey != null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (policy != null ? policy.hashCode() : 0);
+        result = 31 * result + (localKey != null ? localKey.hashCode() : 0);
+        return result;
+    }
 }

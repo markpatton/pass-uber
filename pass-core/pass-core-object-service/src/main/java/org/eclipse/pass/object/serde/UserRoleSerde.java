@@ -17,7 +17,7 @@ package org.eclipse.pass.object.serde;
 
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
-import org.eclipse.pass.object.model.User.UserRole;
+import org.eclipse.pass.object.model.UserRole;
 
 @ElideTypeConverter(type = UserRole.class, name = "UserRole")
 public class UserRoleSerde implements Serde<String, UserRole> {

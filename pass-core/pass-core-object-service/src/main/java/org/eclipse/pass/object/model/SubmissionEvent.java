@@ -15,20 +15,16 @@
  */
 package org.eclipse.pass.object.model;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import javax.persistence.AttributeConverter;
 import javax.persistence.Convert;
-import javax.persistence.Converter;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
+import org.eclipse.pass.object.converter.EventTypeToStringConverter;
+import org.eclipse.pass.object.converter.PerformerRoleToStringConverter;
 
 /**
  * The SubmissionEvent model captures significant events that are performed by an agent and occur against a Submission.
@@ -39,10 +35,7 @@ import com.yahoo.elide.annotation.Include;
 @Include
 @Entity
 @Table(name = "pass_submission_event")
-public class SubmissionEvent {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class SubmissionEvent extends PassEntity {
 
     /**
      * The type of event
@@ -57,7 +50,7 @@ public class SubmissionEvent {
     private ZonedDateTime performedDate;
 
     /**
-     * URI of the User responsible for performing the event
+     * The User responsible for performing the event
      */
     @ManyToOne
     private User performedBy;
@@ -84,126 +77,176 @@ public class SubmissionEvent {
      * A resource relevant to the SubmissionEvent. For example, when a `changes-requested` event occurs,
      * this may contain an Ember application URL to the affected Submission.
      */
-    private String link;
+    private URI link;
 
     /**
-     * The types of events that might be recorded as SubmissionEvents
+     * SubmissionEvent constructor
      */
-    public enum EventType {
-        /**
-         * A Submission was prepared by a preparer on behalf of a person who does not yet have a User
-         * record in PASS. The preparer is requesting that the submitter join PASS and then approve and
-         * submit it or provide feedback.
-         */
-        APPROVAL_REQUESTED_NEWUSER("approval-requested-newuser"),
-
-        /**
-         * A Submission was prepared by a preparer who is now requesting that the submitter approve and
-         * submit it or provide feedback
-         */
-        APPROVAL_REQUESTED("approval-requested"),
-
-        /**
-         * A Submission was prepared by a preparer, but on review by the submitter, a change was requested.
-         * The Submission has been handed back to the preparer for editing.
-         */
-        CHANGES_REQUESTED("changes-requested"),
-
-        /**
-         * A Submission was prepared and then cancelled by the submitter or preparer without being submitted.
-         * No further edits can be made to the Submission.
-         */
-        CANCELLED("cancelled"),
-
-        /**
-         * The submit button has been pressed through the UI.
-         */
-        SUBMITTED("submitted");
-
-        private static final Map<String, EventType> map = new HashMap<>(values().length, 1);
-
-        static {
-            for (EventType s : values()) {
-                map.put(s.value, s);
-            }
-        }
-
-        private String value;
-
-        private EventType(String value) {
-            this.value = value;
-        }
-
-        public static EventType of(String eventType) {
-            EventType result = map.get(eventType);
-            if (result == null) {
-                throw new IllegalArgumentException("Invalid Event Type: " + eventType);
-            }
-            return result;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    @Converter
-    public static class EventTypeToStringConverter implements AttributeConverter<EventType, String> {
-        @Override
-        public String convertToDatabaseColumn(EventType attribute) {
-            return attribute == null ? null : attribute.value;
-        }
-
-        @Override
-        public EventType convertToEntityAttribute(String dbData) {
-            return dbData == null ? null : EventType.of(dbData);
-        }
+    public SubmissionEvent() {
     }
 
     /**
-     * Roles of agents who might perform a SubmissionEvent
+     * Copy constructor, this will copy the values of the object provided into the new object
+     *
+     * @param submissionEvent the submissionEvent to copy
      */
-    public enum PerformerRole {
-        PREPARER("preparer"),
-        SUBMITTER("submitter");
-
-        private String value;
-
-        private PerformerRole(String value) {
-            this.value = value;
-        }
-
-        /**
-         * Parse performer role
-         *
-         * @param s status string
-         * @return parsed role
-         */
-        public static PerformerRole of(String s) {
-            for (PerformerRole r: PerformerRole.values()) {
-                if (r.value.equals(s)) {
-                    return r;
-                }
-            }
-
-            throw new IllegalArgumentException("Invalid performer role: " + s);
-        }
-
-        public String getValue() {
-            return value;
-        }
+    public SubmissionEvent(SubmissionEvent submissionEvent) {
+        super(submissionEvent);
+        this.eventType = submissionEvent.eventType;
+        this.performedDate = submissionEvent.performedDate;
+        this.performedBy = submissionEvent.performedBy;
+        this.performerRole = submissionEvent.performerRole;
+        this.submission = submissionEvent.submission;
+        this.comment = submissionEvent.comment;
+        this.link = submissionEvent.link;
     }
 
-    @Converter
-    public static class PerformerRoleToStringConverter implements AttributeConverter<PerformerRole, String> {
-        @Override
-        public String convertToDatabaseColumn(PerformerRole attribute) {
-            return attribute == null ? null : attribute.value;
+    /**
+     * @return the eventType
+     */
+    public EventType getEventType() {
+        return eventType;
+    }
+
+    /**
+     * @param eventType the eventType to set
+     */
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
+    }
+
+    /**
+     * @return the performedDate
+     */
+    public ZonedDateTime getPerformedDate() {
+        return performedDate;
+    }
+
+    /**
+     * @param performedDate the performedDate to set
+     */
+    public void setPerformedDate(ZonedDateTime performedDate) {
+        this.performedDate = performedDate;
+    }
+
+    /**
+     * @return the performedBy
+     */
+    public User getPerformedBy() {
+        return performedBy;
+    }
+
+    /**
+     * @param performedBy the performedBy to set
+     */
+    public void setPerformedBy(User performedBy) {
+        this.performedBy = performedBy;
+    }
+
+    /**
+     * @return the performerRole
+     */
+    public PerformerRole getPerformerRole() {
+        return performerRole;
+    }
+
+    /**
+     * @param performerRole the performerRole to set
+     */
+    public void setPerformerRole(PerformerRole performerRole) {
+        this.performerRole = performerRole;
+    }
+
+    /**
+     * @return the submission
+     */
+    public Submission getSubmission() {
+        return submission;
+    }
+
+    /**
+     * @param submission the submission to set
+     */
+    public void setSubmission(Submission submission) {
+        this.submission = submission;
+    }
+
+    /**
+     * @return the comment
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * @param comment the comment to set
+     */
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    /**
+     * @return the link
+     */
+    public URI getLink() {
+        return link;
+    }
+
+    /**
+     * @param link the link to set
+     */
+    public void setLink(URI link) {
+        this.link = link;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
         }
 
-        @Override
-        public PerformerRole convertToEntityAttribute(String dbData) {
-            return dbData == null ? null : PerformerRole.of(dbData);
+        SubmissionEvent that = (SubmissionEvent) o;
+
+        if (eventType != null ? !eventType.equals(that.eventType) : that.eventType != null) {
+            return false;
         }
+        if (performedDate != null ? !performedDate.equals(that.performedDate) : that.performedDate != null) {
+            return false;
+        }
+        if (performedBy != null ? !performedBy.equals(that.performedBy) : that.performedBy != null) {
+            return false;
+        }
+        if (performerRole != null ? !performerRole.equals(that.performerRole) : that.performerRole != null) {
+            return false;
+        }
+        if (submission != null ? !submission.equals(that.submission) : that.submission != null) {
+            return false;
+        }
+        if (comment != null ? !comment.equals(that.comment) : that.comment != null) {
+            return false;
+        }
+        if (link != null ? !link.equals(that.link) : that.link != null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (eventType != null ? eventType.hashCode() : 0);
+        result = 31 * result + (performedDate != null ? performedDate.hashCode() : 0);
+        result = 31 * result + (performedBy != null ? performedBy.hashCode() : 0);
+        result = 31 * result + (performerRole != null ? performerRole.hashCode() : 0);
+        result = 31 * result + (submission != null ? submission.hashCode() : 0);
+        result = 31 * result + (comment != null ? comment.hashCode() : 0);
+        result = 31 * result + (link != null ? link.hashCode() : 0);
+        return result;
     }
 }

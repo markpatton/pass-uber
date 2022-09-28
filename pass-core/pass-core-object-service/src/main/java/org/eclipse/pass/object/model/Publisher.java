@@ -25,9 +25,6 @@ package org.eclipse.pass.object.model;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
@@ -35,10 +32,7 @@ import com.yahoo.elide.annotation.Include;
 @Include
 @Entity
 @Table(name = "pass_publisher")
-public class Publisher {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class Publisher extends PassEntity {
 
     /**
      * Name of publisher
@@ -51,5 +45,82 @@ public class Publisher {
      */
 
     @Enumerated(EnumType.STRING)
-    private PmcParticipation pcmParticipation;
+    private PmcParticipation pmcParticipation;
+
+    /**
+     * Publisher constructor
+     */
+    public Publisher() {
+    }
+
+    /**
+     * Copy constructor, this will copy the values of the object provided into the new object
+     *
+     * @param publisher the publisher to copy
+     */
+    public Publisher(Publisher publisher) {
+        super(publisher);
+        this.name = publisher.name;
+        this.pmcParticipation = publisher.pmcParticipation;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the pmcParticipation
+     */
+    public PmcParticipation getPmcParticipation() {
+        return pmcParticipation;
+    }
+
+    /**
+     * @param pmcParticipation the pmcParticipation to set
+     */
+    public void setPmcParticipation(PmcParticipation pmcParticipation) {
+        this.pmcParticipation = pmcParticipation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        Publisher that = (Publisher) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) {
+            return false;
+        }
+        if (pmcParticipation != null ? !pmcParticipation.equals(
+            that.pmcParticipation) : that.pmcParticipation != null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (pmcParticipation != null ? pmcParticipation.hashCode() : 0);
+        return result;
+    }
 }
