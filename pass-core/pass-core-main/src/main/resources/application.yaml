@@ -86,14 +86,14 @@ spring:
       jdbc:
         use_scrollable_resultset: true
   datasource:
-    url: ${JDBC_DATABASE_URL}
-    username: ${JDBC_DATABASE_USERNAME}
-    password: ${JDBC_DATABASE_PASSWORD}
+    url: ${PASS_CORE_DATABASE_URL}
+    username: ${PASS_CORE_DATABASE_USERNAME}
+    password: ${PASS_CORE_DATABASE_PASSWORD}
     driver-class-name: 'org.postgresql.Driver'
   liquibase:
     enabled: false
 server:
-  port: ${PORT}
+  port: ${PASS_CORE_PORT}
 
 security:
-  origin: ${HOST}
+  origin: "*"
