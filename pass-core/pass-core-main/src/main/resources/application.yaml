@@ -6,7 +6,7 @@
 
 elide:
   json-api:
-    path: /object
+    path: /data
     enabled: true
     enableLinks: true    
   graphql:

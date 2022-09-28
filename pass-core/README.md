@@ -37,12 +37,12 @@ If you want to build an image,
 
 # Using JSON API
 
-All of our data model is available, just divided into attributes and relationshiops. Note that ids are now integers, not URIs.
+JSON API is deployed at `/data`. All of our data model is available, just divided into attributes and relationshiops. Note that identifiers are now integers, not URIs.
 
 ## Creating a RepositoryCopy
 
 ```
-curl -v -X POST "http://localhost:8080/object/repositoryCopy" -H "accept: application/vnd.api+json" -H "Content-Type: application/vnd.api+json" -d @rc1.json
+curl -v -X POST "http://localhost:8080/data/repositoryCopy" -H "accept: application/vnd.api+json" -H "Content-Type: application/vnd.api+json" -d @rc1.json
 ```
 
 *rc1.json:*
@@ -63,7 +63,7 @@ curl -v -X POST "http://localhost:8080/object/repositoryCopy" -H "accept: applic
 Add a publisher object to the publisher relationship in a journal. Note that both the journal and publisher objects must already exist.
 
 ```
-curl -X PATCH "http://localhost:8080/object/journal/1" -H "accept: application/vnd.api+json" -H "Content-Type: application/vnd.api+json" -d @patch.json
+curl -X PATCH "http://localhost:8080/data/journal/1" -H "accept: application/vnd.api+json" -H "Content-Type: application/vnd.api+json" -d @patch.json
 ```
 
 *patch.json:*
