@@ -10,7 +10,7 @@ Java 11 and Maven 3.8 required.
 mvn clean package
 ```
 
-This will produce an executabler jar `pass-core-main/target/pass-core-main.jar`.
+This will produce an executabler jar `pass-core-main/target/pass-core-main.jar` and a docker image `ghcr.io/eclipse-pass/pass-core-main`.
 
 # Running local build
 
@@ -33,7 +33,19 @@ In pass-core-main run:
 docker-compose up -d
 ```
 
-If you want to build an image, 
+# Configuration
+
+By default, pass-core-main, will run with an in memory database. In order to use Postgres, switch to the production profile and set environment variables as below.
+Note that the system property javax.persistence.schema-generation.database.action can be used to automatically create database tables.
+
+Environment variables:
+* spring_profiles_active=production
+* PASS_CORE_DATABASE_URL=jdbc:postgresql://postgres:5432/pass
+* PASS_CORE_DATABASE_USERNAME=pass
+* PASS_CORE_DATABASE_PASSWORD=moo
+* PASS_CORE_PORT=8080
+* PASS_CORE_JAVA_OPTS="-Djavax.persistence.schema-generation.database.action=create"
+
 
 # Using JSON API
 
