@@ -69,6 +69,28 @@
 
   <build>
     <plugins>
+
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <configuration>
+          <images>
+            <image>
+              <name>ghcr.io/eclipse-pass/pass-core-main:%v</name>
+            </image>
+          </images>
+        </configuration>
+        <executions>
+          <execution>
+            <id>build-before-its</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
