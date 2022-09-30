@@ -49,19 +49,19 @@ public class Deposit extends PassEntity {
     private DepositStatus depositStatus;
 
     /**
-     * the Submission that this Deposit is a part of
+     * The Submission that this Deposit is a part of
      */
     @ManyToOne
     private Submission submission;
 
     /**
-     * the Repository being deposited to
+     * The Repository being deposited to
      */
     @ManyToOne
     private Repository repository;
 
     /**
-     * the Repository Copy representing the copy that is reltaed to this Deposit. The value is null if there
+     * The Repository Copy representing the copy that is reltaed to this Deposit. The value is null if there
      * is no copy
      */
     @ManyToOne

@@ -62,7 +62,7 @@ public class File extends PassEntity {
     private String mimeType;
 
     /**
-     * the Submission the File is a part of
+     * The Submission the File is a part of
      */
     @ManyToOne
     private Submission submission;

@@ -94,10 +94,10 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-	<version>${maven.spring.plugin.version}</version>
+        <version>${maven.spring.plugin.version}</version>
         <configuration>
           <mainClass>org.eclipse.pass.main.Main</mainClass>
-	        <finalName>pass-core-main</finalName>
+          <finalName>pass-core-main</finalName>
         </configuration>
         <executions>
           <execution>

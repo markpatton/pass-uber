@@ -86,13 +86,13 @@ public class Contributor extends PassEntity {
     private List<ContributorRole> roles = new ArrayList<ContributorRole>();
 
     /**
-     * the publication that this contributor is associated with
+     * The publication that this contributor is associated with
      */
     @ManyToOne
     private Publication publication;
 
     /**
-     * the user that represents the same person as this Contributor, where
+     * The user that represents the same person as this Contributor, where
      * relevant
      */
     @ManyToOne

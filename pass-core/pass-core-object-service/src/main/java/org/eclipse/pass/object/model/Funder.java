@@ -44,7 +44,7 @@ public class Funder extends PassEntity {
     private URI url;
 
     /**
-     * the Policy associated with funder
+     * The Policy associated with funder
      */
     @ManyToOne
     private Policy policy;

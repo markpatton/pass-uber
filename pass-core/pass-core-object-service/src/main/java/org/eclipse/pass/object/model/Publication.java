@@ -54,7 +54,7 @@ public class Publication extends PassEntity {
     private String pmid;
 
     /**
-     * the journal the publication is part of (if article)
+     * The journal the publication is part of (if article)
      */
     @ManyToOne
     private Journal journal;
@@ -74,8 +74,6 @@ public class Publication extends PassEntity {
      */
     public Publication() {
     }
-
-    ;
 
     /**
      * Copy constructor, this will copy the values of the object provided into the new object

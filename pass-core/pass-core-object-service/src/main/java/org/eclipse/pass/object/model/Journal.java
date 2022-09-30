@@ -51,7 +51,7 @@ public class Journal extends PassEntity {
     private List<String> issns = new ArrayList<>();
 
     /**
-     * ID of publisher
+     * The publisher
      */
     @ManyToOne
     private Publisher publisher;
