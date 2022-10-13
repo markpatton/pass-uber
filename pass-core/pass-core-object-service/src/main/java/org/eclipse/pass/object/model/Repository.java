@@ -25,7 +25,7 @@ import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
 import org.eclipse.pass.object.converter.IntegrationTypeToStringConverter;
-import org.eclipse.pass.object.converter.ListToStringConverter;
+import org.eclipse.pass.object.converter.ListToURIStringConverter;
 
 /**
  * Describes a Repository. A Repository is the target of a Deposit.
@@ -81,7 +81,7 @@ public class Repository extends PassEntity {
     /**
      * URLs that link to JSON schema documents describing the repository's metadata requirements
      */
-    @Convert(converter = ListToStringConverter.class)
+    @Convert(converter = ListToURIStringConverter.class)
     private List<URI> schemas = new ArrayList<>();
 
     /**
