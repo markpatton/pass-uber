@@ -5,6 +5,7 @@
 ################################################
 
 elide:
+  baseUrl: ${PASS_CORE_BASE_URL}
   json-api:
     path: /data
     enabled: true

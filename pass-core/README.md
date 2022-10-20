@@ -45,6 +45,8 @@ Environment variables:
 * PASS_CORE_DATABASE_PASSWORD=moo
 * PASS_CORE_PORT=8080
 * PASS_CORE_JAVA_OPTS="-Djavax.persistence.schema-generation.database.action=create"
+* PASS_CORE_BASE_URL
+  * Used when building relationship links. This property does not have a default value and must be defined in your environment. The `pass-core-main/.env` is intended to be used for local testing of pass-core in isolation. If we want to use this in the local PASS demo environment, for example, we would specify `PASS_CORE_BASE_URL=https://pass.local`
 
 
 # Using JSON API
