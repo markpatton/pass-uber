@@ -18,13 +18,13 @@ import org.springframework.boot.web.server.LocalServerPort;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class IntegrationTest {
+public abstract class IntegrationTest {
 
     @LocalServerPort
     int port;
 
     @BeforeAll
-    public void setUp() {
+    public void setup() {
         RestAssured.port = port;
     }
 }

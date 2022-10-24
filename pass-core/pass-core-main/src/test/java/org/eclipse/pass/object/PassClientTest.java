@@ -22,33 +22,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
 
-import com.yahoo.elide.RefreshableElide;
 import org.eclipse.pass.object.model.AggregatedDepositStatus;
 import org.eclipse.pass.object.model.Grant;
 import org.eclipse.pass.object.model.Journal;
 import org.eclipse.pass.object.model.PmcParticipation;
-import org.eclipse.pass.object.model.Publisher;
 import org.eclipse.pass.object.model.Source;
 import org.eclipse.pass.object.model.Submission;
 import org.eclipse.pass.object.model.SubmissionEvent;
 import org.eclipse.pass.object.model.SubmissionStatus;
 import org.eclipse.pass.object.model.User;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-public class ElideDataStorePassClientTest extends IntegrationTest {
-    @Autowired
-    private RefreshableElide refreshableElide;
-
-    private PassClient client;
-
-    @BeforeAll
-    public void setup() {
-        client = new ElideDataStorePassClient(refreshableElide, null);
-    }
+/**
+ * Tests must be written such that they can run in any order and handle objects already existing.
+ */
+public abstract class PassClientTest extends IntegrationTest {
+    protected PassClient client;
 
     @AfterAll
     public void cleanup() throws IOException {
@@ -59,8 +52,9 @@ public class ElideDataStorePassClientTest extends IntegrationTest {
     public void testCreateObject() throws IOException {
         Journal journal = new Journal();
         journal.setJournalName("Test journal");
+        journal.setNlmta("hmm");
         journal.setPmcParticipation(PmcParticipation.A);
-
+        journal.setIssns(List.of("test1", "test2"));
         client.createObject(journal);
 
         assertNotNull(journal.getId());
@@ -126,6 +120,9 @@ public class ElideDataStorePassClientTest extends IntegrationTest {
     @Test
     public void testSelectObjects() throws IOException {
         int num_grants = 10;
+
+        // All grants created in this test will share the same localKey
+        String key = "key: " + UUID.randomUUID();
         for (int i = 0; i < num_grants; i++) {
             User pi = new User();
 
@@ -134,34 +131,47 @@ public class ElideDataStorePassClientTest extends IntegrationTest {
 
             client.createObject(pi);
 
+            User copi1 = new User();
+            copi1.setDisplayName("copi 1 of user " + i);
+            copi1.setLastName("Boberson");
+
+            client.createObject(copi1);
+
+            User copi2 = new User();
+            copi2.setDisplayName("copi 2 of user " + i);
+            copi2.setLastName("Bobert");
+
+            client.createObject(copi2);
+
             Grant grant = new Grant();
             grant.setAwardDate(ZonedDateTime.now());
             grant.setAwardNumber("award:" + i);
-            grant.setLocalKey("key:" + i);
+            grant.setLocalKey(key);
             grant.setPi(pi);
+            grant.getCoPis().add(copi1);
+            grant.getCoPis().add(copi2);
 
             client.createObject(grant);
         }
 
-        Publisher publisher = new Publisher();
-        publisher.setName("This is the name of a publisher");
-        client.createObject(publisher);
-
-        PassClientResult<Grant> result = client.selectObjects(new PassClientSelector<>(Grant.class));
+        String filter = RSQL.equals("localKey", key);
+        PassClientResult<Grant> result = client.selectObjects(new PassClientSelector<>(Grant.class, 0,
+                100, filter, null));
 
         assertEquals(num_grants, result.getEntities().size());
         assertEquals(num_grants, result.getTotal());
 
         result.getEntities().forEach(g -> {
             assertTrue(g.getPi().getDisplayName().startsWith("user"));
+            assertEquals(2, g.getCoPis().size());
         });
 
-        result = client.selectObjects(new PassClientSelector<>(Grant.class, 0, 5, null, null));
+        result = client.selectObjects(new PassClientSelector<>(Grant.class, 0, 5, filter, null));
 
         assertEquals(5, result.getEntities().size());
         assertEquals(num_grants, result.getTotal());
 
-        String filter = RSQL.equals("localKey", "key:3");
+        filter = RSQL.and(RSQL.equals("localKey", key), RSQL.equals("awardNumber", "award:3"));
         result = client.selectObjects(new PassClientSelector<>(Grant.class, 0, 100, filter, "id"));
 
         assertEquals(1, result.getEntities().size());
