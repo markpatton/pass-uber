@@ -33,7 +33,6 @@ import com.yahoo.elide.core.filter.expression.FilterExpression;
 import com.yahoo.elide.core.pagination.PaginationImpl;
 import com.yahoo.elide.core.request.EntityProjection;
 import com.yahoo.elide.core.request.Pagination;
-import com.yahoo.elide.core.security.User;
 import com.yahoo.elide.core.type.ClassType;
 import org.eclipse.pass.object.model.PassEntity;
 
@@ -49,13 +48,11 @@ import org.eclipse.pass.object.model.PassEntity;
 public class ElideDataStorePassClient implements PassClient {
     private final Elide elide;
     private final ElideSettings settings;
-    private final User user;
     private final DataStoreTransaction read_tx;
 
-    public ElideDataStorePassClient(RefreshableElide refreshableElide, User user) {
+    public ElideDataStorePassClient(RefreshableElide refreshableElide) {
         this.elide = refreshableElide.getElide();
         this.settings = elide.getElideSettings();
-        this.user = user;
 
         // Keep a read transaction open for interacting with objects which have lazy loading relationships
         this.read_tx = elide.getDataStore().beginReadTransaction();
@@ -63,17 +60,13 @@ public class ElideDataStorePassClient implements PassClient {
 
     private RequestScope get_scope(String path, DataStoreTransaction tx) {
         String version = settings.getDictionary().getApiVersions().iterator().next();
-        RequestScope scope = new RequestScope(settings.getBaseUrl(), path, version, null, tx, user, null, null,
+        RequestScope scope = new RequestScope(settings.getBaseUrl(), path, version, null, tx, null, null, null,
                 UUID.randomUUID(), settings);
-
-        scope.getPermissionExecutor().executeCommitChecks();
 
         return scope;
     }
 
     private EntityProjection get_projection(RequestScope scope, PassClientSelector<?> selector) throws IOException {
-        ElideSettings settings = elide.getElideSettings();
-
         Pagination pagination = new PaginationImpl(selector.getType(), selector.getOffset(), selector.getLimit(),
                 settings.getDefaultPageSize(), settings.getDefaultMaxPageSize(), true, false);
 
