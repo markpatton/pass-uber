@@ -22,13 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.eclipse.pass.object.model.AggregatedDepositStatus;
 import org.eclipse.pass.object.model.Grant;
 import org.eclipse.pass.object.model.Journal;
 import org.eclipse.pass.object.model.PmcParticipation;
+import org.eclipse.pass.object.model.Publication;
 import org.eclipse.pass.object.model.Source;
 import org.eclipse.pass.object.model.Submission;
 import org.eclipse.pass.object.model.SubmissionEvent;
@@ -177,5 +180,49 @@ public abstract class PassClientTest extends IntegrationTest {
         assertEquals(1, result.getEntities().size());
         assertEquals(1, result.getTotal());
         assertEquals(result.getEntities().get(0).getAwardNumber(), "award:3");
+    }
+
+    @Test
+    public void testStreamObjects() throws IOException {
+        List<Journal> journals = new ArrayList<>();
+        int num_pubs = 10;
+        int num_journals = 4;
+
+        for (int i = 0; i < num_journals; i++) {
+            Journal journal = new Journal();
+
+            journal.setJournalName("Journal of Bovine Studies: " + i);
+            journal.setNlmta("nmlta " + i);
+
+            client.createObject(journal);
+
+            journals.add(journal);
+        }
+
+        String pmid = "pmid:" + UUID.randomUUID();
+        for (int i = 0; i < num_pubs; i++) {
+            Publication pub = new Publication();
+
+            pub.setTitle("Title with Large Words: " + i);
+            pub.setJournal(journals.get(i % num_journals));
+            pub.setPmid(pmid);
+
+            client.createObject(pub);
+        }
+
+        String filter = RSQL.equals("pmid", pmid);
+        List<Publication> pubs = client.streamObjects(new PassClientSelector<>(Publication.class,
+                0, 2, filter, null)).collect(Collectors.toList());
+
+        assertEquals(num_pubs, pubs.size());
+
+        pubs.forEach(p -> {
+            assertNotNull(p);
+            assertNotNull(p.getId());
+            assertEquals(pmid, p.getPmid());
+            assertTrue(p.getTitle().startsWith("Title"));
+            assertNotNull(p.getJournal());
+            assertTrue(p.getJournal().getJournalName().startsWith("Journal"));
+        });
     }
 }
