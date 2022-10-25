@@ -7,7 +7,7 @@ This module is responsible for PASS backend services.
 Java 11 and Maven 3.8 required.
 
 ```
-mvn clean package
+mvn clean install
 ```
 
 This will produce an executabler jar `pass-core-main/target/pass-core-main.jar` and a docker image `ghcr.io/eclipse-pass/pass-core-main`.
