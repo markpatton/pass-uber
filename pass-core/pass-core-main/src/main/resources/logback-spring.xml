@@ -22,24 +22,24 @@
     </appender>
 
 
-    <logger name="com.yahoo.elide.graphql.subscriptions" level="DEBUG" />
+    <logger name="com.yahoo.elide.graphql.subscriptions" level="INFO" />
 
     <!-- Log Hibernate SQL Statements -->
-    <logger name="org.hibernate.SQL" level="DEBUG" />
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+    <logger name="org.hibernate.SQL" level="INFO" />
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO" />
 
     <!-- Log JPA Datastore HQL Statements -->
-    <logger name="com.yahoo.elide.core.hibernate.hql.DefaultQueryLogger" level="DEBUG" />
+    <logger name="com.yahoo.elide.core.hibernate.hql.DefaultQueryLogger" level="INFO" />
 
     <!-- Log SQL/JPQL Timings -->
-    <logger name="com.yahoo.elide.core.utils.TimedFunction" level="DEBUG" />
+    <logger name="com.yahoo.elide.core.utils.TimedFunction" level="INFO" />
 
     <!-- Log HTTP Error Explanations -->
-    <logger name="com.yahoo.elide.graphql.QueryRunner" level="DEBUG" />
-    <logger name="com.yahoo.elide.Elide" level="DEBUG" />
+    <logger name="com.yahoo.elide.graphql.QueryRunner" level="INFO" />
+    <logger name="com.yahoo.elide.Elide" level="INFO" />
 
     <!-- Log Analytic SQL Queries -->
-    <logger name="com.yahoo.elide.datastores.aggregation.core.Slf4jQueryLogger" level="DEBUG" />
+    <logger name="com.yahoo.elide.datastores.aggregation.core.Slf4jQueryLogger" level="INFO" />
 
     <root level="info">
         <appender-ref ref="STDOUT" />

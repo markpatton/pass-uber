@@ -52,6 +52,7 @@ Environment variables:
 # Using JSON API
 
 JSON API is deployed at `/data`. All of our data model is available, just divided into attributes and relationshiops. Note that identifiers are now integers, not URIs.
+See https://elide.io/pages/guide/v6/10-jsonapi.html for information on how Elide provides support for filtering and and sorting.
 
 ## Creating a RepositoryCopy
 
@@ -97,3 +98,8 @@ curl -X PATCH "http://localhost:8080/data/journal/1" -H "accept: application/vnd
   }
 }
 ```
+
+# Debugging problems
+
+To get more information, try changing the logging levels set pass-core-main/src/main/resources/logback-spring.xml.
+See https://elide.io/pages/guide/v6/12-audit.html for more information.
