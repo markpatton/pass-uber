@@ -33,6 +33,7 @@ import org.junit.Test;
  * Jackson integration is functional and the equals / hashcode functions work
  *
  * @author Karen Hanson
+ * @author Jim Martino
  */
 public class PolicyModelTests {
 

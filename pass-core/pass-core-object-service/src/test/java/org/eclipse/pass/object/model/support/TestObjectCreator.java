@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Johns Hopkins University
+ * Copyright 2022 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,26 @@ import org.eclipse.pass.object.model.SubmissionStatus;
 import org.eclipse.pass.object.model.User;
 import org.eclipse.pass.object.model.UserRole;
 
+/**
+ * Creates instances of model objects needed as fields on other objects used in testing
+ *
+ * @author Jim Martino
+ *
+ */
 public class TestObjectCreator {
 
     private TestObjectCreator() {
         //empty constructor
     }
 
+    /**
+     * Creates an instance of a Contributor
+     *
+     * @param contributorId the id for the object to be created
+     * @param userId parameter for the user on this object
+     * @return the Contributor
+     * @throws Exception
+     */
     public static Contributor createContributor(Long contributorId, Long userId) throws Exception {
         Contributor contributor = new Contributor();
         contributor.setId(contributorId);
@@ -65,6 +79,13 @@ public class TestObjectCreator {
         return contributor;
     }
 
+    /**
+     * Creates an instance of a Deposit
+     *
+     * @param depositId the id for the object to be created
+     * @return the Deposit
+     * @throws Exception
+     */
     public static Deposit createDeposit(Long depositId) throws Exception {
         Deposit deposit = new Deposit();
         deposit.setId(depositId);
@@ -77,6 +98,13 @@ public class TestObjectCreator {
         return deposit;
     }
 
+    /**
+     * Creates an instance of a Funder
+     *
+     * @param funderId the id for the object to be created
+     * @return the Funder
+     * @throws Exception
+     */
     public static Funder createFunder(Long funderId) throws Exception {
         Funder funder = new Funder();
         funder.setId(funderId);
@@ -87,6 +115,13 @@ public class TestObjectCreator {
         return funder;
     }
 
+    /**
+     * Creates an instance of a Grant
+     *
+     * @param grantId the id for the object to be created
+     * @return the Grant
+     * @throws Exception
+     */
     public static Grant createGrant(Long grantId) throws Exception {
         Grant grant = new Grant();
         grant.setId(grantId);
@@ -112,6 +147,13 @@ public class TestObjectCreator {
         return grant;
     }
 
+    /**
+     * Creates an instance of a Journal
+     *
+     * @param journalId the id for the object to be created
+     * @return the Journal
+     * @throws Exception
+     */
     public static  Journal createJournal(Long journalId) throws Exception {
         Journal journal = new Journal();
         journal.setId(journalId);
@@ -126,6 +168,14 @@ public class TestObjectCreator {
         return journal;
     }
 
+
+    /**
+     * Creates an instance of a Policy
+     *
+     * @param policyId the id for the object to be created
+     * @return the Policy
+     * @throws Exception
+     */
     public static Policy createPolicy(Long policyId) throws Exception {
         Policy policy = new Policy();
         policy.setId(policyId);
@@ -143,6 +193,14 @@ public class TestObjectCreator {
         return policy;
     }
 
+
+    /**
+     * Creates an instance of a Publication
+     *
+     * @param publicationId the id for the object to be created
+     * @return the Publication
+     * @throws Exception
+     */
     public static Publication createPublication(Long publicationId) throws Exception {
         Publication publication = new Publication();
         publication.setId(publicationId);
@@ -156,6 +214,14 @@ public class TestObjectCreator {
         return publication;
     }
 
+
+    /**
+     * Creates an instance of a Publisher
+     *
+     * @param publisherId the id for the object to be created
+     * @return the Publisher
+     * @throws Exception
+     */
     public static Publisher createPublisher(Long publisherId) throws Exception {
         Publisher publisher = new Publisher();
         publisher.setId(publisherId);
@@ -165,6 +231,14 @@ public class TestObjectCreator {
         return publisher;
     }
 
+
+    /**
+     * Creates an instance of a Repository
+     *
+     * @param repositoryId the id for the object to be created
+     * @return the Repository
+     * @throws Exception
+     */
     public static Repository createRepository(Long repositoryId) throws Exception {
         Repository repository = new Repository();
         repository.setId(repositoryId);
@@ -179,6 +253,14 @@ public class TestObjectCreator {
         return repository;
     }
 
+
+    /**
+     * Creates an instance of a RepositoryCopy
+     *
+     * @param repositoryCopyId the id for the object to be created
+     * @return the Repository Copy
+     * @throws Exception
+     */
     public static RepositoryCopy createRepositoryCopy(Long repositoryCopyId) throws Exception {
         RepositoryCopy repositoryCopy = new RepositoryCopy();
         repositoryCopy.setId(repositoryCopyId);
@@ -195,6 +277,14 @@ public class TestObjectCreator {
         return repositoryCopy;
     }
 
+
+    /**
+     * Creates an instance of a Submission
+     *
+     * @param submissionId the id for the object to be created
+     * @return the Submission
+     * @throws Exception
+     */
     public static Submission createSubmission(Long submissionId) throws Exception {
         Submission submission = new Submission();
         submission.setId(submissionId);
@@ -228,6 +318,14 @@ public class TestObjectCreator {
         return submission;
     }
 
+
+    /**
+     * Creates an instance of a User
+     *
+     * @param userId the id for the object to be created
+     * @return the User
+     * @throws Exception
+     */
     public static User createUser(Long userId) throws Exception {
         User user = new User();
         user.setId(userId);

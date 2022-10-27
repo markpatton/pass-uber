@@ -37,6 +37,7 @@ import org.junit.Test;
  * submitter OR submitterName/submitterEmail would be set, not both at once.
  *
  * @author Karen Hanson
+ * @author Jim Martino
  */
 public class SubmissionModelTests {
 

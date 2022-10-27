@@ -23,6 +23,7 @@ import java.util.Set;
  * Constants used in test data
  *
  * @author Karen Hanson
+ * @author Jim Martino
  * @version $Id$
  */
 public class TestValues {
