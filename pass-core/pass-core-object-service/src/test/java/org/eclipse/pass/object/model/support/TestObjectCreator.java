@@ -168,7 +168,6 @@ public class TestObjectCreator {
         return journal;
     }
 
-
     /**
      * Creates an instance of a Policy
      *
@@ -193,7 +192,6 @@ public class TestObjectCreator {
         return policy;
     }
 
-
     /**
      * Creates an instance of a Publication
      *
@@ -214,7 +212,6 @@ public class TestObjectCreator {
         return publication;
     }
 
-
     /**
      * Creates an instance of a Publisher
      *
@@ -230,7 +227,6 @@ public class TestObjectCreator {
 
         return publisher;
     }
-
 
     /**
      * Creates an instance of a Repository
@@ -252,7 +248,6 @@ public class TestObjectCreator {
 
         return repository;
     }
-
 
     /**
      * Creates an instance of a RepositoryCopy
@@ -276,7 +271,6 @@ public class TestObjectCreator {
 
         return repositoryCopy;
     }
-
 
     /**
      * Creates an instance of a Submission
@@ -317,7 +311,6 @@ public class TestObjectCreator {
 
         return submission;
     }
-
 
     /**
      * Creates an instance of a User
