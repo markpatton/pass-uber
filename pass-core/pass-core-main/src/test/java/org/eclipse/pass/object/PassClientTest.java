@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.eclipse.pass.object.model.AggregatedDepositStatus;
+import org.eclipse.pass.object.model.Funder;
 import org.eclipse.pass.object.model.Grant;
 import org.eclipse.pass.object.model.Journal;
 import org.eclipse.pass.object.model.PmcParticipation;
@@ -37,18 +39,31 @@ import org.eclipse.pass.object.model.Submission;
 import org.eclipse.pass.object.model.SubmissionEvent;
 import org.eclipse.pass.object.model.SubmissionStatus;
 import org.eclipse.pass.object.model.User;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests must be written such that they can run in any order and handle objects already existing.
  */
 public abstract class PassClientTest extends IntegrationTest {
-    protected PassClient client;
+    private PassClient client;
 
-    @AfterAll
-    public void cleanup() throws IOException {
+    protected abstract PassClient getNewClient();
+
+    @BeforeEach
+    public void setupClient() {
+        client = getNewClient();
+    }
+
+    @AfterEach
+    public void cleanupClient() throws IOException {
         client.close();
+    }
+
+    public void refreshClient() throws IOException {
+        client.close();
+        client = getNewClient();
     }
 
     @Test
@@ -100,6 +115,41 @@ public abstract class PassClientTest extends IntegrationTest {
 
         // The lazy loading of objects from relationships does not play nicely with equality tests
         // assertEquals(submission, test);
+    }
+
+    @Test
+    public void testMultipleUpdatesToSameObject() throws IOException {
+        Funder funder = new Funder();
+        funder.setName("This is a name");
+
+        client.createObject(funder);
+
+        Funder test = client.getObject(Funder.class, funder.getId());
+
+        assertEquals(funder.getName(), test.getName());
+        assertEquals(funder.getUrl(), test.getUrl());
+        assertEquals(funder.getLocalKey(), test.getLocalKey());
+
+        funder.setUrl(URI.create("http://example.com"));
+        client.updateObject(funder);
+
+        // The first getObject seems to be cached
+        refreshClient();
+        test = client.getObject(Funder.class, funder.getId());
+
+        assertEquals(funder.getName(), test.getName());
+        assertEquals(funder.getUrl(), test.getUrl());
+        assertEquals(funder.getLocalKey(), test.getLocalKey());
+
+        funder.setLocalKey("key");
+        client.updateObject(funder);
+
+        refreshClient();
+        test = client.getObject(Funder.class, funder.getId());
+
+        assertEquals(funder.getName(), test.getName());
+        assertEquals(funder.getUrl(), test.getUrl());
+        assertEquals(funder.getLocalKey(), test.getLocalKey());
     }
 
     @Test
@@ -161,25 +211,25 @@ public abstract class PassClientTest extends IntegrationTest {
         PassClientResult<Grant> result = client.selectObjects(new PassClientSelector<>(Grant.class, 0,
                 100, filter, null));
 
-        assertEquals(num_grants, result.getEntities().size());
+        assertEquals(num_grants, result.getObjects().size());
         assertEquals(num_grants, result.getTotal());
 
-        result.getEntities().forEach(g -> {
+        result.getObjects().forEach(g -> {
             assertTrue(g.getPi().getDisplayName().startsWith("user"));
             assertEquals(2, g.getCoPis().size());
         });
 
         result = client.selectObjects(new PassClientSelector<>(Grant.class, 0, 5, filter, null));
 
-        assertEquals(5, result.getEntities().size());
+        assertEquals(5, result.getObjects().size());
         assertEquals(num_grants, result.getTotal());
 
         filter = RSQL.and(RSQL.equals("localKey", key), RSQL.equals("awardNumber", "award:3"));
         result = client.selectObjects(new PassClientSelector<>(Grant.class, 0, 100, filter, "id"));
 
-        assertEquals(1, result.getEntities().size());
+        assertEquals(1, result.getObjects().size());
         assertEquals(1, result.getTotal());
-        assertEquals(result.getEntities().get(0).getAwardNumber(), "award:3");
+        assertEquals(result.getObjects().get(0).getAwardNumber(), "award:3");
     }
 
     @Test

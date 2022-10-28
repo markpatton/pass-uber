@@ -16,16 +16,14 @@
 package org.eclipse.pass.object;
 
 import com.yahoo.elide.RefreshableElide;
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ElideDataStorePassClientTest extends PassClientTest {
     @Autowired
     protected RefreshableElide refreshableElide;
 
-    @BeforeAll
-    public void setup() {
-        super.setup();
-        this.client = new ElideDataStorePassClient(refreshableElide);
+    @Override
+    protected PassClient getNewClient() {
+        return new ElideDataStorePassClient(refreshableElide);
     }
 }
