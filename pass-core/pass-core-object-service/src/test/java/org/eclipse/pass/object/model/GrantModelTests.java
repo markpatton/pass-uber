@@ -16,15 +16,15 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createGrant;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.ZonedDateTime;
 
 import org.eclipse.pass.object.model.support.TestValues;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Model has been annotated with JSON tags. These tests do a simple check to ensure the
