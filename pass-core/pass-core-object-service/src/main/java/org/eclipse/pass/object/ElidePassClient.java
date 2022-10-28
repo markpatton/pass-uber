@@ -242,7 +242,7 @@ public class ElidePassClient implements PassClient {
         doc.getData().get().forEach(r -> {
             @SuppressWarnings("unchecked")
             T o = (T) r.toPersistentResource(scope).getObject();
-            result.getEntities().add(o);
+            result.getObjects().add(o);
         });
 
         return result;

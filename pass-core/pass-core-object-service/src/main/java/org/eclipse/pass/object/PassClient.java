@@ -25,7 +25,8 @@ import java.util.stream.StreamSupport;
 import org.eclipse.pass.object.model.PassEntity;
 
 /**
- * PassClient represents a session with the PASS repository.
+ * PassClient represents a session with the PASS repository. It should not be kept open long term.
+ * Objects retrieved by a PassClient instance may only be used while that instance is open.
  */
 interface PassClient extends Closeable {
     /**
@@ -59,7 +60,7 @@ interface PassClient extends Closeable {
     <T extends PassEntity> T getObject(Class<T> type, Long id) throws IOException;
 
     /**
-     * Delete an object in the repository.
+     * Delete the object in the repository with the given type and id.
      *
      * @param <T>
      * @param type
@@ -69,7 +70,7 @@ interface PassClient extends Closeable {
     <T extends PassEntity> void deleteObject(Class<T> type, Long id) throws IOException;
 
     /**
-     * Delete the object in the repository with the given type and id.
+     * Delete the object in the repository.
      *
      * @param <T>
      * @param obj
@@ -114,7 +115,7 @@ interface PassClient extends Closeable {
 
             @Override
             public boolean tryAdvance(Consumer<? super T> consumer) {
-                if (next == result.getEntities().size()) {
+                if (next == result.getObjects().size()) {
                     try {
                         selector.setOffset(selector.getOffset() + selector.getLimit());
                         result = selectObjects(selector);
@@ -123,12 +124,12 @@ interface PassClient extends Closeable {
                         throw new RuntimeException(e);
                     }
 
-                    if (result.getEntities().size() == 0) {
+                    if (result.getObjects().size() == 0) {
                         return false;
                     }
                 }
 
-                consumer.accept(result.getEntities().get(next++));
+                consumer.accept(result.getObjects().get(next++));
                 return true;
             }
 

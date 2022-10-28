@@ -150,7 +150,7 @@ public class ElideDataStorePassClient implements PassClient {
         }
 
         PassClientResult<T> result = new PassClientResult<>(total);
-        List<T> entities = result.getEntities();
+        List<T> entities = result.getObjects();
         iterable.forEach(entities::add);
 
         return result;

@@ -42,7 +42,7 @@ public class PassClientResult<T extends PassEntity> {
     /**
      * @return Matching objects.
      */
-    public List<T> getEntities() {
+    public List<T> getObjects() {
         return entities;
     }
 }
