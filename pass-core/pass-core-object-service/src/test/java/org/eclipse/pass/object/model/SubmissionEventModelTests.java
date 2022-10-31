@@ -24,8 +24,6 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 
 import org.eclipse.pass.object.model.support.TestValues;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,9 +34,6 @@ import org.junit.jupiter.api.Test;
  * @author Jim Martino
  */
 public class SubmissionEventModelTests {
-
-    private DateTimeFormatter dateFormatter = ISODateTimeFormat.dateTime().withZoneUTC();
-
     /**
      * Creates two identical SubmissionEvents and checks the equals and hashcodes match.
      * Modifies one field on one of the SubmissionEvents and verifies they no longer are

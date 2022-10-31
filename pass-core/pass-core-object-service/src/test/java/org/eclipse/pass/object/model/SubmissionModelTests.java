@@ -26,8 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.pass.object.model.support.TestValues;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,10 +38,6 @@ import org.junit.jupiter.api.Test;
  * @author Jim Martino
  */
 public class SubmissionModelTests {
-
-    private DateTimeFormatter dateFormatter = ISODateTimeFormat.dateTime().withZoneUTC();
-
-
     /**
      * Creates two identical Submissions and checks the equals and hashcodes match.
      * Modifies one field on one of the submissions and verifies they no longer are

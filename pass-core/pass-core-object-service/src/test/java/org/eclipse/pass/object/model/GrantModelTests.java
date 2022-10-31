@@ -22,8 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.ZonedDateTime;
 
 import org.eclipse.pass.object.model.support.TestValues;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,10 +32,6 @@ import org.junit.jupiter.api.Test;
  * @author Jim Martino
  */
 public class GrantModelTests {
-
-    private DateTimeFormatter dateFormatter = ISODateTimeFormat.dateTime().withZoneUTC();
-
-
     /**
      * Creates two identical Grants and checks the equals and hashcodes match.
      * Modifies one field on one of the Grants and verifies they no longer are
