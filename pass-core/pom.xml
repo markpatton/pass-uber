@@ -43,8 +43,9 @@
   </developers>
 
   <modules>
+    <module>pass-core-doi-service</module>
     <module>pass-core-object-service</module>
-    <module>pass-core-main</module>    
+    <module>pass-core-main</module>
   </modules>
 
   <scm>
@@ -55,10 +56,13 @@
   </scm>
 
   <properties>
+    <javax.json.version>1.1.4</javax.json.version>
+    <javax.json.api.version>1.1.4</javax.json.api.version>
     <junit.version>4.12</junit.version>
     <elide.version>6.1.8</elide.version>
     <spring.version>2.5.6</spring.version>
     <junit.jupiter.version>5.5.2</junit.jupiter.version>
+    <okhttp.version>4.10.0</okhttp.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -149,6 +153,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <source>11</source>
+          <detectJavaApiLink>false</detectJavaApiLink>
+        </configuration>
       </plugin>
     </plugins>
   </build>
