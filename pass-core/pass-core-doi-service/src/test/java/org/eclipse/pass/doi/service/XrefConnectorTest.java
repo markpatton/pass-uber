@@ -33,7 +33,6 @@ import org.junit.jupiter.api.TestInstance;
  * Unit tests for the doi service
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
 public class XrefConnectorTest {
 
     private final XrefConnector underTest = new XrefConnector();

@@ -23,6 +23,7 @@ import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.yahoo.elide.RefreshableElide;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,8 +33,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class PassDoiServiceController {
 
     private static final Logger LOG = LoggerFactory.getLogger(PassDoiServiceController.class);
-    ElideConnector elideConnector = new ElideConnector();
-    XrefConnector xrefConnector = new XrefConnector();
+    ElideConnector elideConnector;
+    XrefConnector xrefConnector;
+
+    PassDoiServiceController(RefreshableElide refreshableElide) {
+        this.elideConnector = new ElideConnector(refreshableElide);
+        this.xrefConnector= new XrefConnector();
+    }
 
     @GetMapping("/journal")
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

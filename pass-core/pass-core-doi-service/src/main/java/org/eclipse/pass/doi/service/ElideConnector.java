@@ -34,7 +34,6 @@ import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.PassClientSelector;
 import org.eclipse.pass.object.RSQL;
 import org.eclipse.pass.object.model.Journal;
-import org.eclipse.pass.object.model.PassEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +41,10 @@ public class ElideConnector {
     private static final Logger LOG = LoggerFactory.getLogger(ElideConnector.class);
 
     protected RefreshableElide refreshableElide;
+
+    public ElideConnector(RefreshableElide refreshableElide) {
+        this.refreshableElide = refreshableElide;
+    }
 
     protected ElideDataStorePassClient getNewClient() {
         return new ElideDataStorePassClient(refreshableElide);
