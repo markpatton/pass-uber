@@ -79,7 +79,7 @@ public class XrefConnector {
     }
 
     /**
-     * this simply protects teh crossref service from a person hammering on a request thinking
+     * this simply protects the crossref service from a person hammering on a request thinking
      * it wasn't processed, when it really is just slow coming back
      *
      * @param doi the doi to check active

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.eclipse.pass.object;
+package org.eclipse.pass.main;
 
 import com.jayway.restassured.RestAssured;
-import org.eclipse.pass.main.Main;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -25,7 +25,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -37,17 +36,6 @@ public class XrefConnectorTest {
 
     private final XrefConnector underTest = new XrefConnector();
 
- /*   private final String issn1 = String.join(":", PassDoiServlet.IssnType.PRINT.getPassTypeString(), "0000-0001");
-    private final String issn2 = String.join(":", PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString(), "0000-0002");
-    private final String issn3 = String.join(":", PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString(), "0000-0003");
-    private final String issn4 = String.join(":", PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString(), "0000-0004");
-    private final String issn5 = String.join(":", PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString(), "0000-0005");
-    private final String issn6 = String.join(":", PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString(), "0000-0006");
-
-    private final Long completeId = 1L;
-    private final Long missingNameId = 2L;
-    private final Long missingOneIssnId = 3L;
-*/
     //a real-life JSON metadata response for a DOI, from Crossref
     private final String xrefJson = "{\"status\":\"ok\",\"message-type\":\"work\",\"message-version\":\"1.0.0\"," +
                                     "\"message\":" +
@@ -108,48 +96,6 @@ public class XrefConnectorTest {
                                     "\"ISSN\":[\"1179-5468\",\"1179-5468\"],\"issn-type\":[{\"value\":" +
                                     "\"1179-5468\",\"type\":\"print\"},{\"value\":\"1179-5468\"," +
                                     "\"type\":\"electronic\"}]}}";
-
-    /**
-     * set up stuff, including a lot of mocks
-     *
-     * @throws Exception if something goes wrong
-     */
-    @BeforeAll
-    public void setUp() throws Exception {
-
- /*       List<String> issnListComplete = new ArrayList<>();
-        issnListComplete.add(issn1);
-        issnListComplete.add(issn2);
-
-        List<String> issnListMissingName = new ArrayList<>();
-        issnListMissingName.add(issn3);
-        issnListMissingName.add(issn4);
-
-        List<String> issnListOneIssn = new ArrayList<>();
-        issnListOneIssn.add(issn5);
-
-        Journal completeJournal = new Journal();
-        completeJournal.setId(completeId);
-        String journalName = "Fancy Journal";
-        completeJournal.setJournalName(journalName);
-
-        String nlmta = "Irrelevant Data Item";
-        completeJournal.setNlmta(nlmta);
-        completeJournal.setIssns(issnListComplete);
-
-        Journal missingNameJournal = new Journal();
-        missingNameJournal.setId(missingNameId);
-        missingNameJournal.setNlmta(nlmta);
-        missingNameJournal.setIssns(issnListMissingName);
-
-        Journal missingOneIssnJournal = new Journal();
-        missingOneIssnJournal.setId(missingOneIssnId);
-        missingOneIssnJournal.setNlmta(nlmta);
-        missingOneIssnJournal.setJournalName(journalName);
-        missingOneIssnJournal.setIssns(issnListOneIssn);
-*/
-      //  underTest.init(null);
-    }
 
     /**
      * test that hitting the Crossref API with a doi returns the expected JSON object

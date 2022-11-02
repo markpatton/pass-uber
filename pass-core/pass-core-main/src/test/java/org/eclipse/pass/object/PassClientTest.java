@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.eclipse.pass.main.IntegrationTest;
 import org.eclipse.pass.object.model.AggregatedDepositStatus;
 import org.eclipse.pass.object.model.Funder;
 import org.eclipse.pass.object.model.Grant;
