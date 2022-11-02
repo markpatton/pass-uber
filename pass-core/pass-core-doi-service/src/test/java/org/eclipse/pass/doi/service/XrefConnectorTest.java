@@ -21,13 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import org.eclipse.pass.object.model.Journal;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -36,11 +33,12 @@ import org.junit.jupiter.api.TestInstance;
  * Unit tests for the doi service
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class PassDoiServletTest {
 
-    private final PassDoiServlet underTest = new PassDoiServlet();
+public class XrefConnectorTest {
 
-    private final String issn1 = String.join(":", PassDoiServlet.IssnType.PRINT.getPassTypeString(), "0000-0001");
+    private final XrefConnector underTest = new XrefConnector();
+
+ /*   private final String issn1 = String.join(":", PassDoiServlet.IssnType.PRINT.getPassTypeString(), "0000-0001");
     private final String issn2 = String.join(":", PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString(), "0000-0002");
     private final String issn3 = String.join(":", PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString(), "0000-0003");
     private final String issn4 = String.join(":", PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString(), "0000-0004");
@@ -50,7 +48,7 @@ public class PassDoiServletTest {
     private final Long completeId = 1L;
     private final Long missingNameId = 2L;
     private final Long missingOneIssnId = 3L;
-
+*/
     //a real-life JSON metadata response for a DOI, from Crossref
     private final String xrefJson = "{\"status\":\"ok\",\"message-type\":\"work\",\"message-version\":\"1.0.0\"," +
                                     "\"message\":" +
@@ -120,7 +118,7 @@ public class PassDoiServletTest {
     @BeforeAll
     public void setUp() throws Exception {
 
-        List<String> issnListComplete = new ArrayList<>();
+ /*       List<String> issnListComplete = new ArrayList<>();
         issnListComplete.add(issn1);
         issnListComplete.add(issn2);
 
@@ -150,8 +148,8 @@ public class PassDoiServletTest {
         missingOneIssnJournal.setNlmta(nlmta);
         missingOneIssnJournal.setJournalName(journalName);
         missingOneIssnJournal.setIssns(issnListOneIssn);
-
-        underTest.init(null);
+*/
+      //  underTest.init(null);
     }
 
     /**
@@ -182,7 +180,7 @@ public class PassDoiServletTest {
     }
 
     /**
-     * Test that our verify method correctly handle the usual expected doi formats
+     * Test that our verify method correctly handles the usual expected doi formats
      */
     @Test
     public void verifyTest() {

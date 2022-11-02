@@ -22,8 +22,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"org.eclipse.pass.main"})
-@EntityScan(basePackages = { "org.eclipse.pass.object.model",
-                             "org.eclipse.pass.doi.service"})
+@EntityScan(basePackages = { "org.eclipse.pass.object.model" })
 public class Main {
     protected Main() {}
 

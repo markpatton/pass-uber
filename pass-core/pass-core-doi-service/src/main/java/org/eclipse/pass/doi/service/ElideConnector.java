@@ -34,6 +34,7 @@ import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.PassClientSelector;
 import org.eclipse.pass.object.RSQL;
 import org.eclipse.pass.object.model.Journal;
+import org.eclipse.pass.object.model.PassEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,13 +48,13 @@ public class ElideConnector {
     }
 
     /**
-     * This is the only method that the Servlet calls - it orchestrates the process of building
-     * a Journal object from the supplied JSON object, seeing if the Journal is present in PASS,
-     * creating or updating that Journal if needed, and finally returning the PASS id for the Journal
+     * This is the only method interfacing with the repo that the Servlet calls -
+     * it orchestrates the process of building a Journal object from the supplied JSON object,
+     * seeing if the Journal is present in PASS, creating or updating that Journal if needed,
+     * and finally returning the PASS id for the Journal
      *
      * @param xrefJsonObject the supplied crossref JSON object
      * @return the id of the corresponding Journal object in PASS
-     *
      */
     String resolveJournal(JsonObject xrefJsonObject) {
 
@@ -113,11 +114,11 @@ public class ElideConnector {
                 String type = "";
 
                 //translate crossref issn-type strings to PASS issn-type strings
-                if (PassDoiServlet.IssnType.PRINT.getCrossrefTypeString().equals(issn.getString(XREF_ISSN_TYPE))) {
-                    type = PassDoiServlet.IssnType.PRINT.getPassTypeString();
-                } else if (PassDoiServlet.IssnType.ELECTRONIC.getCrossrefTypeString()
-                                                             .equals(issn.getString(XREF_ISSN_TYPE))) {
-                    type = PassDoiServlet.IssnType.ELECTRONIC.getPassTypeString();
+                if (IssnType.PRINT.getCrossrefTypeString().equals(issn.getString(XREF_ISSN_TYPE))) {
+                    type = IssnType.PRINT.getPassTypeString();
+                } else if (IssnType.ELECTRONIC.getCrossrefTypeString()
+                                              .equals(issn.getString(XREF_ISSN_TYPE))) {
+                    type = IssnType.ELECTRONIC.getPassTypeString();
                 }
 
                 //collect the value for this issn
@@ -161,46 +162,42 @@ public class ElideConnector {
         LOG.debug("GETTING NAME");
         String name = journal.getJournalName();
 
+        //see if we have this in PASS
         Journal passJournal = find(name, issns);
 
+        //create or update the pass version of this Journal
         if (passJournal == null) {
             // we don't have this journal in pass yet
             if (name != null && !name.isEmpty() && issns.size() > 0) {
-                // we have enough info to make a journal entry
-                // passJournal = passClient.createAndReadResource(journal, Journal.class);
+                // but we have enough info to make a Journal entry
+                try (ElideDataStorePassClient passClient = getNewClient()) {
+                    passClient.createObject(journal);
+                    passJournal = new Journal(find(name, issns));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else {
                 // do not have enough to create a new journal
                 LOG.debug("Not enough info for journal " + name);
-                return null;
             }
-        } else { //we have a journal, let's see if we can add anything new - just issns atm. we add only if not present
-            //passJournal = passClient.readResource(passJournalUri, Journal.class);
+        } else { //we have a journal, let's see if we can add anything new
+            // just issns atm. we add only if not present
 
-            if (passJournal != null) {
-                //check to see if we can supply issns
-                if (!passJournal.getIssns().containsAll(journal.getIssns())) {
-                    List<String> newIssnList = Stream.concat(passJournal.getIssns().stream(),
-                                                             journal.getIssns().stream()).distinct()
-                                                     .collect(Collectors.toList());
-                    passJournal.setIssns(newIssnList);
-                    try (ElideDataStorePassClient passClient = getNewClient()) {
-                        passClient.updateObject(passJournal);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                } else {
-                    String uhoh = "Journal " + passJournal.getJournalName() +
-                                  " was found, but the object could not be " +
-                                  "retrieved. This should never happen.";
-                    LOG.error(uhoh);
-                    throw new RuntimeException(uhoh);
+            //check to see if we can supply issns
+            if (!passJournal.getIssns().containsAll(journal.getIssns())) {
+                List<String> newIssnList = Stream.concat(passJournal.getIssns().stream(),
+                                                         journal.getIssns().stream()).distinct()
+                                                 .collect(Collectors.toList());
+                passJournal.setIssns(newIssnList);
+                try (ElideDataStorePassClient passClient = getNewClient()) {
+                    passClient.updateObject(passJournal);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
 
         return passJournal;
-
     }
 
     /**
@@ -222,7 +219,7 @@ public class ElideConnector {
             PassClientResult<Journal> result = passClient.
                 selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
             result.getObjects().forEach(j -> {
-                foundList.add(j);
+                foundList.add(new Journal(j));
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -236,7 +233,7 @@ public class ElideConnector {
                     PassClientResult<Journal> result = passClient.
                         selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
                     result.getObjects().forEach(j -> {
-                        foundList.add(j);
+                        foundList.add(new Journal(j));
                     });
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -263,4 +260,34 @@ public class ElideConnector {
         return null; //never reached
     }
 
+    /**
+     * a convenience enum for translating type strings for issns
+     */
+    public enum IssnType {
+        PRINT,
+        ELECTRONIC;
+
+        static {
+            // these values represent how types are stored on the issn field for the PASS Journal object
+            PRINT.passTypeString = "Print";
+            ELECTRONIC.passTypeString = "Online";
+        }
+
+        static {
+            // these values represent how issn types are presented in Crossref metadata
+            PRINT.crossrefTypeString = "print";
+            ELECTRONIC.crossrefTypeString = "electronic";
+        }
+
+        private String passTypeString;
+        private String crossrefTypeString;
+
+        public String getPassTypeString() {
+            return passTypeString;
+        }
+
+        public String getCrossrefTypeString() {
+            return crossrefTypeString;
+        }
+    }
 }

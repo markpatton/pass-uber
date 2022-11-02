@@ -21,6 +21,11 @@
     <dependencies>
         <dependency>
             <groupId>org.eclipse.pass</groupId>
+            <artifactId>pass-core-main</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.pass</groupId>
             <artifactId>pass-core-object-service</artifactId>
             <version>${project.version}</version>
         </dependency>
