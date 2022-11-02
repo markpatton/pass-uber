@@ -38,7 +38,7 @@ public class PassDoiServiceController {
 
     PassDoiServiceController(RefreshableElide refreshableElide) {
         this.elideConnector = new ElideConnector(refreshableElide);
-        this.xrefConnector= new XrefConnector();
+        this.xrefConnector = new XrefConnector();
     }
 
     @GetMapping("/journal")
