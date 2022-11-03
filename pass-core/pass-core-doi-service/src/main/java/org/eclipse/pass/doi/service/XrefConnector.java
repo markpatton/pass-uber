@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class XrefConnector {
-    private static final Logger LOG = LoggerFactory.getLogger(ElideConnector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XrefConnector.class);
 
     private OkHttpClient client;
 
@@ -65,6 +65,7 @@ public class XrefConnector {
      * @return the valid suffix, or null if invalid
      */
     String verify(String doi) {
+        LOG.debug("Verifying doi format for " + doi );
         if (doi == null) {
             return null;
         }
@@ -88,6 +89,7 @@ public class XrefConnector {
     boolean isAlreadyActive(String doi) {
         //stage 2: check cache map for existence of doi
         //put doi on map if absent
+        LOG.debug("Checking to see if doi " + doi + " is already in process");
         if (activeJobs.contains(doi)) {
             return true;
         } else {
@@ -110,6 +112,7 @@ public class XrefConnector {
      * @return a string representing the works object if successful; an empty string if not found; null if IO exception
      */
     JsonObject retrieveXrefMetdata(String doi) {
+        LOG.debug("Attempring to retrieve metadata from Crossref for doi " + doi);
         String agent = System.getenv("PASS_DOI_SERVICE_MAILTO") != null ? System.getenv(
             "PASS_DOI_SERVICE_MAILTO") : MAILTO;
 

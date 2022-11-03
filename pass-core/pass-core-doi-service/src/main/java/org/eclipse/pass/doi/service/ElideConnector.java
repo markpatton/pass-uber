@@ -42,7 +42,7 @@ public class ElideConnector {
 
     protected RefreshableElide refreshableElide;
 
-    public ElideConnector(RefreshableElide refreshableElide) {
+    protected ElideConnector(RefreshableElide refreshableElide) {
         this.refreshableElide = refreshableElide;
     }
 
@@ -59,7 +59,7 @@ public class ElideConnector {
      * @param xrefJsonObject the supplied crossref JSON object
      * @return the id of the corresponding Journal object in PASS
      */
-    String resolveJournal(JsonObject xrefJsonObject) {
+    protected String resolveJournal(JsonObject xrefJsonObject) {
 
         // we have something JSONy, let's build a journal object from it
         LOG.debug("Building pass journal");
@@ -73,6 +73,7 @@ public class ElideConnector {
         String journalId = null;
         if (updatedJournal != null) {
             journalId = updatedJournal.getId().toString();
+            LOG.debug("Journl with id " + journalId + " successfully processed");
         }
 
         return journalId;
@@ -86,7 +87,7 @@ public class ElideConnector {
      * @param metadata - the JSON metadata from Crossref
      * @return the PASS journal object;s id
      */
-    Journal buildPassJournal(JsonObject metadata) {
+    protected Journal buildPassJournal(JsonObject metadata) {
 
         LOG.debug("JSON input (from Crossref): " + metadata.toString());
 
@@ -159,10 +160,9 @@ public class ElideConnector {
      * @return the updated Journal object stored in PASS if the PASS object needs updating; null if we don't have
      * enough info to create a journal
      */
-    Journal updateJournalInPass(Journal journal) {
-        LOG.debug("GETTING ISSNS");
+    protected Journal updateJournalInPass(Journal journal) {
+        LOG.debug("GETTING NAME and  ISSNS for Journal with nme " + journal.getJournalName());
         List<String> issns = journal.getIssns();
-        LOG.debug("GETTING NAME");
         String name = journal.getJournalName();
 
         //see if we have this in PASS
@@ -211,14 +211,14 @@ public class ElideConnector {
      * @param issns the set of issns to find. we assume that the issns stored in the repo are of the format type:value
      * @return the URI of the best match, or null in nothing matches
      */
-    Journal find(String name, List<String> issns) {
+    protected Journal find(String name, List<String> issns) {
 
         //keep track of hits for searches
         List<Journal> foundList = new ArrayList<>();
 
         //look for journals with this name
         try (ElideDataStorePassClient passClient = getNewClient()) {
-            String filter = RSQL.equals("name", name);
+            String filter = RSQL.equals("journalName", name);
             PassClientResult<Journal> result = passClient.
                 selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
             result.getObjects().forEach(j -> {
@@ -228,6 +228,7 @@ public class ElideConnector {
             e.printStackTrace();
         }
 
+        /*commenting this out until we get a search filter that works for finding a string in a list of strings
         //look for journals with any of these issns
         if (!issns.isEmpty()) {
             for (String issn : issns) {
@@ -242,7 +243,7 @@ public class ElideConnector {
                     e.printStackTrace();
                 }
             }
-        }
+        } */
 
         //count the number of hits for each Journal
         if (foundList.size() == 0) {

@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 /**
- * Unit tests for the doi service
+ * Unit tests for the xref connector
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class XrefConnectorTest {

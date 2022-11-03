@@ -81,68 +81,68 @@ public class PassDoiServiceController {
                 response.setStatus(429);
                 LOG.info(message);
             }
+        }
 
-            //stage 3: try to get crossref record, catch errors first, and halt processing
-            JsonObject xrefJsonObject = xrefConnector.retrieveXrefMetdata(doi);
-            if (xrefJsonObject == null) {
-                try (OutputStream out = response.getOutputStream()) {
-                    String message = "There was an error getting the metadata from Crossref for " + doi;
-                    JsonObject jsonObject = Json.createObjectBuilder()
-                                                .add("error", message)
-                                                .build();
-                    out.write(jsonObject.toString().getBytes());
-                    response.setStatus(500);
-                    LOG.info(message);
-                }
-            } else if (xrefJsonObject.getJsonString("error") != null) {
-                int responseCode;
-                String message;
-                if (xrefJsonObject.getString("error").equals("Resource not found.")) {
-                    responseCode = 404;
-                    message = "The resource for DOI " + doi + " could not be found on Crossref.";
-                } else {
-                    responseCode = 500;
-                    message = "A record for this resource could not be returned from Crossref: " +
-                              xrefJsonObject.getJsonString("error");
-                }
-                try (OutputStream out = response.getOutputStream()) {
-                    JsonObject jsonObject = Json.createObjectBuilder()
-                                                .add("error", message)
-                                                .build();
-                    out.write(jsonObject.toString().getBytes());
-                    response.setStatus(responseCode);
-                    LOG.info(message);
-                }
+        //stage 3: try to get crossref record, catch errors first, and halt processing
+        JsonObject xrefJsonObject = xrefConnector.retrieveXrefMetdata(doi);
+        if (xrefJsonObject == null) {
+            try (OutputStream out = response.getOutputStream()) {
+                String message = "There was an error getting the metadata from Crossref for " + doi;
+                JsonObject jsonObject = Json.createObjectBuilder()
+                                            .add("error", message)
+                                            .build();
+                out.write(jsonObject.toString().getBytes());
+                response.setStatus(500);
+                LOG.info(message);
+            }
+        } else if (xrefJsonObject.getJsonString("error") != null) {
+            int responseCode;
+            String message;
+            if (xrefJsonObject.getString("error").equals("Resource not found.")) {
+                responseCode = 404;
+                message = "The resource for DOI " + doi + " could not be found on Crossref.";
             } else {
-                // have a non-empty string to process
-                String journalId = elideConnector.resolveJournal(xrefJsonObject);
-                if (journalId != null) {
+                responseCode = 500;
+                message = "A record for this resource could not be returned from Crossref: " +
+                          xrefJsonObject.getJsonString("error");
+            }
+            try (OutputStream out = response.getOutputStream()) {
+                JsonObject jsonObject = Json.createObjectBuilder()
+                                            .add("error", message)
+                                            .build();
+                out.write(jsonObject.toString().getBytes());
+                response.setStatus(responseCode);
+                LOG.info(message);
+            }
+        } else {
+            // have a non-empty string to process
+            String journalId = elideConnector.resolveJournal(xrefJsonObject);
+            if (journalId != null) {
 
-                    try (OutputStream out = response.getOutputStream()) {
-                        JsonObject jsonObject = Json.createObjectBuilder()
-                                                    .add("journal-id", journalId)
-                                                    .add("crossref", xrefJsonObject)
-                                                    .build();
+                try (OutputStream out = response.getOutputStream()) {
+                    JsonObject jsonObject = Json.createObjectBuilder()
+                                                .add("journal-id", journalId)
+                                                .add("crossref", xrefJsonObject)
+                                                .build();
 
-                        out.write(jsonObject.toString().getBytes());
-                        response.setStatus(200);
-                        LOG.info("Returning result for DOI " + doi);
-                    }
+                    out.write(jsonObject.toString().getBytes());
+                    response.setStatus(200);
+                    LOG.info("Returning result for DOI " + doi);
+                }
 
-                } else {
-                    // journal id is null - this should never happen unless Crosssref journal is insufficient
-                    // for example, if a book doi ws supplied which has no issns
+            } else {
+                // journal id is null - this should never happen unless Crosssref journal is insufficient
+                // for example, if a book doi ws supplied which has no issns
 
-                    try (OutputStream out = response.getOutputStream()) {
-                        String message = "Insufficient information to locate or specify a journal entry.";
-                        JsonObject jsonObject = Json.createObjectBuilder()
-                                                    .add("error", message)
-                                                    .build();
+                try (OutputStream out = response.getOutputStream()) {
+                    String message = "Insufficient information to locate or specify a journal entry.";
+                    JsonObject jsonObject = Json.createObjectBuilder()
+                                                .add("error", message)
+                                                .build();
 
-                        out.write(jsonObject.toString().getBytes());
-                        response.setStatus(422);
-                        LOG.info(message);
-                    }
+                    out.write(jsonObject.toString().getBytes());
+                    response.setStatus(422);
+                    LOG.info(message);
                 }
             }
         }
