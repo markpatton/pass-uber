@@ -28,7 +28,7 @@ import org.eclipse.pass.object.model.PassEntity;
  * PassClient represents a session with the PASS repository. It should not be kept open long term.
  * Objects retrieved by a PassClient instance may only be used while that instance is open.
  */
-interface PassClient extends Closeable {
+public interface PassClient extends Closeable {
     /**
      * Create a new object in the repository.
      * The id of the object must be null and will be set by the method.

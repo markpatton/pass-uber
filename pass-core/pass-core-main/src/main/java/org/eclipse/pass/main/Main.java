@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.eclipse.pass.main"})
+@ComponentScan(basePackages = {"org.eclipse.pass.main", "org.eclipse.pass.doi.service"})
 @EntityScan(basePackages = { "org.eclipse.pass.object.model" })
 public class Main {
     protected Main() {}
