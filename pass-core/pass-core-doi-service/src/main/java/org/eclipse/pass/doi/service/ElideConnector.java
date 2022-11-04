@@ -30,6 +30,7 @@ import javax.json.JsonObject;
 
 import com.yahoo.elide.RefreshableElide;
 import org.eclipse.pass.object.ElideDataStorePassClient;
+import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.PassClientSelector;
 import org.eclipse.pass.object.RSQL;
@@ -46,7 +47,7 @@ public class ElideConnector {
         this.refreshableElide = refreshableElide;
     }
 
-    protected ElideDataStorePassClient getNewClient() {
+    protected PassClient getNewClient() {
         return new ElideDataStorePassClient(refreshableElide);
     }
 
@@ -173,7 +174,7 @@ public class ElideConnector {
             // we don't have this journal in pass yet
             if (name != null && !name.isEmpty() && issns.size() > 0) {
                 // but we have enough info to make a Journal entry
-                try (ElideDataStorePassClient passClient = getNewClient()) {
+                try (PassClient passClient = getNewClient()) {
                     passClient.createObject(journal);
                     passJournal = new Journal(find(name, issns));
                 } catch (IOException e) {
@@ -192,7 +193,7 @@ public class ElideConnector {
                                                          journal.getIssns().stream()).distinct()
                                                  .collect(Collectors.toList());
                 passJournal.setIssns(newIssnList);
-                try (ElideDataStorePassClient passClient = getNewClient()) {
+                try (PassClient passClient = getNewClient()) {
                     passClient.updateObject(passJournal);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -217,33 +218,30 @@ public class ElideConnector {
         List<Journal> foundList = new ArrayList<>();
 
         //look for journals with this name
-        try (ElideDataStorePassClient passClient = getNewClient()) {
+        try (PassClient passClient = getNewClient()) {
             String filter = RSQL.equals("journalName", name);
             PassClientResult<Journal> result = passClient.
                 selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
             result.getObjects().forEach(j -> {
-                foundList.add(new Journal(j));
+                foundList.add(j);
             });
+
+            //commenting this out until we get a search filter that works for finding a string in a list of strings
+            //look for journals with any of these issns
+           /* if (!issns.isEmpty()) {
+                for (String issn : issns) {
+                    filter = RSQL.equals("issns", issn);
+                    result = passClient.
+                        selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
+                    result.getObjects().forEach(j -> {
+                        foundList.add(j);
+                    });
+                }
+            }
+            */
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        /*commenting this out until we get a search filter that works for finding a string in a list of strings
-        //look for journals with any of these issns
-        if (!issns.isEmpty()) {
-            for (String issn : issns) {
-                try (ElideDataStorePassClient passClient = getNewClient()) {
-                    String filter = RSQL.equals("issns", issn);
-                    PassClientResult<Journal> result = passClient.
-                        selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
-                    result.getObjects().forEach(j -> {
-                        foundList.add(new Journal(j));
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        } */
 
         //count the number of hits for each Journal
         if (foundList.size() == 0) {

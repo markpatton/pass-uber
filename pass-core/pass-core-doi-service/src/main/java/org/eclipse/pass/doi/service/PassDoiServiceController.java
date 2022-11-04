@@ -41,7 +41,7 @@ public class PassDoiServiceController {
         this.xrefConnector = new XrefConnector();
     }
 
-    @GetMapping("pass-doi-service/journal")
+    @GetMapping("/journal")
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
 

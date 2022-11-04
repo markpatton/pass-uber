@@ -18,6 +18,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.eclipse.pass.main.IntegrationTest;
 import org.eclipse.pass.object.ElideDataStorePassClient;
+import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.PassClientSelector;
 import org.eclipse.pass.object.RSQL;
@@ -30,7 +31,7 @@ public class DoiServiceTest extends IntegrationTest {
     @Autowired
     protected RefreshableElide refreshableElide;
 
-    protected ElideDataStorePassClient getNewClient() {
+    protected PassClient getNewClient() {
         return new ElideDataStorePassClient(refreshableElide);
     }
 
@@ -132,8 +133,8 @@ public class DoiServiceTest extends IntegrationTest {
         HttpUrl url = formDoiUrl("10.4137/cmc.s38446" );
         String id;
 
-        //if this journal is in the database already, delete it
-        try (ElideDataStorePassClient passClient = getNewClient()) {
+        try (PassClient passClient = getNewClient()) {
+            //if this journal is in the database already, delete it
             String filter = RSQL.equals("journalName", name);
             PassClientResult<Journal> result = passClient.
                 selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
@@ -144,60 +145,49 @@ public class DoiServiceTest extends IntegrationTest {
                     e.printStackTrace();
                 }
             });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        //verify that this journal is not in the database
-        try (ElideDataStorePassClient passClient = getNewClient()) {
-            String filter = RSQL.equals("journalName", name);
-            PassClientResult<Journal> result = passClient.
+            //verify that this journal is not in the database
+            filter = RSQL.equals("journalName", name);
+            result = passClient.
                 selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
             assertEquals(0, result.getObjects().size());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        Request okHttpRequest = new Request.Builder()
-            .url(url)
-            .build();
-        Call call = httpClient.newCall(okHttpRequest);
-        try (Response okHttpResponse = call.execute()) {
-            assertEquals(200, okHttpResponse.code());
-            JsonReader jsonReader = Json.createReader(new StringReader(okHttpResponse.body().string()));
-            JsonObject successReport = jsonReader.readObject();
-            assertNotNull(successReport.getString("journal-id"));
-            id = successReport.getString("journal-id");
-        }
+            Request okHttpRequest = new Request.Builder()
+                .url(url)
+                .build();
+            Call call = httpClient.newCall(okHttpRequest);
 
-        //verify that this journal is now in the database
-        try (ElideDataStorePassClient passClient = getNewClient()) {
-            String filter = RSQL.equals("journalName", name);
-            PassClientResult<Journal> result = passClient.
+            try (Response okHttpResponse = call.execute()) {
+                assertEquals(200, okHttpResponse.code());
+                JsonReader jsonReader = Json.createReader(new StringReader(okHttpResponse.body().string()));
+                JsonObject successReport = jsonReader.readObject();
+                assertNotNull(successReport.getString("journal-id"));
+                id = successReport.getString("journal-id");
+
+                //verify that this journal is now in the database
+                //try (ElideDataStorePassClient passClient = getNewClient()) {
+                filter = RSQL.equals("journalName", name);
+                result = passClient.
+                    selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
+                assertEquals(1, result.getObjects().size());
+
+                //verify that the returned object for the same request has the right id
+                jsonReader = Json.createReader(new StringReader(okHttpResponse.body().string()));
+                successReport = jsonReader.readObject();
+                assertEquals(id, successReport.getString("journal-id"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //and that there is only one of them in the database
+            //try (ElideDataStorePassClient passClient = getNewClient()) {
+            filter = RSQL.equals("journalName", name);
+            result = passClient.
                 selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
             assertEquals(1, result.getObjects().size());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //verify that the returned object for the same request has the right id
-        call = httpClient.newCall(okHttpRequest);
-        try (Response okHttpResponse = call.execute()) {
-            JsonReader jsonReader = Json.createReader(new StringReader(okHttpResponse.body().string()));
-            JsonObject successReport = jsonReader.readObject();
-            assertEquals(id, successReport.getString("journal-id"));
-        }
-
-        //and that there is only one of the m in the database
-        try (ElideDataStorePassClient passClient = getNewClient()) {
-            String filter = RSQL.equals("journalName", name);
-            PassClientResult<Journal> result = passClient.
-                selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
-            assertEquals(1, result.getObjects().size());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     private HttpUrl formDoiUrl(String doi) {
@@ -205,7 +195,6 @@ public class DoiServiceTest extends IntegrationTest {
             .scheme("http")
             .host("localhost")
             .port(port)
-            .addPathSegment("pass-doi-service")
             .addPathSegment("journal")
             .addQueryParameter("doi", doi)
             .build();
