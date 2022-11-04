@@ -131,7 +131,7 @@ public class DoiServiceTest extends IntegrationTest {
     public void realJournalTest() throws Exception {
         String name = "Clinical Medicine Insights: Cardiology";
         HttpUrl url = formDoiUrl("10.4137/cmc.s38446" );
-        String id;
+        String id = "";
 
         try (PassClient passClient = getNewClient()) {
             //if this journal is in the database already, delete it
@@ -155,25 +155,31 @@ public class DoiServiceTest extends IntegrationTest {
             Request okHttpRequest = new Request.Builder()
                 .url(url)
                 .build();
-            Call call = httpClient.newCall(okHttpRequest);
 
+            Call call = httpClient.newCall(okHttpRequest);
             try (Response okHttpResponse = call.execute()) {
                 assertEquals(200, okHttpResponse.code());
-                JsonReader jsonReader = Json.createReader(new StringReader(okHttpResponse.body().string()));
-                JsonObject successReport = jsonReader.readObject();
+                JsonReader jsonReader1 = Json.createReader(new StringReader(okHttpResponse.body().string()));
+                JsonObject successReport = jsonReader1.readObject();
+                jsonReader1.close();
                 assertNotNull(successReport.getString("journal-id"));
                 id = successReport.getString("journal-id");
 
                 //verify that this journal is now in the database
-                //try (ElideDataStorePassClient passClient = getNewClient()) {
                 filter = RSQL.equals("journalName", name);
                 result = passClient.
                     selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
                 assertEquals(1, result.getObjects().size());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-                //verify that the returned object for the same request has the right id
-                jsonReader = Json.createReader(new StringReader(okHttpResponse.body().string()));
-                successReport = jsonReader.readObject();
+            //verify that the returned object for the same request has the right id
+            call = httpClient.newCall(okHttpRequest);
+            try (Response okHttpResponse = call.execute()) {
+                JsonReader jsonReader2 = Json.createReader(new StringReader(okHttpResponse.body().string()));
+                JsonObject successReport = jsonReader2.readObject();
+                jsonReader2.close();
                 assertEquals(id, successReport.getString("journal-id"));
             } catch (Exception e) {
                 e.printStackTrace();

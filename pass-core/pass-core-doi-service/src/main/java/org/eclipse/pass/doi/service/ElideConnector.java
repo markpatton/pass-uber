@@ -62,21 +62,28 @@ public class ElideConnector {
      */
     protected String resolveJournal(JsonObject xrefJsonObject) {
 
-        // we have something JSONy, let's build a journal object from it
-        LOG.debug("Building pass journal");
-        Journal journal = buildPassJournal(xrefJsonObject);
-
-        // and compare it with what we already have in PASS, updating PASS if necessary
-        LOG.debug("Comparing journal object with possible PASS version");
-        Journal updatedJournal = updateJournalInPass(journal);
-
-        //we return the journal id if we have one
         String journalId = null;
-        if (updatedJournal != null) {
-            journalId = updatedJournal.getId().toString();
-            LOG.debug("Journl with id " + journalId + " successfully processed");
-        }
 
+        try (PassClient passClient = getNewClient()) {
+
+            // we have something JSONy, let's build a journal object from it
+            LOG.debug("Building pass journal");
+            Journal journal = buildPassJournal(xrefJsonObject);
+
+            // and compare it with what we already have in PASS, updating PASS if necessary
+            LOG.debug("Comparing journal object with possible PASS version");
+            Journal updatedJournal = updateJournalInPass(journal, passClient);
+
+            //we return the journal id if we have one
+
+            if (updatedJournal != null) {
+                journalId = updatedJournal.getId().toString();
+                LOG.debug("Journal with id " + journalId + " successfully processed");
+            }
+
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        }
         return journalId;
     }
 
@@ -161,25 +168,21 @@ public class ElideConnector {
      * @return the updated Journal object stored in PASS if the PASS object needs updating; null if we don't have
      * enough info to create a journal
      */
-    protected Journal updateJournalInPass(Journal journal) {
+    protected Journal updateJournalInPass(Journal journal, PassClient passClient) throws IOException {
         LOG.debug("GETTING NAME and  ISSNS for Journal with nme " + journal.getJournalName());
         List<String> issns = journal.getIssns();
         String name = journal.getJournalName();
 
         //see if we have this in PASS
-        Journal passJournal = find(name, issns);
+        Journal passJournal = find(name, issns, passClient);
 
         //create or update the pass version of this Journal
         if (passJournal == null) {
             // we don't have this journal in pass yet
             if (name != null && !name.isEmpty() && issns.size() > 0) {
                 // but we have enough info to make a Journal entry
-                try (PassClient passClient = getNewClient()) {
-                    passClient.createObject(journal);
-                    passJournal = new Journal(find(name, issns));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                passClient.createObject(journal);
+                passJournal = new Journal(find(name, issns, passClient));
             } else {
                 // do not have enough to create a new journal
                 LOG.debug("Not enough info for journal " + name);
@@ -193,11 +196,8 @@ public class ElideConnector {
                                                          journal.getIssns().stream()).distinct()
                                                  .collect(Collectors.toList());
                 passJournal.setIssns(newIssnList);
-                try (PassClient passClient = getNewClient()) {
-                    passClient.updateObject(passJournal);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                passClient.updateObject(passJournal);
+
             }
         }
 
@@ -212,36 +212,32 @@ public class ElideConnector {
      * @param issns the set of issns to find. we assume that the issns stored in the repo are of the format type:value
      * @return the URI of the best match, or null in nothing matches
      */
-    protected Journal find(String name, List<String> issns) {
+    protected Journal find(String name, List<String> issns, PassClient passClient) throws IOException {
 
         //keep track of hits for searches
         List<Journal> foundList = new ArrayList<>();
 
         //look for journals with this name
-        try (PassClient passClient = getNewClient()) {
-            String filter = RSQL.equals("journalName", name);
-            PassClientResult<Journal> result = passClient.
-                selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
-            result.getObjects().forEach(j -> {
-                foundList.add(j);
-            });
+        String filter = RSQL.equals("journalName", name);
+        PassClientResult<Journal> result = passClient.
+            selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
+        result.getObjects().forEach(j -> {
+            foundList.add(j);
+        });
 
-            //commenting this out until we get a search filter that works for finding a string in a list of strings
-            //look for journals with any of these issns
-           /* if (!issns.isEmpty()) {
-                for (String issn : issns) {
-                    filter = RSQL.equals("issns", issn);
-                    result = passClient.
-                        selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
-                    result.getObjects().forEach(j -> {
-                        foundList.add(j);
-                    });
-                }
+        //commenting this out until we get a search filter that works for finding a string in a list of strings
+        //look for journals with any of these issns
+        /* if (!issns.isEmpty()) {
+            for (String issn : issns) {
+                filter = RSQL.equals("issns", issn);
+                result = passClient.
+                    selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
+                result.getObjects().forEach(j -> {
+                    foundList.add(j);
+                });
             }
-            */
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        */
 
         //count the number of hits for each Journal
         if (foundList.size() == 0) {
