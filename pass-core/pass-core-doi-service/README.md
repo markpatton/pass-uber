@@ -6,7 +6,7 @@ Service for accepting a DOI and returning a Journal ID and Crossref metadata for
 
 This service accepts a journal DOI as a query parameter:
 
-`http://<host>:<port>/pass-doi-service/journal?doi=<doi>`
+`http://<host>:<port>/journal?doi=<doi>`
 
 DOIs must contain a form like `10.1234/ ...`
 If a DOI is of a longer URL form containing the string `doi.org/`, then we truncate the DOI to take everything after
