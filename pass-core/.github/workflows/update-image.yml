@@ -24,6 +24,9 @@ jobs:
         run: mvn clean verify
       - name: "Upload Docker image to GHCR"
         run: docker push ghcr.io/eclipse-pass/pass-core-main
+      - name: "Get image hash"
+        id: image_hash
+        run: echo "IMAGE_HASH=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.ID}}`" >> $GITHUB_OUTPUT
 
       # Update pass-core config in pass-docker
       - name: Return to root folder
@@ -40,9 +43,9 @@ jobs:
         id: pom_version
         run: echo "POM_VERSION=${{ github.event.inputs.pomVersion }}" >> $GITHUB_OUTPUT
       - name: Update nightly server config
-        run: python tools/update-image.py eclipse-pass.nightly.yml pass-core ${{ steps.pom_version.outputs.POM_VERSION }}
+        run: python tools/update-image.py eclipse-pass.nightly.yml pass-core "${{ steps.pom_version.outputs.POM_VERSION }}@${{ steps.image_hash.outputs.IMAGE_HASH }}"
       - name: Commit change (if any)
         # The 'git diff --quiet' ensures that the add/commit is only attempted if there is a change
-        run: git diff --quiet || git commit -am 'Update pass-core image to ${{ steps.pom_version.outputs.POM_VERSION }}'
+        run: git diff --quiet || git commit -am 'Update pass-core image to ${{ steps.pom_version.outputs.POM_VERSION }}@${{ steps.image_hash.outputs.IMAGE_HASH }}'
       - name: Push update
         run: git push
