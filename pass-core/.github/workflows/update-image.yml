@@ -43,7 +43,7 @@ jobs:
         id: pom_version
         run: echo "POM_VERSION=${{ github.event.inputs.pomVersion }}" >> $GITHUB_OUTPUT
       - name: Update nightly server config
-        run: python tools/update-image.py eclipse-pass.nightly.yml pass-core "${{ steps.pom_version.outputs.POM_VERSION }}@${{ steps.image_hash.outputs.IMAGE_HASH }}"
+        run: python tools/update-image.py eclipse-pass.nightly.yml pass-core "ghcr.io/eclipse-pass/pass-core-main:${{ steps.pom_version.outputs.POM_VERSION }}@${{ steps.image_hash.outputs.IMAGE_HASH }}"
       - name: Commit change (if any)
         # The 'git diff --quiet' ensures that the add/commit is only attempted if there is a change
         run: git diff --quiet || git commit -am 'Update pass-core image to ${{ steps.pom_version.outputs.POM_VERSION }}@${{ steps.image_hash.outputs.IMAGE_HASH }}'
