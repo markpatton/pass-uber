@@ -1,0 +1,51 @@
+# This workflow will update the pass-core-main Docker image in GHCR and update the pass-core config
+#   in pass-docker
+
+name: Update Docker image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Update pass-core-main Docker image in GHCR
+      - name: Check out latest pass-core
+        uses: actions/checkout@v2
+      - name: "Set up JDK 11"
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: "Build and upload new package"
+        run: mvn clean verify
+      - name: "Upload Docker image to GHCR"
+        run: docker push ghcr.io/eclipse-pass/pass-core-main
+      - name: "Get image hash"
+        id: image_hash
+        run: echo "IMAGE_HASH=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.ID}}`" >> $GITHUB_OUTPUT
+
+      # Update pass-core config in pass-docker
+      - name: Return to root folder
+        action: cd ..
+      - name: Check out pass-docker
+        uses: actions/checkout@v2
+        with:
+          repository: eclipse-pass/pass-docker
+          token: ${{ secrets.pass_docker_pat }}
+      - uses: oleksiyrudenko/gha-git-credentials@v2-latest
+        with:
+          token: ${{ secrets.pass_docker_pat }}
+      - name: Get pom version
+        id: pom_version
+        run: echo "POM_VERSION=${{ github.event.inputs.pomVersion }}" >> $GITHUB_OUTPUT
+      - name: Update nightly server config
+        run: python tools/update-image.py eclipse-pass.nightly.yml pass-core "ghcr.io/eclipse-pass/pass-core-main:${{ steps.pom_version.outputs.POM_VERSION }}@${{ steps.image_hash.outputs.IMAGE_HASH }}"
+      - name: Commit change (if any)
+        # The 'git diff --quiet' ensures that the add/commit is only attempted if there is a change
+        run: git diff --quiet || git commit -am 'Update pass-core image to ${{ steps.pom_version.outputs.POM_VERSION }}@${{ steps.image_hash.outputs.IMAGE_HASH }}'
+      - name: Push update
+        run: git push
