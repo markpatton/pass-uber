@@ -30,7 +30,7 @@ jobs:
 
       # Update pass-core config in pass-docker
       - name: Return to root folder
-        action: cd ..
+        run: cd ..
       - name: Check out pass-docker
         uses: actions/checkout@v2
         with:
