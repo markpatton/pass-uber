@@ -22,11 +22,14 @@ jobs:
           java-version: 11
       - name: "Build and upload new package"
         run: mvn clean verify
-      - name: "Upload Docker image to GHCR"
-        run: docker push ghcr.io/eclipse-pass/pass-core-main
+      - name: "Get image tag"
+        id: image_tag
+        run: echo "IMAGE_TAG=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.Tag}}`" >> $GITHUB_OUTPUT
       - name: "Get image hash"
         id: image_hash
         run: echo "IMAGE_HASH=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.ID}}`" >> $GITHUB_OUTPUT
+      - name: "Upload Docker image to GHCR"
+        run: "docker push ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }}"
 
       # Update pass-core config in pass-docker
       - name: Return to root folder
