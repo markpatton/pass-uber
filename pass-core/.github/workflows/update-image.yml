@@ -20,6 +20,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: "Log into GHCR"
+        run: echo ${{ secrets.pass_docker_pat }} | docker login ghcr.io --username grant-mcs --password-stdin
       - name: "Build and upload new package"
         run: mvn clean verify
       - name: "Get image tag"
