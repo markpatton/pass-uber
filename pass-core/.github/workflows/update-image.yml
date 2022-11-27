@@ -27,11 +27,11 @@ jobs:
       - name: "Get image tag"
         id: image_tag
         run: echo "IMAGE_TAG=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.Tag}}`" >> $GITHUB_OUTPUT
-      - name: "Get image hash"
-        id: image_hash
-        run: echo "IMAGE_HASH=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.ID}}`" >> $GITHUB_OUTPUT
       - name: "Upload Docker image to GHCR"
         run: "docker push ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }}"
+      - name: "Get GHCR image hash"
+        id: image_hash
+        run: echo "IMAGE_HASH=`docker inspect ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }} | jq '.[0].RepoDigests[0]'`" >> $GITHUB_OUTPUT
 
       # Update pass-core config in pass-docker
       - name: Return to root folder
