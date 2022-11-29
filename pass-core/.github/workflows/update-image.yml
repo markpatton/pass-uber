@@ -29,9 +29,12 @@ jobs:
         run: echo "IMAGE_TAG=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.Tag}}`" >> $GITHUB_OUTPUT
       - name: "Upload Docker image to GHCR"
         run: "docker push ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }}"
+
+      # The hash of the Docker image locally is different from the hash of the image on GHCR but can be parsed from the
+      #   info returned by 'docker inspect'. Sed is used to separate out the hash from the rest of the image identifier.
       - name: "Get GHCR image hash"
         id: image_hash
-        run: echo "IMAGE_HASH=`docker inspect ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }} | jq '.[0].RepoDigests[0]'`" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_HASH=`docker inspect ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }} | jq '.[0].RepoDigests[0]' | sed -r 's/.*@(.*)"/\1/'`" >> $GITHUB_OUTPUT
 
       # Update pass-core config in pass-docker
       - name: Return to root folder
