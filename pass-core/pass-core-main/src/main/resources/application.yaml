@@ -61,6 +61,11 @@ spring:
   activemq:
     broker-url: 'vm://embedded?broker.persistent=false,useShutdownHook=false'
     in-memory: true
+  file-service:
+    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE}
+    ocfl-root-dir: ${PASS_CORE_FILE_SERVICE_OCFL_ROOT}
+    ocfl-work-dir: ${PASS_CORE_FILE_SERVICE_OCFL_WORK}
+    temp-dir: ${PASS_CORE_FILE_SERVICE_TEMP}
 
 server:
   port: 8080
@@ -93,6 +98,11 @@ spring:
     driver-class-name: 'org.postgresql.Driver'
   liquibase:
     enabled: false
+  file-service:
+    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE}
+    ocfl-root-dir: ${PASS_CORE_FILE_SERVICE_OCFL_ROOT}
+    ocfl-work-dir: ${PASS_CORE_FILE_SERVICE_OCFL_WORK}
+    temp-dir: ${PASS_CORE_FILE_SERVICE_TEMP}
 server:
   port: ${PASS_CORE_PORT}
 
