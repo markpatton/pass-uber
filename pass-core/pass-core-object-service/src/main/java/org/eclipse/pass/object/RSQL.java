@@ -21,26 +21,54 @@ package org.eclipse.pass.object;
 public class RSQL {
     private RSQL() {}
 
+    /**
+     * @param expressions RSQL expressions
+     * @return logical conjunction of arguments as RSQL expression
+     */
     public static String and(String... expressions) {
         return group_expressions(";", expressions);
     }
 
+    /**
+     * @param expressions RSQL expressions
+     * @return logical disjunction of arguments as RSQL expression
+     */
     public static String or(String... expressions) {
         return group_expressions(",", expressions);
     }
 
+    /**
+     * @param name Name of field
+     * @param value Value of field
+     * @return RSQL expression testing that object has a field with a value
+     */
     public static String equals(String name, String value) {
         return comparison(name, "==", value);
     }
 
+    /**
+     * @param name Name of field
+     * @param value Value of field
+     * @return RSQL expression testing that object does not have a field with a value
+     */
     public static String notEquals(String name, String value) {
         return comparison(name, "!=", value);
     }
 
+    /**
+     * @param name Name of field
+     * @param values Values of field
+     * @return RSQL expression testing that object has a field with at least one of the values
+     */
     public static String in(String name, String... values) {
         return comparison_group(name, "=in=", values);
     }
 
+    /**
+     * @param name Name of field
+     * @param values Values of field
+     * @return RSQL expression testing that object has a field without any of the values
+     */
     public static String out(String name, String... values) {
         return comparison_group(name, "=out=", values);
     }
@@ -87,7 +115,7 @@ public class RSQL {
         for (int i = 0; i < s.length(); i++) {
             Character c = s.charAt(i);
 
-            if (c == '\\' || c == '\"' || c == '\"') {
+            if (c == '\\' || c == '\"' || c == '\'') {
                 result.append('\\');
             }
 
