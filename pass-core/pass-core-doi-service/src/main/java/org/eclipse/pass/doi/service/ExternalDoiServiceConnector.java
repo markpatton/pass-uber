@@ -31,6 +31,7 @@ import javax.json.JsonReader;
 import javax.json.stream.JsonParsingException;
 
 import okhttp3.Call;
+import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -38,20 +39,14 @@ import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class XrefConnector {
-    private static final Logger LOG = LoggerFactory.getLogger(XrefConnector.class);
+public class ExternalDoiServiceConnector {
+    private static final Logger LOG = LoggerFactory.getLogger(ExternalDoiServiceConnector.class);
 
     private OkHttpClient client;
 
-    private String BASE_URL = "https://api.crossref.org/";
-    private String VERSION = "v1/";
-    private String BASIC_PREFIX = "works/";
-    //some defaults
-    private String MAILTO = "pass@jhu.edu";
-
     private Set<String> activeJobs = new HashSet<>();
 
-    XrefConnector() {
+    ExternalDoiServiceConnector() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.connectTimeout(30, SECONDS);
         builder.readTimeout(30, SECONDS);
@@ -60,7 +55,7 @@ public class XrefConnector {
     }
 
     /**
-     * check to see whether supplied DOI is in Crossref format after splitting off a possible prefix
+     * check to see whether supplied DOI is in valid format after splitting off a possible prefix
      *
      * @return the valid suffix, or null if invalid
      */
@@ -106,35 +101,43 @@ public class XrefConnector {
     }
 
     /**
-     * consult crossref to get a works object for a supplied doi
+     * consult external service to get a json object for a supplied doi
      *
      * @param doi - the supplied doi string, prefix trimmed if necessary
      * @return a string representing the works object if successful; an empty string if not found; null if IO exception
      */
-    JsonObject retrieveXrefMetdata(String doi) {
-        LOG.debug("Attempring to retrieve metadata from Crossref for doi " + doi);
-        String agent = System.getenv("PASS_DOI_SERVICE_MAILTO") != null ? System.getenv(
-            "PASS_DOI_SERVICE_MAILTO") : MAILTO;
+    JsonObject retrieveMetdata(String doi, ExternalDoiService service) {
+        LOG.debug("Attempting to retrieve " + service.name() + "metadata for doi " + doi);
 
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL + VERSION + BASIC_PREFIX + doi).newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(service.baseUrl() + doi).newBuilder();
+
+        if ( service.parameterMap() != null ) {
+            for ( String key : service.parameterMap().keySet() )
+            urlBuilder.addQueryParameter(key, service.parameterMap().get(key));
+        }
+
         String url = urlBuilder.build().toString();
-        Request okHttpRequest = new Request.Builder()
-            .url(url)
-            .addHeader("User-Agent", agent)
-            .build();
+
+        Request.Builder requestBuilder =  new Request.Builder()
+            .url(url);
+        if ( service.headerMap() != null ) {
+            requestBuilder.headers(Headers.of(service.headerMap()));
+        }
+        Request okHttpRequest =  requestBuilder.build();
+
         Call call = client.newCall(okHttpRequest);
         JsonReader reader;
-        JsonObject xrefJsonObject;
+        JsonObject metadataJsonObject;
         String responseString = null;
 
         try (Response okHttpResponse = call.execute()) {
             responseString = okHttpResponse.body().string();
             reader = Json.createReader(new StringReader(responseString));
-            xrefJsonObject = reader.readObject();
+            metadataJsonObject = reader.readObject();
             reader.close();
 
             activeJobs.remove(doi);
-            return xrefJsonObject;
+            return metadataJsonObject;
         } catch (JsonParsingException e) {
             if (responseString != null) {
                 return Json.createObjectBuilder()
