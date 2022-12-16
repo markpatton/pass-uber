@@ -53,6 +53,7 @@ public class DoiServiceTest extends IntegrationTest {
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
             assertEquals(400, okHttpResponse.code());
+            assert okHttpResponse.body() != null;
             assertEquals("{\"error\":\"Supplied DOI is not in valid DOI format.\"}",
                          okHttpResponse.body().string());
 
@@ -75,6 +76,7 @@ public class DoiServiceTest extends IntegrationTest {
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
             assertEquals(400, okHttpResponse.code());
+            assert okHttpResponse.body() != null;
             assertEquals("{\"error\":\"Supplied DOI is not in valid DOI format.\"}",
                          okHttpResponse.body().string());
 
@@ -97,6 +99,7 @@ public class DoiServiceTest extends IntegrationTest {
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
             assertEquals(404, okHttpResponse.code());
+            assert okHttpResponse.body() != null;
             assertEquals("{\"error\":\"The resource for DOI 10.1212/abc.DEF could not be found on Crossref.\"}",
                          okHttpResponse.body().string());
 
@@ -122,13 +125,14 @@ public class DoiServiceTest extends IntegrationTest {
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
             assertEquals(422, okHttpResponse.code());
+            assert okHttpResponse.body() != null;
             assertEquals("{\"error\":\"Insufficient information to locate or specify a journal entry.\"}",
                          okHttpResponse.body().string());
         }
     }
 
     @Test
-    public void realJournalTest() throws Exception {
+    public void realJournalTest() {
         String name = "Clinical Medicine Insights: Cardiology";
         HttpUrl url = formDoiUrl("10.4137/cmc.s38446" );
         String id = "";
@@ -137,7 +141,7 @@ public class DoiServiceTest extends IntegrationTest {
             //if this journal is in the database already, delete it
             String filter = RSQL.equals("journalName", name);
             PassClientResult<Journal> result = passClient.
-                selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
+                selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
             result.getObjects().forEach(j -> {
                 try {
                     passClient.deleteObject(Journal.class, j.getId());
@@ -149,7 +153,7 @@ public class DoiServiceTest extends IntegrationTest {
             //verify that this journal is not in the database
             filter = RSQL.equals("journalName", name);
             result = passClient.
-                selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
+                selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
             assertEquals(0, result.getObjects().size());
 
             Request okHttpRequest = new Request.Builder()
@@ -159,6 +163,7 @@ public class DoiServiceTest extends IntegrationTest {
             Call call = httpClient.newCall(okHttpRequest);
             try (Response okHttpResponse = call.execute()) {
                 assertEquals(200, okHttpResponse.code());
+                assert okHttpResponse.body() != null;
                 JsonReader jsonReader1 = Json.createReader(new StringReader(okHttpResponse.body().string()));
                 JsonObject successReport = jsonReader1.readObject();
                 jsonReader1.close();
@@ -168,7 +173,7 @@ public class DoiServiceTest extends IntegrationTest {
                 //verify that this journal is now in the database
                 filter = RSQL.equals("journalName", name);
                 result = passClient.
-                    selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
+                    selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
                 assertEquals(1, result.getObjects().size());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -177,6 +182,7 @@ public class DoiServiceTest extends IntegrationTest {
             //verify that the returned object for the same request has the right id
             call = httpClient.newCall(okHttpRequest);
             try (Response okHttpResponse = call.execute()) {
+                assert okHttpResponse.body() != null;
                 JsonReader jsonReader2 = Json.createReader(new StringReader(okHttpResponse.body().string()));
                 JsonObject successReport = jsonReader2.readObject();
                 jsonReader2.close();
@@ -189,7 +195,7 @@ public class DoiServiceTest extends IntegrationTest {
             //try (ElideDataStorePassClient passClient = getNewClient()) {
             filter = RSQL.equals("journalName", name);
             result = passClient.
-                selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
+                selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
             assertEquals(1, result.getObjects().size());
         } catch (Exception e) {
             e.printStackTrace();
@@ -197,15 +203,14 @@ public class DoiServiceTest extends IntegrationTest {
     }
 
     private HttpUrl formDoiUrl(String doi) {
-        HttpUrl url = new HttpUrl.Builder()
+
+        return new HttpUrl.Builder()
             .scheme("http")
             .host("localhost")
             .port(port)
             .addPathSegment("journal")
             .addQueryParameter("doi", doi)
             .build();
-
-        return url;
     }
 
 }

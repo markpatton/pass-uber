@@ -38,6 +38,10 @@ import org.eclipse.pass.object.model.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class manages Journal objects related to a journal lookup on Crossref - creating or updating
+ * a Journal through the Elide interface when necessary
+ */
 public class ElideConnector {
     private static final Logger LOG = LoggerFactory.getLogger(ElideConnector.class);
 
@@ -89,7 +93,7 @@ public class ElideConnector {
 
     /**
      * Takes JSON which represents journal article metadata from Crossref
-     * and populates a new Journal object. Currently we take typed issns and the journal
+     * and populates a new Journal object. Currently, we take typed issns and the journal
      * name.
      *
      * @param metadata - the JSON metadata from Crossref
@@ -220,16 +224,14 @@ public class ElideConnector {
         //look for journals with this name
         String filter = RSQL.equals("journalName", name);
         PassClientResult<Journal> result = passClient.
-            selectObjects(new PassClientSelector<Journal>(Journal.class, 0, 100, filter, null));
-        result.getObjects().forEach(j -> {
-            foundList.add(j);
-        });
+            selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
+        foundList.addAll(result.getObjects());
 
         //commenting this out until we get a search filter that works for finding a string in a list of strings
         //look for journals with any of these issns
         /* if (!issns.isEmpty()) {
             for (String issn : issns) {
-                filter = RSQL.equals("issns", issn);
+                filter = RSQL.equals("issns", issn); //probably not the right call, not implemented yet
                 result = passClient.
                     selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
                 result.getObjects().forEach(j -> {

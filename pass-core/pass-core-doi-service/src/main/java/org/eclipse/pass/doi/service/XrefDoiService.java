@@ -21,9 +21,6 @@ import javax.json.JsonObject;
 
 public class XrefDoiService extends ExternalDoiService {
 
-    private String MAILTO = "pass@jhu.edu";
-    private String XREF_BASEURI = "https://api.crossref.org/v1/works/";
-
     @Override
     public String name() {
         return "Crossref";
@@ -31,9 +28,9 @@ public class XrefDoiService extends ExternalDoiService {
 
     @Override
     public String baseUrl() {
-        String baseUri = System.getenv("XREF_BASEURI") != null ? System.getenv(
+        String XREF_BASEURI = "https://api.crossref.org/v1/works/";
+        return System.getenv("XREF_BASEURI") != null ? System.getenv(
             "XREF_BASEURI") : XREF_BASEURI;
-        return baseUri;
     }
 
     @Override
@@ -44,6 +41,7 @@ public class XrefDoiService extends ExternalDoiService {
     @Override
     public HashMap<String, String> headerMap() {
         HashMap<String, String> headerMap = new HashMap<>();
+        String MAILTO = "pass@jhu.edu";
         String agent = System.getenv("PASS_DOI_SERVICE_MAILTO") != null ? System.getenv(
             "PASS_DOI_SERVICE_MAILTO") : MAILTO;
         headerMap.put("User-Agent", agent);

@@ -21,12 +21,9 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 public class UnpaywallDoiService extends ExternalDoiService {
-
-    //defaults
-    private String MAILTO = "pass@jhu.edu";
-    String UNPAYWALL_BASEURI = "https://api.unpaywall.org/v2/";
 
     @Override
     public String name() {
@@ -35,14 +32,15 @@ public class UnpaywallDoiService extends ExternalDoiService {
 
     @Override
     public String baseUrl() {
-        String baseUri = System.getenv("UNPAYWALL_BASEURI") != null ? System.getenv(
+        String UNPAYWALL_BASEURI = "https://api.unpaywall.org/v2/";
+        return System.getenv("UNPAYWALL_BASEURI") != null ? System.getenv(
             "UNPAYWALL_BASEURI") : UNPAYWALL_BASEURI;
-        return baseUri;
     }
 
     @Override
     public HashMap<String, String> parameterMap() {
         HashMap<String, String> parameterMap = new HashMap<>();
+        String MAILTO = "pass@jhu.edu";
         String agent = System.getenv("PASS_DOI_SERVICE_MAILTO") != null ? System.getenv(
             "PASS_DOI_SERVICE_MAILTO") : MAILTO;
         parameterMap.put("email", agent);
@@ -61,12 +59,20 @@ public class UnpaywallDoiService extends ExternalDoiService {
 
         for (int i = 0; i < locations.size(); i++) {
             JsonObject manuscript = locations.getJsonObject(i);
-            String urlForPdf = manuscript.getString("url_for_pdf");
-            String filename = urlForPdf.substring(urlForPdf.lastIndexOf('/') + 1);
+            JsonValue urlForPdf = manuscript.getValue("/url_for_pdf");
+
+            JsonValue filename;
+            if ( urlForPdf == JsonValue.NULL ) {
+                filename = JsonValue.NULL;
+            } else {
+                String urlForPdfString = urlForPdf.toString().replaceAll("\"","");
+                filename = Json.createValue (urlForPdfString.substring(urlForPdfString.lastIndexOf('/') + 1));
+            }
+
+            JsonValue repoInst = manuscript.getValue("/repository_institution");
 
             JsonObject manuscriptObject = Json.createObjectBuilder().add("Location", urlForPdf)
-                                              .add("RepositoryInstitution",
-                                                   manuscript.getString("repository_institution"))
+                                              .add("RepositoryInstitution", repoInst)
                                               .add("Type", "application/pdf")
                                               .add("Source", name())
                                               .add("Name", filename)
@@ -74,9 +80,8 @@ public class UnpaywallDoiService extends ExternalDoiService {
             jab.add(manuscriptObject);
         }
 
-        JsonObject jsonObject = Json.createObjectBuilder()
-                                    .add("Manuscripts", jab.build())
-                                    .build();
-        return jsonObject;
+        return Json.createObjectBuilder()
+                   .add("Manuscripts", jab.build())
+                   .build();
     }
 }

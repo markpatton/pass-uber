@@ -20,6 +20,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Objects;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -34,10 +35,13 @@ import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A class which manages the retrieval of JSON from external DOI services (Unpaywall, Crossref)
+ */
 public class ExternalDoiServiceConnector {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalDoiServiceConnector.class);
 
-    private OkHttpClient client;
+    private final OkHttpClient client;
 
     ExternalDoiServiceConnector() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -53,10 +57,10 @@ public class ExternalDoiServiceConnector {
      * @param doi - the supplied doi string, prefix trimmed if necessary
      * @return a string representing the works object if successful; an empty string if not found; null if IO exception
      */
-    JsonObject retrieveMetdata(String doi, ExternalDoiService service) {
+    JsonObject retrieveMetadata(String doi, ExternalDoiService service) {
         LOG.debug("Attempting to retrieve " + service.name() + "metadata for doi " + doi);
 
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(service.baseUrl() + doi).newBuilder();
+        HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(service.baseUrl() + doi)).newBuilder();
 
         if ( service.parameterMap() != null ) {
             for ( String key : service.parameterMap().keySet() ) {
@@ -79,7 +83,7 @@ public class ExternalDoiServiceConnector {
         String responseString = null;
 
         try (Response okHttpResponse = call.execute()) {
-            responseString = okHttpResponse.body().string();
+            responseString = Objects.requireNonNull(okHttpResponse.body()).string();
             reader = Json.createReader(new StringReader(responseString));
             metadataJsonObject = reader.readObject();
             reader.close();

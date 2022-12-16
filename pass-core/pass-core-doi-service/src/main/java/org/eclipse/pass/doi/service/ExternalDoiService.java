@@ -28,18 +28,44 @@ import javax.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * ExternalDoiService classes provide configuration needed for specific implementations'
+ * connections, as well as a method to process the raw JSON object returned by the external service to
+ * suit the requirements of the PASS UI.
+ */
 public abstract class ExternalDoiService {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalDoiService.class);
-    private Set<String> activeJobs = new HashSet<>();
+    private final Set<String> activeJobs = new HashSet<>();
 
+    /**
+     * The name of the external service
+     * @return the name of the external service
+     */
     public abstract String name();
 
+    /**
+     * The base URL of the external service
+     * @return the base URL of the external service
+     */
     public  abstract String baseUrl();
 
+    /**
+     * A key, value map of query parameters used by the external service; null if there aren't any.
+     * @return the map
+     */
     public  abstract HashMap<String, String> parameterMap();
 
+    /**
+     * A key, value map of headers used by the external service; null if there aren't any.
+     * @return the map
+     */
     public  abstract HashMap<String, String> headerMap();
 
+    /**
+     * A method to transform the raw external service's JSON response to suit the UI requirements
+     * @param object the raw external JSON object
+     * @return the transformed JSON object
+     */
     public  abstract JsonObject processObject(JsonObject object);
 
     /**
@@ -88,10 +114,12 @@ public abstract class ExternalDoiService {
         return false;
     }
 
+    /**
+     * Once a doi has been processed, this method removes it from the locked list.
+     * @param doi the doi
+     */
     void unlockDoi(String doi) {
-        if (activeJobs.contains(doi)) {
-            activeJobs.remove(doi);
-        }
+        activeJobs.remove(doi);
     }
 
     /**
@@ -99,8 +127,8 @@ public abstract class ExternalDoiService {
      * another one begins
      */
     public class ExpiringLock implements Runnable {
-        private String key;
-        private int duration;
+        private final String key;
+        private final int duration;
 
         ExpiringLock(String key, int duration) {
             this.key = key;
