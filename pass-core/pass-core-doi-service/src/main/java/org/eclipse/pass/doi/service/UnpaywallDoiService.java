@@ -22,11 +22,11 @@ import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 
-public class UnpaywallDoiService implements ExternalDoiService {
+public class UnpaywallDoiService extends ExternalDoiService {
 
     //defaults
     private String MAILTO = "pass@jhu.edu";
-    String UNPAYWALL_BASEURI= "https://api.unpaywall.org/v2/";
+    String UNPAYWALL_BASEURI = "https://api.unpaywall.org/v2/";
 
     @Override
     public String name() {
@@ -43,7 +43,6 @@ public class UnpaywallDoiService implements ExternalDoiService {
     @Override
     public HashMap<String, String> parameterMap() {
         HashMap<String, String> parameterMap = new HashMap<>();
-
         String agent = System.getenv("PASS_DOI_SERVICE_MAILTO") != null ? System.getenv(
             "PASS_DOI_SERVICE_MAILTO") : MAILTO;
         parameterMap.put("email", agent);
@@ -55,26 +54,23 @@ public class UnpaywallDoiService implements ExternalDoiService {
         return null;
     }
 
-
     @Override
     public JsonObject processObject(JsonObject object) {
         JsonArray locations = object.getJsonArray("oa_locations");
-
         JsonArrayBuilder jab = Json.createArrayBuilder();
 
         for (int i = 0; i < locations.size(); i++) {
             JsonObject manuscript = locations.getJsonObject(i);
             String urlForPdf = manuscript.getString("url_for_pdf");
-            String filename = urlForPdf.substring(urlForPdf.lastIndexOf("/") + 1);
+            String filename = urlForPdf.substring(urlForPdf.lastIndexOf('/') + 1);
 
             JsonObject manuscriptObject = Json.createObjectBuilder().add("Location", urlForPdf)
                                               .add("RepositoryInstitution",
                                                    manuscript.getString("repository_institution"))
                                               .add("Type", "application/pdf")
-                                              .add("Source", "Unpaywall")
+                                              .add("Source", name())
                                               .add("Name", filename)
                                               .build();
-
             jab.add(manuscriptObject);
         }
 
@@ -82,5 +78,5 @@ public class UnpaywallDoiService implements ExternalDoiService {
                                     .add("Manuscripts", jab.build())
                                     .build();
         return jsonObject;
-        }
+    }
 }

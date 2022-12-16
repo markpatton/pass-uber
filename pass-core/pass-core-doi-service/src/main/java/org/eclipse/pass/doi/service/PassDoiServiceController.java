@@ -19,8 +19,6 @@ package org.eclipse.pass.doi.service;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,14 +36,6 @@ public class PassDoiServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassDoiServiceController.class);
     ElideConnector elideConnector;
     ExternalDoiServiceConnector externalDoiServiceConnector;
-    String XREF_BASEURI = "https://api.crossref.org/v1/works/";
-    String UNPAYWALL_BASEURI= "https://api.unpaywall.org/v2/";
-
-    enum ExternalService {
-        XREF,
-        UNPAYWALL
-    }
-
 
     PassDoiServiceController(RefreshableElide refreshableElide) {
         this.elideConnector = new ElideConnector(refreshableElide);
@@ -61,7 +51,7 @@ public class PassDoiServiceController {
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
-        LOG.info("Servicing new request ... ");
+        LOG.info("Servicing new " + externalService.name() + " request ... ");
         LOG.debug("Context path: " + request.getContextPath() + "; query string " + request.getQueryString());
 
         //we will call out to crossref and collect the work JSON object
@@ -69,7 +59,7 @@ public class PassDoiServiceController {
         String doi = request.getParameter("doi");
 
         //stage 1: verify doi is valid
-        if (externalDoiServiceConnector.verify(doi) == null) {
+        if (externalService.verify(doi) == null) {
             // do not have have a valid xref doi
             try (OutputStream out = response.getOutputStream()) {
                 JsonObject jsonObject = Json.createObjectBuilder()
@@ -82,8 +72,7 @@ public class PassDoiServiceController {
         }
 
         //Stage 2: make sure we don't already have a request being processed for this doi
-        //
-        if (externalDoiServiceConnector.isAlreadyActive(doi)) {
+        if (externalService.isAlreadyActive(doi)) {
             // return already processing error (429>)
             try (OutputStream out = response.getOutputStream()) {
                 String message = "There is already an active request for " + doi;
@@ -116,10 +105,10 @@ public class PassDoiServiceController {
             String message;
             if (xrefJsonObject.getString("error").equals("Resource not found.")) {
                 responseCode = 404;
-                message = "The resource for DOI " + doi + " could not be found on " + externalService.name() +".";
+                message = "The resource for DOI " + doi + " could not be found on " + externalService.name() + ".";
             } else {
                 responseCode = 500;
-                message = "A record for this resource could not be returned from " + externalService.name() +": " +
+                message = "A record for this resource could not be returned from " + externalService.name() + ": " +
                           xrefJsonObject.getJsonString("error");
             }
             try (OutputStream out = response.getOutputStream()) {
@@ -172,7 +161,7 @@ public class PassDoiServiceController {
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
-        LOG.info("Servicing new request ... ");
+        LOG.info("Servicing new " + externalService.name() + " request ... ");
         LOG.debug("Context path: " + request.getContextPath() + "; query string " + request.getQueryString());
 
         //we will call out to unpaywall and collect the JSON object
@@ -180,7 +169,7 @@ public class PassDoiServiceController {
         String doi = request.getParameter("doi");
 
         //stage 1: verify doi is valid
-        if (externalDoiServiceConnector.verify(doi) == null) {
+        if (externalService.verify(doi) == null) {
             // do not have have a valid doi
             try (OutputStream out = response.getOutputStream()) {
                 JsonObject jsonObject = Json.createObjectBuilder()
@@ -193,8 +182,7 @@ public class PassDoiServiceController {
         }
 
         //Stage 2: make sure we don't already have a request being processed for this doi
-        //
-        if (externalDoiServiceConnector.isAlreadyActive(doi)) {
+        if (externalService.isAlreadyActive(doi)) {
             // return already processing error (429>)
             try (OutputStream out = response.getOutputStream()) {
                 String message = "There is already an active request for " + doi;
@@ -223,6 +211,7 @@ public class PassDoiServiceController {
         } else if (unpaywallJsonObject.getJsonString("error") != null) {
             int responseCode;
             String message;
+            //TODO fix error string returned by unpaywall here
             if (unpaywallJsonObject.getString("error").equals("Resource not found.")) {
                 responseCode = 404;
                 message = "The resource for DOI " + doi + " could not be found on Unpaywall.";
@@ -241,36 +230,12 @@ public class PassDoiServiceController {
             }
         } else {
             // have a non-empty JSON string to process
-            JsonArray locations = unpaywallJsonObject.getJsonArray("oa_locations");
-
-            JsonArrayBuilder jab = Json.createArrayBuilder();
-
-            for (int i = 0; i < locations.size(); i++) {
-                JsonObject manuscript = locations.getJsonObject(i);
-                String urlForPdf = manuscript.getString("url_for_pdf");
-                String filename = urlForPdf.substring(urlForPdf.lastIndexOf("/") + 1);
-
-                JsonObject manuscriptObject = Json.createObjectBuilder().add("Location", urlForPdf)
-                    .add("RepositoryInstitution", manuscript.getString("repository_institution"))
-                    .add("Type", "application/pdf")
-                    .add("Source", "Unpaywall")
-                    .add("Name", filename)
-                    .build();
-
-                jab.add(manuscriptObject);
-            }
-
             try (OutputStream out = response.getOutputStream()) {
-                JsonObject jsonObject = Json.createObjectBuilder()
-                                            .add("Manuscripts", jab.build())
-                                            .build();
-
+                JsonObject jsonObject = externalService.processObject(unpaywallJsonObject);
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(200);
                 LOG.info("Returning " + externalService.name() + " result for DOI " + doi);
-                }
-
+            }
         }
     }
-
 }

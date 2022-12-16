@@ -53,7 +53,7 @@ public class DoiServiceTest extends IntegrationTest {
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
             assertEquals(400, okHttpResponse.code());
-            assertEquals("{\"error\":\"Supplied DOI is not in valid Crossref format.\"}",
+            assertEquals("{\"error\":\"Supplied DOI is not in valid DOI format.\"}",
                          okHttpResponse.body().string());
 
         }
@@ -75,7 +75,7 @@ public class DoiServiceTest extends IntegrationTest {
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
             assertEquals(400, okHttpResponse.code());
-            assertEquals("{\"error\":\"Supplied DOI is not in valid Crossref format.\"}",
+            assertEquals("{\"error\":\"Supplied DOI is not in valid DOI format.\"}",
                          okHttpResponse.body().string());
 
         }

@@ -18,8 +18,6 @@ package org.eclipse.pass.doi.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.StringReader;
 import javax.json.Json;
@@ -134,7 +132,8 @@ public class ExternalDoiServiceConnectorTest {
         "{\"updated\":\"2022-06-10T11:46:53.484862\",\"url\":\"https://europepmc.org/articles/pmc5072460?pdf=render\","  +
         "\"url_for_pdf\":\"https://europepmc.org/articles/pmc5072460?pdf=render\"," +
         "\"url_for_landing_page\":\"https://europepmc.org/articles/pmc5072460\"," +
-        "\"evidence\":\"oa repository (via OAI-PMH doi match)\",\"license\":\"implied-oa\",\"version\":\"publishedVersion\"," +
+        "\"evidence\":\"oa repository (via OAI-PMH doi match)\",\"license\":\"implied-oa\"," +
+        "\"version\":\"publishedVersion\"," +
         "\"host_type\":\"repository\",\"is_best\":false,\"pmh_id\":\"oai:europepmc.org:o4XNeKpNbeRdWobq6BX7\"," +
         "\"endpoint_id\":\"b5e840539009389b1a6\",\"repository_institution\":\"PubMed Central - Europe PMC\"," +
         "\"oa_date\":null},{\"updated\":\"2022-12-14T21:03:17.169410\"," +
@@ -166,6 +165,7 @@ public class ExternalDoiServiceConnectorTest {
         assertEquals(blob.getJsonObject("message").getJsonArray("ISSN"),
                      object.getJsonObject("message").getJsonArray("ISSN"));
     }
+
     /**
      * test that hitting the Crossref API with a doi returns the expected JSON object
      */
@@ -204,27 +204,5 @@ public class ExternalDoiServiceConnectorTest {
         assertEquals("true",blob.getValue("/error").toString());
     }
 
-
-
-    /**
-     * Test that our verify method correctly handles the usual expected doi formats
-     */
-    @Test
-    public void verifyTest() {
-        String doi0 = "http://dx.doi.org/10.4137/cmc.s38446";
-        assertEquals("10.4137/cmc.s38446", underTest.verify(doi0));
-
-        String doi1 = "https://dx.doi.org/10.4137/cmc.s38446";
-        assertEquals("10.4137/cmc.s38446", underTest.verify(doi1));
-
-        String doi2 = "dx.doi.org/10.4137/cmc.s38446";
-        assertEquals("10.4137/cmc.s38446", underTest.verify(doi2));
-
-        String doi3 = "10.4137/cmc.s38446";
-        assertEquals("10.4137/cmc.s38446", underTest.verify(doi3));
-
-        String doi4 = "4137/cmc.s38446";
-        assertNull(underTest.verify(doi4));
-    }
 }
 

@@ -19,11 +19,10 @@ package org.eclipse.pass.doi.service;
 import java.util.HashMap;
 import javax.json.JsonObject;
 
-public class XrefDoiService implements ExternalDoiService {
+public class XrefDoiService extends ExternalDoiService {
 
     private String MAILTO = "pass@jhu.edu";
     private String XREF_BASEURI = "https://api.crossref.org/v1/works/";
-
 
     @Override
     public String name() {
@@ -42,11 +41,9 @@ public class XrefDoiService implements ExternalDoiService {
         return null;
     }
 
-
     @Override
     public HashMap<String, String> headerMap() {
         HashMap<String, String> headerMap = new HashMap<>();
-
         String agent = System.getenv("PASS_DOI_SERVICE_MAILTO") != null ? System.getenv(
             "PASS_DOI_SERVICE_MAILTO") : MAILTO;
         headerMap.put("User-Agent", agent);
@@ -57,6 +54,5 @@ public class XrefDoiService implements ExternalDoiService {
     public JsonObject processObject(JsonObject object) {
         return object;
     }
-
 
 }
