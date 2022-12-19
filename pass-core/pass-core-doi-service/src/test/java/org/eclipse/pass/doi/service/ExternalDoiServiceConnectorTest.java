@@ -25,7 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 /**
- * Unit tests for the xref connector
+ * Unit tests for the connector
+ *
+ * @author jrm
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ExternalDoiServiceConnectorTest {

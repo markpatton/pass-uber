@@ -23,6 +23,8 @@ import javax.json.JsonReader;
 
 /**
  * A utility class to provide real-life json responses
+ *
+ * @author jrm
  */
 public class JsonTestObjects {
 

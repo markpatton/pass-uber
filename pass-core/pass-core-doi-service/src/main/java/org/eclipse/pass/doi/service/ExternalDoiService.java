@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
  * ExternalDoiService classes provide configuration needed for specific implementations'
  * connections, as well as a method to process the raw JSON object returned by the external service to
  * suit the requirements of the PASS UI.
+ *
+ * @author jrm
  */
 public abstract class ExternalDoiService {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalDoiService.class);

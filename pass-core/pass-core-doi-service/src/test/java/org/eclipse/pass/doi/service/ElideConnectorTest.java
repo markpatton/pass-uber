@@ -32,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Unit tests for the elide connector
+ *
+ * @author jrm
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ElideConnectorTest {

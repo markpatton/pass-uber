@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * This class defines DOI service endpoints and orchestrates responses
+ *
+ * @author jrm
  */
 @RestController
 public class PassDoiServiceController {
@@ -48,7 +50,7 @@ public class PassDoiServiceController {
         this.unpaywallDoiService = new UnpaywallDoiService();
     }
 
-    @GetMapping("/journal")
+    @GetMapping("/doi/journal")
     protected void getXrefMetadata(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
 
@@ -155,7 +157,7 @@ public class PassDoiServiceController {
         }
     }
 
-    @GetMapping("/manuscript")
+    @GetMapping("/doi/manuscript")
     protected void getUnpaywallMetadata(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
 

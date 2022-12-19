@@ -41,6 +41,8 @@ import org.slf4j.LoggerFactory;
 /**
  * This class manages Journal objects related to a journal lookup on Crossref - creating or updating
  * a Journal through the Elide interface when necessary
+ *
+ * @author jrm
  */
 public class ElideConnector {
     private static final Logger LOG = LoggerFactory.getLogger(ElideConnector.class);

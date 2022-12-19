@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A class which manages the retrieval of JSON from external DOI services (Unpaywall, Crossref)
+ *
+ * @author jrm
  */
 public class ExternalDoiServiceConnector {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalDoiServiceConnector.class);
