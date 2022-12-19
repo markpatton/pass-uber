@@ -18,6 +18,7 @@ package org.eclipse.pass.object.model;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -155,45 +156,30 @@ public class Policy extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Policy that = (Policy) o;
-
-        if (title != null ? !title.equals(that.title) : that.title != null) {
-            return false;
-        }
-        if (description != null ? !description.equals(that.description) : that.description != null) {
-            return false;
-        }
-        if (policyUrl != null ? !policyUrl.equals(that.policyUrl) : that.policyUrl != null) {
-            return false;
-        }
-        if (repositories != null ? !repositories.equals(that.repositories) : that.repositories != null) {
-            return false;
-        }
-        if (institution != null ? !institution.equals(that.institution) : that.institution != null) {
-            return false;
-        }
-        return true;
+        Policy other = (Policy) obj;
+        return Objects.equals(description, other.description) && Objects.equals(institution, other.institution)
+                && Objects.equals(policyUrl, other.policyUrl) && Objects.equals(repositories, other.repositories)
+                && Objects.equals(title, other.title);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (policyUrl != null ? policyUrl.hashCode() : 0);
-        result = 31 * result + (repositories != null ? repositories.hashCode() : 0);
-        result = 31 * result + (institution != null ? institution.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), title);
+    }
+
+    @Override
+    public String toString() {
+        return "Policy [title=" + title + ", description=" + description + ", policyUrl=" + policyUrl
+                + ", repositories=" + repositories + ", institution=" + institution + ", id=" + getId() + "]";
     }
 }

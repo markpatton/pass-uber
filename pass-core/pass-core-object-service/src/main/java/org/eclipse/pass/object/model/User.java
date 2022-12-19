@@ -18,6 +18,7 @@ package org.eclipse.pass.object.model;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -263,65 +264,33 @@ public class User extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        User that = (User) o;
-
-        if (username != null ? !username.equals(that.username) : that.username != null) {
-            return false;
-        }
-        if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) {
-            return false;
-        }
-        if (middleName != null ? !middleName.equals(that.middleName) : that.middleName != null) {
-            return false;
-        }
-        if (lastName != null ? !lastName.equals(that.lastName) : that.lastName != null) {
-            return false;
-        }
-        if (displayName != null ? !displayName.equals(that.displayName) : that.displayName != null) {
-            return false;
-        }
-        if (email != null ? !email.equals(that.email) : that.email != null) {
-            return false;
-        }
-        if (affiliation != null ? !affiliation.equals(that.affiliation) : that.affiliation != null) {
-            return false;
-        }
-        if (locatorIds != null ? !locatorIds.equals(that.locatorIds) : that.locatorIds != null) {
-            return false;
-        }
-        if (orcidId != null ? !orcidId.equals(that.orcidId) : that.orcidId != null) {
-            return false;
-        }
-        if (roles != null ? !roles.equals(that.roles) : that.roles != null) {
-            return false;
-        }
-        return true;
+        User other = (User) obj;
+        return Objects.equals(affiliation, other.affiliation) && Objects.equals(displayName, other.displayName)
+                && Objects.equals(email, other.email) && Objects.equals(firstName, other.firstName)
+                && Objects.equals(lastName, other.lastName) && Objects.equals(locatorIds, other.locatorIds)
+                && Objects.equals(middleName, other.middleName) && Objects.equals(orcidId, other.orcidId)
+                && Objects.equals(roles, other.roles) && Objects.equals(username, other.username);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
-        result = 31 * result + (middleName != null ? middleName.hashCode() : 0);
-        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
-        result = 31 * result + (displayName != null ? displayName.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (affiliation != null ? affiliation.hashCode() : 0);
-        result = 31 * result + (locatorIds != null ? locatorIds.hashCode() : 0);
-        result = 31 * result + (orcidId != null ? orcidId.hashCode() : 0);
-        result = 31 * result + (roles != null ? roles.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), email, username);
+    }
+
+    @Override
+    public String toString() {
+        return "User [username=" + username + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName="
+                + lastName + ", displayName=" + displayName + ", email=" + email + ", affiliation=" + affiliation
+                + ", locatorIds=" + locatorIds + ", orcidId=" + orcidId + ", roles=" + roles + ", id=" + getId() + "]";
     }
 }

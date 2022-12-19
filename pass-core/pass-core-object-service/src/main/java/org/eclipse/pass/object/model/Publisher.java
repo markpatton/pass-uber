@@ -22,6 +22,7 @@ package org.eclipse.pass.object.model;
  * @author Karen Hanson
  */
 
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -93,34 +94,27 @@ public class Publisher extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Publisher that = (Publisher) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null) {
-            return false;
-        }
-        if (pmcParticipation != null ? !pmcParticipation.equals(
-            that.pmcParticipation) : that.pmcParticipation != null) {
-            return false;
-        }
-        return true;
+        Publisher other = (Publisher) obj;
+        return Objects.equals(name, other.name) && pmcParticipation == other.pmcParticipation;
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (pmcParticipation != null ? pmcParticipation.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), name);
+    }
+
+    @Override
+    public String toString() {
+        return "Publisher [name=" + name + ", pmcParticipation=" + pmcParticipation + ", id=" + getId() + "]";
     }
 }

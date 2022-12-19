@@ -15,6 +15,7 @@
  */
 package org.eclipse.pass.object.model;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -190,54 +191,32 @@ public class Publication extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Publication that = (Publication) o;
-
-        if (title != null ? !title.equals(that.title) : that.title != null) {
-            return false;
-        }
-        if (publicationAbstract != null ? !publicationAbstract.equals(
-            that.publicationAbstract) : that.publicationAbstract != null) {
-            return false;
-        }
-        if (doi != null ? !doi.equals(that.doi) : that.doi != null) {
-            return false;
-        }
-        if (pmid != null ? !pmid.equals(that.pmid) : that.pmid != null) {
-            return false;
-        }
-        if (journal != null ? !journal.equals(that.journal) : that.journal != null) {
-            return false;
-        }
-        if (volume != null ? !volume.equals(that.volume) : that.volume != null) {
-            return false;
-        }
-        if (issue != null ? !issue.equals(that.issue) : that.issue != null) {
-            return false;
-        }
-        return true;
+        Publication other = (Publication) obj;
+        return Objects.equals(doi, other.doi) && Objects.equals(issue, other.issue)
+                && Objects.equals(journal, other.journal) && Objects.equals(pmid, other.pmid)
+                && Objects.equals(publicationAbstract, other.publicationAbstract) && Objects.equals(title, other.title)
+                && Objects.equals(volume, other.volume);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (publicationAbstract != null ? publicationAbstract.hashCode() : 0);
-        result = 31 * result + (doi != null ? doi.hashCode() : 0);
-        result = 31 * result + (pmid != null ? pmid.hashCode() : 0);
-        result = 31 * result + (journal != null ? journal.hashCode() : 0);
-        result = 31 * result + (volume != null ? volume.hashCode() : 0);
-        result = 31 * result + (issue != null ? issue.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), doi, title);
+    }
+
+    @Override
+    public String toString() {
+        return "Publication [title=" + title + ", publicationAbstract=" + publicationAbstract + ", doi=" + doi
+                + ", pmid=" + pmid + ", journal=" + journal + ", volume=" + volume + ", issue=" + issue
+                + ", id=" + getId() + "]";
     }
 }

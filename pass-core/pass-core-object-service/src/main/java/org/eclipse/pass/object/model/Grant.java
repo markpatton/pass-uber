@@ -18,6 +18,7 @@ package org.eclipse.pass.object.model;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -281,70 +282,35 @@ public class Grant extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Grant that = (Grant) o;
-
-        if (awardNumber != null ? !awardNumber.equals(that.awardNumber) : that.awardNumber != null) {
-            return false;
-        }
-        if (awardStatus != null ? !awardStatus.equals(that.awardStatus) : that.awardStatus != null) {
-            return false;
-        }
-        if (localKey != null ? !localKey.equals(that.localKey) : that.localKey != null) {
-            return false;
-        }
-        if (projectName != null ? !projectName.equals(that.projectName) : that.projectName != null) {
-            return false;
-        }
-        if (primaryFunder != null ? !primaryFunder.equals(that.primaryFunder) : that.primaryFunder != null) {
-            return false;
-        }
-        if (directFunder != null ? !directFunder.equals(that.directFunder) : that.directFunder != null) {
-            return false;
-        }
-        if (pi != null ? !pi.equals(that.pi) : that.pi != null) {
-            return false;
-        }
-        if (coPis != null ? !coPis.equals(that.coPis) : that.coPis != null) {
-            return false;
-        }
-        if (awardDate != null ? !awardDate.equals(that.awardDate) : that.awardDate != null) {
-            return false;
-        }
-        if (startDate != null ? !startDate.equals(that.startDate) : that.startDate != null) {
-            return false;
-        }
-        if (endDate != null ? !endDate.equals(that.endDate) : that.endDate != null) {
-            return false;
-        }
-        return true;
-
+        Grant other = (Grant) obj;
+        return Objects.equals(awardDate, other.awardDate) && Objects.equals(awardNumber, other.awardNumber)
+                && awardStatus == other.awardStatus && Objects.equals(coPis, other.coPis)
+                && Objects.equals(directFunder, other.directFunder) && Objects.equals(endDate, other.endDate)
+                && Objects.equals(localKey, other.localKey) && Objects.equals(pi, other.pi)
+                && Objects.equals(primaryFunder, other.primaryFunder) && Objects.equals(projectName, other.projectName)
+                && Objects.equals(startDate, other.startDate);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (awardNumber != null ? awardNumber.hashCode() : 0);
-        result = 31 * result + (awardStatus != null ? awardStatus.hashCode() : 0);
-        result = 31 * result + (localKey != null ? localKey.hashCode() : 0);
-        result = 31 * result + (projectName != null ? projectName.hashCode() : 0);
-        result = 31 * result + (primaryFunder != null ? primaryFunder.hashCode() : 0);
-        result = 31 * result + (directFunder != null ? directFunder.hashCode() : 0);
-        result = 31 * result + (pi != null ? pi.hashCode() : 0);
-        result = 31 * result + (coPis != null ? coPis.hashCode() : 0);
-        result = 31 * result + (awardDate != null ? awardDate.hashCode() : 0);
-        result = 31 * result + (startDate != null ? startDate.hashCode() : 0);
-        result = 31 * result + (endDate != null ? endDate.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), awardNumber, localKey);
+    }
+
+    @Override
+    public String toString() {
+        return "Grant [awardNumber=" + awardNumber + ", awardStatus=" + awardStatus + ", localKey=" + localKey
+                + ", projectName=" + projectName + ", primaryFunder=" + primaryFunder + ", directFunder=" + directFunder
+                + ", pi=" + pi + ", coPis=" + coPis + ", awardDate=" + awardDate + ", startDate=" + startDate
+                + ", endDate=" + endDate + ", id=" + getId() + "]";
     }
 }

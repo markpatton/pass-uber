@@ -16,6 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import java.net.URI;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -131,41 +132,29 @@ public class Funder extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Funder that = (Funder) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null) {
-            return false;
-        }
-        if (url != null ? !url.equals(that.url) : that.url != null) {
-            return false;
-        }
-        if (policy != null ? !policy.equals(that.policy) : that.policy != null) {
-            return false;
-        }
-        if (localKey != null ? !localKey.equals(that.localKey) : that.localKey != null) {
-            return false;
-        }
-        return true;
+        Funder other = (Funder) obj;
+        return Objects.equals(localKey, other.localKey) && Objects.equals(name, other.name)
+                && Objects.equals(policy, other.policy) && Objects.equals(url, other.url);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (url != null ? url.hashCode() : 0);
-        result = 31 * result + (policy != null ? policy.hashCode() : 0);
-        result = 31 * result + (localKey != null ? localKey.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), localKey);
+    }
+
+    @Override
+    public String toString() {
+        return "Funder [name=" + name + ", url=" + url + ", policy=" + policy + ", localKey=" + localKey +
+                ", id=" + getId() + "]";
     }
 }

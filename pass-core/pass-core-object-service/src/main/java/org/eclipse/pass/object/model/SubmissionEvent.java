@@ -17,6 +17,7 @@ package org.eclipse.pass.object.model;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -200,53 +201,32 @@ public class SubmissionEvent extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        SubmissionEvent that = (SubmissionEvent) o;
-
-        if (eventType != null ? !eventType.equals(that.eventType) : that.eventType != null) {
-            return false;
-        }
-        if (performedDate != null ? !performedDate.equals(that.performedDate) : that.performedDate != null) {
-            return false;
-        }
-        if (performedBy != null ? !performedBy.equals(that.performedBy) : that.performedBy != null) {
-            return false;
-        }
-        if (performerRole != null ? !performerRole.equals(that.performerRole) : that.performerRole != null) {
-            return false;
-        }
-        if (submission != null ? !submission.equals(that.submission) : that.submission != null) {
-            return false;
-        }
-        if (comment != null ? !comment.equals(that.comment) : that.comment != null) {
-            return false;
-        }
-        if (link != null ? !link.equals(that.link) : that.link != null) {
-            return false;
-        }
-        return true;
+        SubmissionEvent other = (SubmissionEvent) obj;
+        return Objects.equals(comment, other.comment) && eventType == other.eventType
+                && Objects.equals(link, other.link) && Objects.equals(performedBy, other.performedBy)
+                && Objects.equals(performedDate, other.performedDate) && performerRole == other.performerRole
+                && Objects.equals(submission, other.submission);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (eventType != null ? eventType.hashCode() : 0);
-        result = 31 * result + (performedDate != null ? performedDate.hashCode() : 0);
-        result = 31 * result + (performedBy != null ? performedBy.hashCode() : 0);
-        result = 31 * result + (performerRole != null ? performerRole.hashCode() : 0);
-        result = 31 * result + (submission != null ? submission.hashCode() : 0);
-        result = 31 * result + (comment != null ? comment.hashCode() : 0);
-        result = 31 * result + (link != null ? link.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), comment);
+    }
+
+    @Override
+    public String toString() {
+        return "SubmissionEvent [eventType=" + eventType + ", performedDate=" + performedDate + ", performedBy="
+                + performedBy + ", performerRole=" + performerRole + ", submission=" + submission + ", comment="
+                + comment + ", link=" + link + ", id=" + getId() + "]";
     }
 }

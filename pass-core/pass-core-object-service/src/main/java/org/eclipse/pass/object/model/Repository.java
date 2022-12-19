@@ -18,6 +18,7 @@ package org.eclipse.pass.object.model;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -226,57 +227,32 @@ public class Repository extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Repository that = (Repository) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null) {
-            return false;
-        }
-        if (description != null ? !description.equals(that.description) : that.description != null) {
-            return false;
-        }
-        if (url != null ? !url.equals(that.url) : that.url != null) {
-            return false;
-        }
-        if (formSchema != null ? !formSchema.equals(that.formSchema) : that.formSchema != null) {
-            return false;
-        }
-        if (integrationType != null ? !integrationType.equals(that.integrationType) : that.integrationType != null) {
-            return false;
-        }
-        if (agreementText != null ? !agreementText.equals(that.agreementText) : that.agreementText != null) {
-            return false;
-        }
-        if (repositoryKey != null ? !repositoryKey.equals(that.repositoryKey) : that.repositoryKey != null) {
-            return false;
-        }
-        if (schemas != null ? !schemas.equals(that.schemas) : that.schemas != null) {
-            return false;
-        }
-        return true;
+        Repository other = (Repository) obj;
+        return Objects.equals(agreementText, other.agreementText) && Objects.equals(description, other.description)
+                && Objects.equals(formSchema, other.formSchema) && integrationType == other.integrationType
+                && Objects.equals(name, other.name) && Objects.equals(repositoryKey, other.repositoryKey)
+                && Objects.equals(schemas, other.schemas) && Objects.equals(url, other.url);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (url != null ? url.hashCode() : 0);
-        result = 31 * result + (formSchema != null ? formSchema.hashCode() : 0);
-        result = 31 * result + (integrationType != null ? integrationType.hashCode() : 0);
-        result = 31 * result + (agreementText != null ? agreementText.hashCode() : 0);
-        result = 31 * result + (repositoryKey != null ? repositoryKey.hashCode() : 0);
-        result = 31 * result + (schemas != null ? schemas.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), repositoryKey);
+    }
+
+    @Override
+    public String toString() {
+        return "Repository [name=" + name + ", description=" + description + ", url=" + url + ", agreementText="
+                + agreementText + ", formSchema=" + formSchema + ", integrationType=" + integrationType
+                + ", repositoryKey=" + repositoryKey + ", schemas=" + schemas + ", id=" + getId() + "]";
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.eclipse.pass.object.model;
 
+import java.util.Objects;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -76,27 +77,22 @@ public abstract class PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null) {
             return false;
         }
-
-        PassEntity that = (PassEntity) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        return true;
+        PassEntity other = (PassEntity) obj;
+        return Objects.equals(id, other.id);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (id != null ? id.hashCode() : 0);
-        return result;
+        return Objects.hash(id);
     }
 }

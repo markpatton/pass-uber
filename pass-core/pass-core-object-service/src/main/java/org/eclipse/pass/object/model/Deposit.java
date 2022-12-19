@@ -15,6 +15,7 @@
  */
 package org.eclipse.pass.object.model;
 
+import java.util.Objects;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -158,46 +159,31 @@ public class Deposit extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Deposit that = (Deposit) o;
-
-        if (depositStatusRef != null ? !depositStatusRef.equals(
-            that.depositStatusRef) : that.depositStatusRef != null) {
-            return false;
-        }
-        if (depositStatus != null ? !depositStatus.equals(that.depositStatus) : that.depositStatus != null) {
-            return false;
-        }
-        if (submission != null ? !submission.equals(that.submission) : that.submission != null) {
-            return false;
-        }
-        if (repository != null ? !repository.equals(that.repository) : that.repository != null) {
-            return false;
-        }
-        if (repositoryCopy != null ? !repositoryCopy.equals(that.repositoryCopy) : that.repositoryCopy != null) {
-            return false;
-        }
-        return true;
+        Deposit other = (Deposit) obj;
+        return depositStatus == other.depositStatus && Objects.equals(depositStatusRef, other.depositStatusRef)
+                && Objects.equals(repository, other.repository) && Objects.equals(repositoryCopy, other.repositoryCopy)
+                && Objects.equals(submission, other.submission);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (depositStatusRef != null ? depositStatusRef.hashCode() : 0);
-        result = 31 * result + (depositStatus != null ? depositStatus.hashCode() : 0);
-        result = 31 * result + (submission != null ? submission.hashCode() : 0);
-        result = 31 * result + (repository != null ? repository.hashCode() : 0);
-        result = 31 * result + (repositoryCopy != null ? repositoryCopy.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), depositStatusRef);
+    }
+
+    @Override
+    public String toString() {
+        return "Deposit [depositStatusRef=" + depositStatusRef + ", depositStatus=" + depositStatus + ", submission="
+                + submission + ", repository=" + repository + ", repositoryCopy=" + repositoryCopy +
+                ", id=" + getId() + "]";
     }
 }

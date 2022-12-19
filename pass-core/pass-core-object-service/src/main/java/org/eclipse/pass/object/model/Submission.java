@@ -19,6 +19,7 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -371,84 +372,39 @@ public class Submission extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Submission that = (Submission) o;
-
-        if (metadata != null ? !metadata.equals(that.metadata) : that.metadata != null) {
-            return false;
-        }
-        if (source != null ? !source.equals(that.source) : that.source != null) {
-            return false;
-        }
-        if (submitted != null ? !submitted.equals(that.submitted) : that.submitted != null) {
-            return false;
-        }
-        if (submittedDate != null ? !submittedDate.equals(that.submittedDate) : that.submittedDate != null) {
-            return false;
-        }
-        if (submissionStatus != null ? !submissionStatus.equals(
-            that.submissionStatus) : that.submissionStatus != null) {
-            return false;
-        }
-        if (aggregatedDepositStatus != null ? !aggregatedDepositStatus.equals(
-            that.aggregatedDepositStatus) : that.aggregatedDepositStatus != null) {
-            return false;
-        }
-        if (publication != null ? !publication.equals(that.publication) : that.publication != null) {
-            return false;
-        }
-        if (repositories != null ? !repositories.equals(that.repositories) : that.repositories != null) {
-            return false;
-        }
-        if (effectivePolicies != null ? !effectivePolicies.equals(
-            that.effectivePolicies) : that.effectivePolicies != null) {
-            return false;
-        }
-        if (submitter != null ? !submitter.equals(that.submitter) : that.submitter != null) {
-            return false;
-        }
-        if (submitterName != null ? !submitterName.equals(that.submitterName) : that.submitterName != null) {
-            return false;
-        }
-        if (submitterEmail != null ? !submitterEmail.equals(that.submitterEmail) : that.submitterEmail != null) {
-            return false;
-        }
-        if (preparers != null ? !preparers.equals(that.preparers) : that.preparers != null) {
-            return false;
-        }
-        if (grants != null ? !grants.equals(that.grants) : that.grants != null) {
-            return false;
-        }
-        return true;
+        Submission other = (Submission) obj;
+        return aggregatedDepositStatus == other.aggregatedDepositStatus
+                && Objects.equals(effectivePolicies, other.effectivePolicies) && Objects.equals(grants, other.grants)
+                && Objects.equals(metadata, other.metadata) && Objects.equals(preparers, other.preparers)
+                && Objects.equals(publication, other.publication) && Objects.equals(repositories, other.repositories)
+                && source == other.source && submissionStatus == other.submissionStatus
+                && Objects.equals(submitted, other.submitted) && Objects.equals(submittedDate, other.submittedDate)
+                && Objects.equals(submitter, other.submitter) && Objects.equals(submitterEmail, other.submitterEmail)
+                && Objects.equals(submitterName, other.submitterName);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (metadata != null ? metadata.hashCode() : 0);
-        result = 31 * result + (source != null ? source.hashCode() : 0);
-        result = 31 * result + (submitted != null ? submitted.hashCode() : 0);
-        result = 31 * result + (submittedDate != null ? submittedDate.hashCode() : 0);
-        result = 31 * result + (submissionStatus != null ? submissionStatus.hashCode() : 0);
-        result = 31 * result + (aggregatedDepositStatus != null ? aggregatedDepositStatus.hashCode() : 0);
-        result = 31 * result + (publication != null ? publication.hashCode() : 0);
-        result = 31 * result + (repositories != null ? repositories.hashCode() : 0);
-        result = 31 * result + (effectivePolicies != null ? effectivePolicies.hashCode() : 0);
-        result = 31 * result + (submitter != null ? submitter.hashCode() : 0);
-        result = 31 * result + (submitterName != null ? submitterName.hashCode() : 0);
-        result = 31 * result + (submitterEmail != null ? submitterEmail.hashCode() : 0);
-        result = 31 * result + (preparers != null ? preparers.hashCode() : 0);
-        result = 31 * result + (grants != null ? grants.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), metadata);
+    }
+
+    @Override
+    public String toString() {
+        return "Submission [metadata=" + metadata + ", source=" + source + ", submitted=" + submitted
+                + ", submittedDate=" + submittedDate + ", submissionStatus=" + submissionStatus
+                + ", aggregatedDepositStatus=" + aggregatedDepositStatus + ", publication=" + publication
+                + ", repositories=" + repositories + ", submitter=" + submitter + ", submitterName=" + submitterName
+                + ", submitterEmail=" + submitterEmail + ", preparers=" + preparers + ", grants=" + grants
+                + ", effectivePolicies=" + effectivePolicies + ", id=" + getId() + "]";
     }
 }

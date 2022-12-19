@@ -16,6 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import java.net.URI;
+import java.util.Objects;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -173,49 +174,30 @@ public class File extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        File that = (File) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null) {
-            return false;
-        }
-        if (uri != null ? !uri.equals(that.uri) : that.uri != null) {
-            return false;
-        }
-        if (description != null ? !description.equals(that.description) : that.description != null) {
-            return false;
-        }
-        if (fileRole != null ? !fileRole.equals(that.fileRole) : that.fileRole != null) {
-            return false;
-        }
-        if (mimeType != null ? !mimeType.equals(that.mimeType) : that.mimeType != null) {
-            return false;
-        }
-        if (submission != null ? !submission.equals(that.submission) : that.submission != null) {
-            return false;
-        }
-        return true;
+        File other = (File) obj;
+        return Objects.equals(description, other.description) && fileRole == other.fileRole
+                && Objects.equals(mimeType, other.mimeType) && Objects.equals(name, other.name)
+                && Objects.equals(submission, other.submission) && Objects.equals(uri, other.uri);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (uri != null ? uri.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (fileRole != null ? fileRole.hashCode() : 0);
-        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
-        result = 31 * result + (submission != null ? submission.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), name);
+    }
+
+    @Override
+    public String toString() {
+        return "File [name=" + name + ", uri=" + uri + ", description=" + description + ", fileRole=" + fileRole
+                + ", mimeType=" + mimeType + ", submission=" + submission + ", id=" + getId() + "]";
     }
 }

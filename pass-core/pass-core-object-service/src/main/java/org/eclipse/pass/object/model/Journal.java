@@ -17,6 +17,7 @@ package org.eclipse.pass.object.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -159,46 +160,30 @@ public class Journal extends PassEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        Journal that = (Journal) o;
-
-        if (journalName != null ? !journalName.equals(that.journalName) : that.journalName != null) {
-            return false;
-        }
-        if (issns != null ? !issns.equals(that.issns) : that.issns != null) {
-            return false;
-        }
-        if (publisher != null ? !publisher.equals(that.publisher) : that.publisher != null) {
-            return false;
-        }
-        if (nlmta != null ? !nlmta.equals(that.nlmta) : that.nlmta != null) {
-            return false;
-        }
-        if (pmcParticipation != null ? !pmcParticipation.equals(
-            that.pmcParticipation) : that.pmcParticipation != null) {
-            return false;
-        }
-        return true;
+        Journal other = (Journal) obj;
+        return Objects.equals(issns, other.issns) && Objects.equals(journalName, other.journalName)
+                && Objects.equals(nlmta, other.nlmta) && pmcParticipation == other.pmcParticipation
+                && Objects.equals(publisher, other.publisher);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (journalName != null ? journalName.hashCode() : 0);
-        result = 31 * result + (issns != null ? issns.hashCode() : 0);
-        result = 31 * result + (publisher != null ? publisher.hashCode() : 0);
-        result = 31 * result + (nlmta != null ? nlmta.hashCode() : 0);
-        result = 31 * result + (pmcParticipation != null ? pmcParticipation.hashCode() : 0);
-        return result;
+        return Objects.hash(getId(), journalName);
+    }
+
+    @Override
+    public String toString() {
+        return "Journal [journalName=" + journalName + ", issns=" + issns + ", publisher=" + publisher + ", nlmta="
+                + nlmta + ", pmcParticipation=" + pmcParticipation + ", id=" + getId() + "]";
     }
 }
