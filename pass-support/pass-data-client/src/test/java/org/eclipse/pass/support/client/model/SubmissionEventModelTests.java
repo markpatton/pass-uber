@@ -40,13 +40,10 @@ public class SubmissionEventModelTests {
         SubmissionEvent submissionEvent2 = createSubmissionEvent();
 
         assertEquals(submissionEvent1, submissionEvent2);
-        submissionEvent1.setPerformerRole(PerformerRole.SUBMITTER);
-        assertTrue(!submissionEvent1.equals(submissionEvent2));
-
-        assertTrue(submissionEvent1.hashCode() != submissionEvent2.hashCode());
-        submissionEvent1 = submissionEvent2;
         assertEquals(submissionEvent1.hashCode(), submissionEvent2.hashCode());
 
+        submissionEvent1.setPerformerRole(PerformerRole.SUBMITTER);
+        assertTrue(!submissionEvent1.equals(submissionEvent2));
     }
 
     /**
