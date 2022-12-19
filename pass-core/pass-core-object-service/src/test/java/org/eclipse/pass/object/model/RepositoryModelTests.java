@@ -23,44 +23,29 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class RepositoryModelTests {
-
-    /**
-     * Creates two identical Repositorys and checks the equals and hashcodes match.
-     * Modifies one field on one of the repositorys and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testRepositoryEqualsAndHashCode() throws Exception {
-
+    public void testRepositoryEqualsAndHashCode()  {
         Repository repository1 = createRepository(TestValues.REPOSITORY_ID_1);
         Repository repository2 = createRepository(TestValues.REPOSITORY_ID_1);
 
         assertEquals(repository1, repository2);
-        repository1.setName("different");
-        assertTrue(!repository1.equals(repository2));
-
-        assertTrue(repository1.hashCode() != repository2.hashCode());
-        repository1 = repository2;
         assertEquals(repository1.hashCode(), repository2.hashCode());
 
+        repository1.setName("different");
+        assertTrue(!repository1.equals(repository2));
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testRepositoryCopyConstructor() throws Exception {
+    public void testRepositoryCopyConstructor()  {
         Repository repository = createRepository(TestValues.REPOSITORY_ID_1);
         Repository repositoryCopy = new Repository(repository);
         assertEquals(repository, repositoryCopy);
@@ -74,5 +59,4 @@ public class RepositoryModelTests {
         assertEquals(IntegrationType.of(TestValues.REPOSITORY_INTEGRATION_TYPE), repository.getIntegrationType());
         assertEquals(IntegrationType.ONE_WAY, repositoryCopy.getIntegrationType());
     }
-
 }

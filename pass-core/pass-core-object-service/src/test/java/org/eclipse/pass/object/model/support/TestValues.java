@@ -16,7 +16,7 @@
 
 package org.eclipse.pass.object.model.support;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -495,9 +495,7 @@ public class TestValues {
     /**
      * A test value
      */
-    public static final Set<String> USER_AFFILIATION = new HashSet<String>() {{
-            add("Johns Hopkins University");
-        }};
+    public static final Set<String> USER_AFFILIATION = Collections.singleton("Johns Hopkins University");
 
     /**
      * A test value

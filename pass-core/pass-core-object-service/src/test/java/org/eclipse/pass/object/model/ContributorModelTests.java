@@ -23,44 +23,29 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class ContributorModelTests {
-
-    /**
-     * Creates two identical Contributors and checks the equals and hashcodes match.
-     * Modifies one field on one of the Contributors and verifies they no Longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testContributorEqualsAndHashCode() throws Exception {
-
+    public void testContributorEqualsAndHashCode() {
         Contributor contributor1 = createContributor(TestValues.CONTRIBUTOR_ID_1, TestValues.USER_ID_1);
         Contributor contributor2 = createContributor(TestValues.CONTRIBUTOR_ID_1, TestValues.USER_ID_1);
 
         assertEquals(contributor1, contributor2);
-        contributor1.setFirstName("different");
-        assertTrue(!contributor1.equals(contributor2));
-
-        assertTrue(contributor1.hashCode() != contributor2.hashCode());
-        contributor1 = contributor2;
         assertEquals(contributor1.hashCode(), contributor2.hashCode());
 
+        contributor1.setFirstName("different");
+        assertTrue(!contributor1.equals(contributor2));
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testContributorCopyConstructor() throws Exception {
+    public void testContributorCopyConstructor()  {
         Contributor contributor = createContributor(TestValues.CONTRIBUTOR_ID_1, TestValues.USER_ID_1);
         Contributor contributorCopy = new Contributor(contributor);
         assertEquals(contributor, contributorCopy);
@@ -88,5 +73,4 @@ public class ContributorModelTests {
 
         return user;
     }
-
 }

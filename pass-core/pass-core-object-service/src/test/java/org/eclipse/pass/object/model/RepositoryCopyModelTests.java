@@ -29,44 +29,29 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class RepositoryCopyModelTests {
-
-    /**
-     * Creates two identical RepositoryCopys and checks the equals and hashcodes match.
-     * Modifies one field on one of the RepositoryCopies and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testRepositoryCopyEqualsAndHashCode() throws Exception {
-
+    public void testRepositoryCopyEqualsAndHashCode()  {
         RepositoryCopy repoCopy1 = createRepositoryCopy(TestValues.REPOSITORYCOPY_ID_1);
         RepositoryCopy repoCopy2 = createRepositoryCopy(TestValues.REPOSITORYCOPY_ID_1);
 
         assertEquals(repoCopy1, repoCopy2);
-        repoCopy1.setRepository(createRepository(TestValues.REPOSITORY_ID_2));
-        assertTrue(!repoCopy1.equals(repoCopy2));
-
-        assertTrue(repoCopy1.hashCode() != repoCopy2.hashCode());
-        repoCopy1 = repoCopy2;
         assertEquals(repoCopy1.hashCode(), repoCopy2.hashCode());
 
+        repoCopy1.setRepository(createRepository(TestValues.REPOSITORY_ID_2));
+        assertTrue(!repoCopy1.equals(repoCopy2));
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testRepositoryCopyCopyConstructor() throws Exception {
+    public void testRepositoryCopyCopyConstructor()  {
         RepositoryCopy repositoryCopy = createRepositoryCopy(TestValues.REPOSITORYCOPY_ID_1);
         List<String> externalIds = new ArrayList<String>(
             Arrays.asList(TestValues.REPOSITORYCOPY_EXTERNALID_1, TestValues.REPOSITORYCOPY_EXTERNALID_2));
@@ -84,5 +69,4 @@ public class RepositoryCopyModelTests {
         assertEquals(externalIds, repositoryCopy.getExternalIds());
         assertEquals(externalIdsNew, repositoryCopyCopy.getExternalIds());
     }
-
 }

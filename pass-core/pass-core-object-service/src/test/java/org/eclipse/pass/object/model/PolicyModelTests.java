@@ -29,45 +29,29 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the the equals / hashcode functions work
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class PolicyModelTests {
-
-
-
-    /**
-     * Creates two identical Policys and checks the equals and hashcodes match.
-     * Modifies one field on one of the policys and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testPolicyEqualsAndHashCode() throws Exception {
-
+    public void testPolicyEqualsAndHashCode()  {
         Policy policy1 = createPolicy(TestValues.POLICY_ID_1);
         Policy policy2 = createPolicy(TestValues.POLICY_ID_1);
 
         assertEquals(policy1, policy2);
-        policy1.setPolicyUrl(new URI("https://somethingdifferent.test"));
-        assertTrue(!policy1.equals(policy2));
-
-        assertTrue(policy1.hashCode() != policy2.hashCode());
-        policy1 = policy2;
         assertEquals(policy1.hashCode(), policy2.hashCode());
+
+        policy1.setPolicyUrl(URI.create("https://somethingdifferent.test"));
+        assertTrue(!policy1.equals(policy2));
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testPolicyCopyConstructor() throws Exception {
+    public void testPolicyCopyConstructor()  {
         Policy policy = createPolicy(TestValues.POLICY_ID_1);
         List<Repository> repositoriesOrig =
             new ArrayList<Repository>(Arrays.asList(createRepository(TestValues.REPOSITORY_ID_1),
@@ -77,9 +61,9 @@ public class PolicyModelTests {
         Policy policyCopy = new Policy(policy);
         assertEquals(policy, policyCopy);
 
-        URI newInstitution = new URI("different:institution");
+        URI newInstitution = URI.create("different:institution");
         policyCopy.setInstitution(newInstitution);
-        assertEquals(new URI(TestValues.INSTITUTION_ID_1), policy.getInstitution());
+        assertEquals(URI.create(TestValues.INSTITUTION_ID_1), policy.getInstitution());
         assertEquals(newInstitution, policyCopy.getInstitution());
 
         List<Repository> repositoriesNew =
@@ -88,5 +72,4 @@ public class PolicyModelTests {
         assertEquals(repositoriesOrig, policy.getRepositories());
         assertEquals(repositoriesNew, policyCopy.getRepositories());
     }
-
 }

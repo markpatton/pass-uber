@@ -23,43 +23,29 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class PublicationModelTests {
-
-    /**
-     * Creates two identical Publication and checks the equals and hashcodes match.
-     * Modifies one field on one of the publications and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testSubmissionEqualsAndHashCode() throws Exception {
+    public void testSubmissionEqualsAndHashCode()  {
         Publication publication1 = createPublication(TestValues.PUBLICATION_ID_1);
         Publication publication2 = createPublication(TestValues.PUBLICATION_ID_1);
 
         assertEquals(publication1, publication2);
-        publication1.setIssue("different");
-        assertTrue(!publication1.equals(publication2));
-
-        assertTrue(publication1.hashCode() != publication2.hashCode());
-        publication1 = publication2;
         assertEquals(publication1.hashCode(), publication2.hashCode());
 
+        publication1.setIssue("different");
+        assertTrue(!publication1.equals(publication2));
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testPublicationCopyConstructor() throws Exception {
+    public void testPublicationCopyConstructor()  {
         Publication publication = createPublication(TestValues.PUBLICATION_ID_1);
         Publication publicationCopy = new Publication(publication);
         assertEquals(publication, publicationCopy);
@@ -74,5 +60,4 @@ public class PublicationModelTests {
         assertEquals(TestValues.PUBLICATION_VOLUME, publication.getVolume());
         assertEquals(newVolume, publicationCopy.getVolume());
     }
-
 }

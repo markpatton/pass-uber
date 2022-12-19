@@ -25,45 +25,30 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class FileModelTests {
-
-
-    /**
-     * Creates two identical Files and checks the equals and hashcodes match.
-     * Modifies one field on one of the Files and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testFileEqualsAndHashCode() throws Exception {
+    public void testFileEqualsAndHashCode()  {
 
         File file1 = createFile();
         File file2 = createFile();
 
         assertEquals(file1, file2);
-        file1.setDescription("different");
-        assertTrue(!file1.equals(file2));
-
-        assertTrue(file1.hashCode() != file2.hashCode());
-        file1 = file2;
         assertEquals(file1.hashCode(), file2.hashCode());
 
+        file1.setDescription("different");
+        assertTrue(!file1.equals(file2));
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testFileCopyConstructor() throws Exception {
+    public void testFileCopyConstructor()  {
         File file = createFile();
         File fileCopy = new File(file);
         assertEquals(file, fileCopy);
@@ -78,11 +63,11 @@ public class FileModelTests {
         assertEquals(newMimeType, fileCopy.getMimeType());
     }
 
-    private File createFile() throws Exception {
+    private File createFile()  {
         File file = new File();
         file.setId(TestValues.FILE_ID_1);
         file.setName(TestValues.FILE_NAME);
-        file.setUri(new URI(TestValues.FILE_URI));
+        file.setUri(URI.create(TestValues.FILE_URI));
         file.setDescription(TestValues.FILE_DESCRIPTION);
         file.setFileRole(FileRole.of(TestValues.FILE_ROLE));
         file.setMimeType(TestValues.FILE_MIMETYPE);

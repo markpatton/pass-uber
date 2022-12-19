@@ -25,41 +25,30 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class GrantModelTests {
-    /**
-     * Creates two identical Grants and checks the equals and hashcodes match.
-     * Modifies one field on one of the Grants and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testGrantEqualsAndHashCode() throws Exception {
+    public void testGrantEqualsAndHashCode()  {
 
         Grant grant1 = createGrant(TestValues.GRANT_ID_1);
         Grant grant2 = createGrant(TestValues.GRANT_ID_1);
 
         assertEquals(grant1, grant2);
         assertEquals(grant1.hashCode(), grant2.hashCode());
+
         grant1.setAwardNumber("different");
         assertTrue(!grant1.equals(grant2));
-        assertTrue(grant1.hashCode() != grant2.hashCode());
-
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testGrantCopyConstructor() throws Exception {
+    public void testGrantCopyConstructor()  {
         Grant grant = createGrant(TestValues.GRANT_ID_1);
         Grant grantCopy = new Grant(grant);
         assertEquals(grant, grantCopy);
@@ -75,5 +64,4 @@ public class GrantModelTests {
         assertEquals(zdt, grant.getAwardDate());
         assertEquals(newAwardDate, grantCopy.getAwardDate());
     }
-
 }

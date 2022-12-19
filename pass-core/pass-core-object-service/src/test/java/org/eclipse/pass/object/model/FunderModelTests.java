@@ -25,41 +25,29 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class FunderModelTests {
-
-    /**
-     * Creates two identical Funders and checks the equals and hashcodes match.
-     * Modifies one field on one of the Funders and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testFunderEqualsAndHashCode() throws Exception {
-
+    public void testFunderEqualsAndHashCode()  {
         Funder funder1 = createFunder(TestValues.FUNDER_ID_1);
         Funder funder2 = createFunder(TestValues.FUNDER_ID_1);
 
         assertEquals(funder1, funder2);
         assertEquals(funder1.hashCode(), funder2.hashCode());
+
         funder1.setName("different");
         assertTrue(!funder1.equals(funder2));
-        assertTrue(funder1.hashCode() != funder2.hashCode());
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testFunderCopyConstructor() throws Exception {
+    public void testFunderCopyConstructor()  {
         Funder funder = createFunder(TestValues.FUNDER_ID_1);
         Funder funderCopy = new Funder(funder);
         assertEquals(funder, funderCopy);
@@ -69,10 +57,9 @@ public class FunderModelTests {
         assertEquals(TestValues.FUNDER_LOCALKEY, funder.getLocalKey());
         assertEquals(newLocalKey, funderCopy.getLocalKey());
 
-        URI newUrl = new URI("different:url");
+        URI newUrl = URI.create("different:url");
         funderCopy.setUrl(newUrl);
-        assertEquals(new URI(TestValues.FUNDER_URL), funder.getUrl());
+        assertEquals(URI.create(TestValues.FUNDER_URL), funder.getUrl());
         assertEquals(newUrl, funderCopy.getUrl());
     }
-
 }

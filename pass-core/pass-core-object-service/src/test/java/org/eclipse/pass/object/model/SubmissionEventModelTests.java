@@ -27,50 +27,37 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class SubmissionEventModelTests {
-    /**
-     * Creates two identical SubmissionEvents and checks the equals and hashcodes match.
-     * Modifies one field on one of the SubmissionEvents and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testSubmissionEqualsAndHashCode() throws Exception {
+    public void testSubmissionEqualsAndHashCode()  {
 
         SubmissionEvent submissionEvent1 = createSubmissionEvent();
         SubmissionEvent submissionEvent2 = createSubmissionEvent();
 
         assertEquals(submissionEvent1, submissionEvent2);
-        submissionEvent1.setPerformerRole(PerformerRole.SUBMITTER);
-        assertTrue(!submissionEvent1.equals(submissionEvent2));
-
-        assertTrue(submissionEvent1.hashCode() != submissionEvent2.hashCode());
-        submissionEvent1 = submissionEvent2;
         assertEquals(submissionEvent1.hashCode(), submissionEvent2.hashCode());
 
+        submissionEvent1.setPerformerRole(PerformerRole.SUBMITTER);
+        assertTrue(!submissionEvent1.equals(submissionEvent2));
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testSubmissionEventCopyConstructor() throws Exception {
+    public void testSubmissionEventCopyConstructor()  {
         SubmissionEvent submissionEvent = createSubmissionEvent();
         SubmissionEvent submissionEventCopy = new SubmissionEvent(submissionEvent);
         assertEquals(submissionEvent, submissionEventCopy);
 
-        URI newLink = new URI("different:link");
+        URI newLink = URI.create("different:link");
         submissionEventCopy.setLink(newLink);
-        assertEquals(new URI(TestValues.SUBMISSIONEVENT_LINK), submissionEvent.getLink());
+        assertEquals(URI.create(TestValues.SUBMISSIONEVENT_LINK), submissionEvent.getLink());
         assertEquals(newLink, submissionEventCopy.getLink());
 
         submissionEventCopy.setEventType(EventType.CANCELLED);
@@ -79,7 +66,7 @@ public class SubmissionEventModelTests {
         assertEquals(EventType.CANCELLED, submissionEventCopy.getEventType());
     }
 
-    private SubmissionEvent createSubmissionEvent() throws Exception {
+    private SubmissionEvent createSubmissionEvent()  {
         SubmissionEvent submissionEvent = new SubmissionEvent();
         submissionEvent.setId(TestValues.SUBMISSIONEVENT_ID);
         submissionEvent.setEventType(EventType.of(TestValues.SUBMISSIONEVENT_EVENT_TYPE));
@@ -89,9 +76,8 @@ public class SubmissionEventModelTests {
         submissionEvent.setPerformerRole(PerformerRole.PREPARER);
         submissionEvent.setSubmission(createSubmission(TestValues.SUBMISSION_ID_1));
         submissionEvent.setComment(TestValues.SUBMISSIONEVENT_COMMENT);
-        submissionEvent.setLink(new URI(TestValues.SUBMISSIONEVENT_LINK));
+        submissionEvent.setLink(URI.create(TestValues.SUBMISSIONEVENT_LINK));
 
         return submissionEvent;
     }
-
 }

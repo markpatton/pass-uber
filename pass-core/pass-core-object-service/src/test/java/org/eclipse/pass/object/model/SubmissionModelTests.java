@@ -29,8 +29,7 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work.
+ * These tests do a simple check to ensure the equals / hashcode functions work.
  * Note that in these tests every field is set, though in a reality, either
  * submitter OR submitterName/submitterEmail would be set, not both at once.
  *
@@ -38,36 +37,23 @@ import org.junit.jupiter.api.Test;
  * @author Jim Martino
  */
 public class SubmissionModelTests {
-    /**
-     * Creates two identical Submissions and checks the equals and hashcodes match.
-     * Modifies one field on one of the submissions and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testSubmissionEqualsAndHashCode() throws Exception {
-
+    public void testSubmissionEqualsAndHashCode()  {
         Submission submission1 = createSubmission(TestValues.SUBMISSION_ID_1);
         Submission submission2 = createSubmission(TestValues.SUBMISSION_ID_1);
 
         assertEquals(submission1, submission2);
-        submission1.setSubmissionStatus(SubmissionStatus.CANCELLED);
-        assertTrue(!submission1.equals(submission2));
-
-        assertTrue(submission1.hashCode() != submission2.hashCode());
-        submission1 = submission2;
         assertEquals(submission1.hashCode(), submission2.hashCode());
 
+        submission1.setSubmissionStatus(SubmissionStatus.CANCELLED);
+        assertTrue(!submission1.equals(submission2));
     }
 
     /**
      * Verifies that we can use the "submitted" status related to a SubmissionStatus.
-     *
-     * @throws Exception
      */
     @Test
-    public void testSubmissionStatusSubmitted() throws Exception {
+    public void testSubmissionStatusSubmitted()  {
         assertFalse(SubmissionStatus.APPROVAL_REQUESTED.isSubmitted());
         assertFalse(SubmissionStatus.CANCELLED.isSubmitted());
         assertTrue(SubmissionStatus.COMPLETE.isSubmitted());
@@ -78,11 +64,9 @@ public class SubmissionModelTests {
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testSubmissionCopyConstructor() throws Exception {
+    public void testSubmissionCopyConstructor()  {
         Submission submission = createSubmission(TestValues.SUBMISSION_ID_1);
         List<User> preparersOrig = new ArrayList<>(Arrays.asList(createUser(TestValues.USER_ID_1)));
         submission.setPreparers(preparersOrig);

@@ -27,43 +27,30 @@ import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
 
 /**
- * Model has been annotated with JSON tags. These tests do a simple check to ensure the
- * Jackson integration is functional and the equals / hashcode functions work
+ * These tests do a simple check to ensure the equals / hashcode functions work.
  *
  * @author Karen Hanson
  * @author Jim Martino
  */
 public class UserModelTest {
-
-    /**
-     * Creates two identical Users and checks the equals and hashcodes match.
-     * Modifies one field on one of the users and verifies they no longer are
-     * equal or have matching hashcodes.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testUserEqualsAndHashCode() throws Exception {
+    public void testUserEqualsAndHashCode()  {
 
         User user1 = createUser(TestValues.USER_ID_1);
         User user2 = createUser(TestValues.USER_ID_1);
 
         assertEquals(user1, user2);
+        assertEquals(user1.hashCode(), user2.hashCode());
+
         user1.setUsername("different");
         assertTrue(!user1.equals(user2));
-
-        assertTrue(user1.hashCode() != user2.hashCode());
-        user1 = user2;
-        assertEquals(user1.hashCode(), user2.hashCode());
     }
 
     /**
      * Test copy constructor creates a valid duplicate that is not the same object
-     *
-     * @throws Exception
      */
     @Test
-    public void testUserCopyConstructor() throws Exception {
+    public void testUserCopyConstructor()  {
         User user = createUser(TestValues.USER_ID_1);
         List<UserRole> rolesOrig = new ArrayList<UserRole>(Arrays.asList(UserRole.ADMIN));
         user.setRoles(rolesOrig);
