@@ -71,17 +71,17 @@ public class UnpaywallDoiService extends ExternalDoiService {
 
             JsonValue repoInst = manuscript.getValue("/repository_institution");
 
-            JsonObject manuscriptObject = Json.createObjectBuilder().add("Location", urlForPdf)
-                                              .add("RepositoryInstitution", repoInst)
-                                              .add("Type", "application/pdf")
-                                              .add("Source", name())
-                                              .add("Name", filename)
+            JsonObject manuscriptObject = Json.createObjectBuilder().add("url", urlForPdf)
+                                              .add("repositoryLabel", repoInst)
+                                              .add("type", "application/pdf")
+                                              .add("source", name())
+                                              .add("name", filename)
                                               .build();
             jab.add(manuscriptObject);
         }
 
         return Json.createObjectBuilder()
-                   .add("Manuscripts", jab.build())
+                   .add("manuscripts", jab.build())
                    .build();
     }
 }
