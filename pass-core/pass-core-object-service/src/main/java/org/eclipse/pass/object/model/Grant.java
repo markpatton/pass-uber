@@ -293,12 +293,17 @@ public class Grant extends PassEntity {
             return false;
         }
         Grant other = (Grant) obj;
-        return Objects.equals(awardDate, other.awardDate) && Objects.equals(awardNumber, other.awardNumber)
-                && awardStatus == other.awardStatus && Objects.equals(coPis, other.coPis)
-                && Objects.equals(directFunder, other.directFunder) && Objects.equals(endDate, other.endDate)
-                && Objects.equals(localKey, other.localKey) && Objects.equals(pi, other.pi)
-                && Objects.equals(primaryFunder, other.primaryFunder) && Objects.equals(projectName, other.projectName)
-                && Objects.equals(startDate, other.startDate);
+        return Objects.equals(awardDate == null ? null : awardDate.toInstant(),
+                    other.awardDate == null ? null : other.awardDate.toInstant())
+               && Objects.equals(awardNumber, other.awardNumber)
+               && awardStatus == other.awardStatus && Objects.equals(coPis, other.coPis)
+               && Objects.equals(directFunder, other.directFunder)
+               && Objects.equals(endDate == null ? null : endDate.toInstant(),
+                    other.endDate == null ? null : other.endDate.toInstant())
+               && Objects.equals(localKey, other.localKey) && Objects.equals(pi, other.pi)
+               && Objects.equals(primaryFunder, other.primaryFunder) && Objects.equals(projectName, other.projectName)
+               && Objects.equals(startDate == null ? null : startDate.toInstant(),
+                       other.startDate == null ? null : other.startDate.toInstant());
     }
 
     @Override

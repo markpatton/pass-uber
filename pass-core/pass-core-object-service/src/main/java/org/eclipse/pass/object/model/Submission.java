@@ -388,7 +388,8 @@ public class Submission extends PassEntity {
                 && Objects.equals(metadata, other.metadata) && Objects.equals(preparers, other.preparers)
                 && Objects.equals(publication, other.publication) && Objects.equals(repositories, other.repositories)
                 && source == other.source && submissionStatus == other.submissionStatus
-                && Objects.equals(submitted, other.submitted) && Objects.equals(submittedDate, other.submittedDate)
+                && Objects.equals(submitted, other.submitted) && Objects.equals(submittedDate == null ? null : submittedDate.toInstant(),
+                        other.submittedDate == null ? null : other.submittedDate.toInstant())
                 && Objects.equals(submitter, other.submitter) && Objects.equals(submitterEmail, other.submitterEmail)
                 && Objects.equals(submitterName, other.submitterName);
     }

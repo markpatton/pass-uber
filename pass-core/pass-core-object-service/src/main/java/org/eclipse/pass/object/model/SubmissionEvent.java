@@ -214,7 +214,9 @@ public class SubmissionEvent extends PassEntity {
         SubmissionEvent other = (SubmissionEvent) obj;
         return Objects.equals(comment, other.comment) && eventType == other.eventType
                 && Objects.equals(link, other.link) && Objects.equals(performedBy, other.performedBy)
-                && Objects.equals(performedDate, other.performedDate) && performerRole == other.performerRole
+                && Objects.equals(performedDate == null ? null : performedDate.toInstant(),
+                        other.performedDate == null ? null : other.performedDate.toInstant())
+                && performerRole == other.performerRole
                 && Objects.equals(submission, other.submission);
     }
 
