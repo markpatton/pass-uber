@@ -34,7 +34,7 @@ public class PassClientSelector<T extends PassEntity> {
     /**
      * Match all objects of the given type.
      *
-     * @param type
+     * @param type object type to match
      */
     public PassClientSelector(Class<T> type) {
         this(type, 0, DEFAULT_LIMIT, null, null);
