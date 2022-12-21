@@ -100,7 +100,7 @@ public class ExternalDoiServiceConnector {
                            .build();
             }
         } catch (IOException e) {
-            return null;
+            LOG.error(e.getMessage(), e);
         }
         return null;
     }

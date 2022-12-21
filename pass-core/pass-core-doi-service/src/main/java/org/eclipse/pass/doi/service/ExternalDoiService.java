@@ -41,6 +41,8 @@ public abstract class ExternalDoiService {
     private final Set<String> activeJobSet = new HashSet<>();
     private final Set<String> syncActiveJobSet = Collections.synchronizedSet(activeJobSet);
 
+    String MAILTO = "pass@jhu.edu";
+
     /**
      * The name of the external service
      * @return the name of the external service

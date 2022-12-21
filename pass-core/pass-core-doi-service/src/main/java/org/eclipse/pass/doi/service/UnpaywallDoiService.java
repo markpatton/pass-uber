@@ -25,6 +25,8 @@ import javax.json.JsonValue;
 
 public class UnpaywallDoiService extends ExternalDoiService {
 
+    String UNPAYWALL_BASEURI = "https://api.unpaywall.org/v2/";
+
     @Override
     public String name() {
         return "Unpaywall";
@@ -32,7 +34,6 @@ public class UnpaywallDoiService extends ExternalDoiService {
 
     @Override
     public String baseUrl() {
-        String UNPAYWALL_BASEURI = "https://api.unpaywall.org/v2/";
         return System.getenv("UNPAYWALL_BASEURI") != null ? System.getenv(
             "UNPAYWALL_BASEURI") : UNPAYWALL_BASEURI;
     }
@@ -40,7 +41,6 @@ public class UnpaywallDoiService extends ExternalDoiService {
     @Override
     public HashMap<String, String> parameterMap() {
         HashMap<String, String> parameterMap = new HashMap<>();
-        String MAILTO = "pass@jhu.edu";
         String agent = System.getenv("PASS_DOI_SERVICE_MAILTO") != null ? System.getenv(
             "PASS_DOI_SERVICE_MAILTO") : MAILTO;
         parameterMap.put("email", agent);
@@ -60,6 +60,7 @@ public class UnpaywallDoiService extends ExternalDoiService {
         for (int i = 0; i < locations.size(); i++) {
             JsonObject manuscript = locations.getJsonObject(i);
             JsonValue urlForPdf = manuscript.getValue("/url_for_pdf");
+            JsonValue isBest = manuscript.getValue("/is_best");
 
             JsonValue filename;
             if ( urlForPdf == JsonValue.NULL ) {
@@ -76,6 +77,7 @@ public class UnpaywallDoiService extends ExternalDoiService {
                                               .add("type", "application/pdf")
                                               .add("source", name())
                                               .add("name", filename)
+                                              .add("isBest", isBest)
                                               .build();
             jab.add(manuscriptObject);
         }

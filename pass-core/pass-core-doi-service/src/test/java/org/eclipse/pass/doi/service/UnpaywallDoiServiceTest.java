@@ -29,11 +29,11 @@ public class UnpaywallDoiServiceTest {
     String unpaywallData =
         "{\"manuscripts\":[{\"url\":\"https://journals.sagepub.com/doi/pdf/10.4137/CMC.S38446\"," +
         "\"repositoryLabel\":null,\"type\":\"application/pdf\",\"source\":\"Unpaywall\"," +
-        "\"name\":\"CMC.S38446\"},{\"url\":\"https://europepmc.org/articles/pmc5072460?pdf=render\"," +
+        "\"name\":\"CMC.S38446\",\"isBest\":true},{\"url\":\"https://europepmc.org/articles/pmc5072460?pdf=render\"," +
         "\"repositoryLabel\":\"PubMed Central - Europe PMC\",\"type\":\"application/pdf\"," +
-        "\"source\":\"Unpaywall\",\"name\":\"pmc5072460?pdf=render\"}," +
+        "\"source\":\"Unpaywall\",\"name\":\"pmc5072460?pdf=render\",\"isBest\":false}," +
         "{\"url\":null,\"repositoryLabel\":null,\"type\":\"application/pdf\"," +
-        "\"source\":\"Unpaywall\",\"name\":null}]}";
+        "\"source\":\"Unpaywall\",\"name\":null,\"isBest\":false}]}";
 
     @Test
     public void testProcessObject() {

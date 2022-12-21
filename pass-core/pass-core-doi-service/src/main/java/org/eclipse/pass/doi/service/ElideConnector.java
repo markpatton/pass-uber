@@ -171,8 +171,11 @@ public class ElideConnector {
      * Crossref version if we don't have it already in PASS. Store the resulting object in PASS.
      *
      * @param journal - the Journal object generated from Crossref metadata
+     * @param passClient - the PASS client
      * @return the updated Journal object stored in PASS if the PASS object needs updating; null if we don't have
      * enough info to create a journal
+     *
+     * @throws IOException if the connection to Elide was unsuccessful
      */
     protected Journal updateJournalInPass(Journal journal, PassClient passClient) throws IOException {
         LOG.debug("GETTING NAME and  ISSNS for Journal with nme " + journal.getJournalName());
@@ -216,7 +219,11 @@ public class ElideConnector {
      *
      * @param name  the name of the journal to be found
      * @param issns the set of issns to find. we assume that the issns stored in the repo are of the format type:value
+     * @param passClient - the PASS client
      * @return the URI of the best match, or null in nothing matches
+     *
+     * @throws IOException if the connection to Elide was unsuccessful
+     *
      */
     protected Journal find(String name, List<String> issns, PassClient passClient) throws IOException {
 
