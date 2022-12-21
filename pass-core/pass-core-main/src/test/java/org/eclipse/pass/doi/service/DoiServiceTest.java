@@ -208,6 +208,7 @@ public class DoiServiceTest extends IntegrationTest {
             .scheme("http")
             .host("localhost")
             .port(port)
+            .addPathSegment("doi")
             .addPathSegment("journal")
             .addQueryParameter("doi", doi)
             .build();

@@ -18,6 +18,7 @@ package org.eclipse.pass.doi.service;
 
 import static java.lang.Thread.sleep;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,7 +38,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ExternalDoiService {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalDoiService.class);
-    private final Set<String> activeJobs = new HashSet<>();
+    private final Set<String> activeJobSet = new HashSet<>();
+    private final Set<String> syncActiveJobSet = Collections.synchronizedSet(activeJobSet);
 
     /**
      * The name of the external service
@@ -101,12 +103,12 @@ public abstract class ExternalDoiService {
         //check cache map for existence of doi
         //put doi on map if absent
         LOG.debug("Checking to see if doi " + doi + " is already in process");
-        if (activeJobs.contains(doi)) {
+        if (syncActiveJobSet.contains(doi)) {
             return true;
         } else {
             // this DOI is not actively being processed
             // let's temporarily prohibit new requests for this DOI
-            activeJobs.add(doi);
+            syncActiveJobSet.add(doi);
             //longest time we expect it should take to create a Journal object, in
             //milliseconds
             int cachePeriod = 30000;
@@ -121,7 +123,7 @@ public abstract class ExternalDoiService {
      * @param doi the doi
      */
     void unlockDoi(String doi) {
-        activeJobs.remove(doi);
+        syncActiveJobSet.remove(doi);
     }
 
     /**
@@ -140,9 +142,9 @@ public abstract class ExternalDoiService {
         public void run() {
             try {
                 sleep(duration);
-                activeJobs.remove(key);
+                syncActiveJobSet.remove(key);
             } catch (InterruptedException e) {
-                activeJobs.remove(key);
+                syncActiveJobSet.remove(key);
             }
         }
     }

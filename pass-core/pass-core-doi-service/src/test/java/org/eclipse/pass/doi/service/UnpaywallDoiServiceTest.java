@@ -27,13 +27,13 @@ public class UnpaywallDoiServiceTest {
     ExternalDoiService underTest = new UnpaywallDoiService();
 
     String unpaywallData =
-        "{\"Manuscripts\":[{\"Location\":\"https://journals.sagepub.com/doi/pdf/10.4137/CMC.S38446\"," +
-        "\"RepositoryInstitution\":null,\"Type\":\"application/pdf\",\"Source\":\"Unpaywall\"," +
-        "\"Name\":\"CMC.S38446\"},{\"Location\":\"https://europepmc.org/articles/pmc5072460?pdf=render\"," +
-        "\"RepositoryInstitution\":\"PubMed Central - Europe PMC\",\"Type\":\"application/pdf\"," +
-        "\"Source\":\"Unpaywall\",\"Name\":\"pmc5072460?pdf=render\"}," +
-        "{\"Location\":null,\"RepositoryInstitution\":null,\"Type\":\"application/pdf\"," +
-        "\"Source\":\"Unpaywall\",\"Name\":null}]}";
+        "{\"manuscripts\":[{\"url\":\"https://journals.sagepub.com/doi/pdf/10.4137/CMC.S38446\"," +
+        "\"repositoryLabel\":null,\"type\":\"application/pdf\",\"source\":\"Unpaywall\"," +
+        "\"name\":\"CMC.S38446\"},{\"url\":\"https://europepmc.org/articles/pmc5072460?pdf=render\"," +
+        "\"repositoryLabel\":\"PubMed Central - Europe PMC\",\"type\":\"application/pdf\"," +
+        "\"source\":\"Unpaywall\",\"name\":\"pmc5072460?pdf=render\"}," +
+        "{\"url\":null,\"repositoryLabel\":null,\"type\":\"application/pdf\"," +
+        "\"source\":\"Unpaywall\",\"name\":null}]}";
 
     @Test
     public void testProcessObject() {
