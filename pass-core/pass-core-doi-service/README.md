@@ -26,7 +26,7 @@ header on the Crossref request. Default value os `pass@jhu/edu`.
 
 ## Description for the `/doi/manuscript` endpoint
 
-This service accepts a journal DOI as a query parameter:
+This service accepts a manuscript DOI as a query parameter:
 
 `http://<host>:<port>/doi/manuscript?doi=<doi>`
 
