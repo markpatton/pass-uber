@@ -192,7 +192,6 @@ public class DoiServiceTest extends IntegrationTest {
             }
 
             //and that there is only one of them in the database
-            //try (ElideDataStorePassClient passClient = getNewClient()) {
             filter = RSQL.equals("journalName", name);
             result = passClient.
                 selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
