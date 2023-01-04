@@ -29,26 +29,37 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This class defines DOI service endpoints and orchestrates responses
+ *
+ * @author jrm
+ */
 @RestController
 public class PassDoiServiceController {
 
     private static final Logger LOG = LoggerFactory.getLogger(PassDoiServiceController.class);
     ElideConnector elideConnector;
-    XrefConnector xrefConnector;
+    ExternalDoiServiceConnector externalDoiServiceConnector;
+    ExternalDoiService xrefDoiService;
+    ExternalDoiService unpaywallDoiService;
 
     PassDoiServiceController(RefreshableElide refreshableElide) {
         this.elideConnector = new ElideConnector(refreshableElide);
-        this.xrefConnector = new XrefConnector();
+        this.externalDoiServiceConnector = new ExternalDoiServiceConnector();
+        this.xrefDoiService = new XrefDoiService();
+        this.unpaywallDoiService = new UnpaywallDoiService();
     }
 
-    @GetMapping("/journal")
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    @GetMapping("/doi/journal")
+    protected void getXrefMetadata(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
+
+        ExternalDoiService externalService = xrefDoiService;
 
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
-        LOG.info("Servicing new request ... ");
+        LOG.info("Servicing new " + externalService.name() + " request ... ");
         LOG.debug("Context path: " + request.getContextPath() + "; query string " + request.getQueryString());
 
         //we will call out to crossref and collect the work JSON object
@@ -56,11 +67,11 @@ public class PassDoiServiceController {
         String doi = request.getParameter("doi");
 
         //stage 1: verify doi is valid
-        if (xrefConnector.verify(doi) == null) {
+        if (externalService.verify(doi) == null) {
             // do not have have a valid xref doi
             try (OutputStream out = response.getOutputStream()) {
                 JsonObject jsonObject = Json.createObjectBuilder()
-                                            .add("error", "Supplied DOI is not in valid Crossref format.")
+                                            .add("error", "Supplied DOI is not in valid DOI format.")
                                             .build();
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(400);
@@ -69,8 +80,7 @@ public class PassDoiServiceController {
         }
 
         //Stage 2: make sure we don't already have a request being processed for this doi
-        //
-        if (xrefConnector.isAlreadyActive(doi)) {
+        if (externalService.isAlreadyActive(doi)) {
             // return already processing error (429>)
             try (OutputStream out = response.getOutputStream()) {
                 String message = "There is already an active request for " + doi;
@@ -84,10 +94,11 @@ public class PassDoiServiceController {
         }
 
         //stage 3: try to get crossref record, catch errors first, and halt processing
-        JsonObject xrefJsonObject = xrefConnector.retrieveXrefMetdata(doi);
+        JsonObject xrefJsonObject = externalDoiServiceConnector.retrieveMetadata(doi, externalService);
         if (xrefJsonObject == null) {
             try (OutputStream out = response.getOutputStream()) {
-                String message = "There was an error getting the metadata from Crossref for " + doi;
+                String message = "There was an error getting the metadata from " +
+                                 externalService.name() + " for " + doi;
                 JsonObject jsonObject = Json.createObjectBuilder()
                                             .add("error", message)
                                             .build();
@@ -100,10 +111,10 @@ public class PassDoiServiceController {
             String message;
             if (xrefJsonObject.getString("error").equals("Resource not found.")) {
                 responseCode = 404;
-                message = "The resource for DOI " + doi + " could not be found on Crossref.";
+                message = "The resource for DOI " + doi + " could not be found on " + externalService.name() + ".";
             } else {
                 responseCode = 500;
-                message = "A record for this resource could not be returned from Crossref: " +
+                message = "A record for this resource could not be returned from " + externalService.name() + ": " +
                           xrefJsonObject.getJsonString("error");
             }
             try (OutputStream out = response.getOutputStream()) {
@@ -133,17 +144,105 @@ public class PassDoiServiceController {
             } else {
                 // journal id is null - this should never happen unless Crosssref journal is insufficient
                 // for example, if a book doi ws supplied which has no issns
-
                 try (OutputStream out = response.getOutputStream()) {
                     String message = "Insufficient information to locate or specify a journal entry.";
                     JsonObject jsonObject = Json.createObjectBuilder()
                                                 .add("error", message)
                                                 .build();
-
                     out.write(jsonObject.toString().getBytes());
                     response.setStatus(422);
                     LOG.info(message);
                 }
+            }
+        }
+    }
+
+    @GetMapping("/doi/manuscript")
+    protected void getUnpaywallMetadata(HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+
+        ExternalDoiService externalService = unpaywallDoiService;
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+
+        LOG.info("Servicing new " + externalService.name() + " request ... ");
+        LOG.debug("Context path: " + request.getContextPath() + "; query string " + request.getQueryString());
+
+        //we will call out to unpaywall and collect the JSON object
+        //the value of this parameter is expected to be already URIencoded
+        String doi = request.getParameter("doi");
+
+        //stage 1: verify doi is valid
+        if (externalService.verify(doi) == null) {
+            // do not have have a valid doi
+            try (OutputStream out = response.getOutputStream()) {
+                JsonObject jsonObject = Json.createObjectBuilder()
+                                            .add("error", "Supplied DOI is not in valid DOI format.")
+                                            .build();
+                out.write(jsonObject.toString().getBytes());
+                response.setStatus(400);
+                return;
+            }
+        }
+
+        //Stage 2: make sure we don't already have a request being processed for this doi
+        if (externalService.isAlreadyActive(doi)) {
+            // return already processing error (429)
+            try (OutputStream out = response.getOutputStream()) {
+                String message = "There is already an active request for " + doi;
+                JsonObject jsonObject = Json.createObjectBuilder()
+                                            .add("error", message + "; try again later.")
+                                            .build();
+                out.write(jsonObject.toString().getBytes());
+                response.setStatus(429);
+                LOG.info(message);
+            }
+        }
+
+        //stage 3: try to get unpaywall record, catch errors first, and halt processing
+        JsonObject unpaywallJsonObject = externalDoiServiceConnector.retrieveMetadata(doi, externalService);
+        if (unpaywallJsonObject == null) {
+            try (OutputStream out = response.getOutputStream()) {
+                String message = "There was an error getting the metadata from " +
+                                 externalService.name() + " for " + doi;
+                JsonObject jsonObject = Json.createObjectBuilder()
+                                            .add("error", message)
+                                            .build();
+                out.write(jsonObject.toString().getBytes());
+                response.setStatus(500);
+                LOG.info(message);
+            }
+        } else if (unpaywallJsonObject.getValue("/error").toString().equals("true") ) {
+            int responseCode;
+            String message;
+
+            if (unpaywallJsonObject.getValue("/HTTP_status_code") != null &&
+                unpaywallJsonObject.getValue("/message") != null) {
+
+                responseCode = Integer.parseInt(unpaywallJsonObject.getValue("/HTTP_status_code").toString());
+                message = unpaywallJsonObject.getValue("/message").toString();
+            } else {
+                responseCode = 500;
+                message = "A record for this resource could not be returned from Unpaywall: " +
+                          unpaywallJsonObject.getJsonString("error");
+            }
+
+            try (OutputStream out = response.getOutputStream()) {
+                JsonObject jsonObject = Json.createObjectBuilder()
+                                            .add("error", message)
+                                            .build();
+                out.write(jsonObject.toString().getBytes());
+                response.setStatus(responseCode);
+                LOG.info(message);
+            }
+        } else {
+            // have a non-empty JSON string to process
+            try (OutputStream out = response.getOutputStream()) {
+                JsonObject jsonObject = externalService.processObject(unpaywallJsonObject);
+                out.write(jsonObject.toString().getBytes());
+                response.setStatus(200);
+                LOG.info("Returning " + externalService.name() + " result for DOI " + doi);
             }
         }
     }
