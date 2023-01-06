@@ -21,18 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import javax.json.JsonObject;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 /**
- * Unit tests for the connector. This test class is @ignored in production, and is only used to
+ * Unit tests for the connector. This test class is @Disableed in production, and is only used to
  * verify behavior against live services when either the connector class or the external APIs
  * are changed
  *
  * @author jrm
  */
-@Ignore
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ExternalDoiServiceConnectorTest {
 
