@@ -66,6 +66,7 @@
     <postgres.version>42.3.3</postgres.version>
     <rest-assured.version>2.9.0</rest-assured.version>
     <spring.version>2.5.6</spring.version>
+    <maven.spring.plugin.version>2.7.4</maven.spring.plugin.version>
   </properties>
 
   <dependencyManagement>
