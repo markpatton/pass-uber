@@ -48,7 +48,7 @@ public class JsonApiPassClientIT {
     private static PassClient client;
 
     @BeforeAll
-    private static void setup() {
+    public static void setup() {
         String base_url = System.getProperty("pass.core.url", "http://localhost:8080");
         client = new JsonApiPassClient(base_url);
     }
