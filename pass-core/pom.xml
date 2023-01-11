@@ -58,12 +58,14 @@
   <properties>
     <javax.json.version>1.1.4</javax.json.version>
     <javax.json.api.version>1.1.4</javax.json.api.version>
-    <junit.version>4.12</junit.version>
     <elide.version>6.1.8</elide.version>
-    <spring.version>2.5.6</spring.version>
+    <h2.version>2.1.210</h2.version>
     <junit.jupiter.version>5.5.2</junit.jupiter.version>
+    <liquibase.version>4.8.0</liquibase.version>
     <okhttp.version>4.10.0</okhttp.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <postgres.version>42.3.3</postgres.version>
+    <rest-assured.version>2.9.0</rest-assured.version>
+    <spring.version>2.5.6</spring.version>
   </properties>
 
   <dependencyManagement>
