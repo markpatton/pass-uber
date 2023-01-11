@@ -54,11 +54,12 @@
   </scm>
 
   <properties>
-    <junit.version>4.12</junit.version>
     <elide.version>6.1.8</elide.version>
+    <javapoet.version>1.13.0</javapoet.version>
+    <junit.jupiter.version>5.9.2</junit.jupiter.version>
+    <jsonapi-adapters.version>1.1.0</jsonapi-adapters.version>
+    <okhttp.version>4.10.0</okhttp.version>
     <spring.version>2.5.6</spring.version>
-    <junit.jupiter.version>5.5.2</junit.jupiter.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencyManagement>
