@@ -52,8 +52,8 @@
   <modules>
     <module>pass-core-doi-service</module>
     <module>pass-core-object-service</module>
-    <module>pass-core-main</module>
     <module>pass-core-file-service</module>
+    <module>pass-core-main</module>
   </modules>
 
   <scm>
@@ -70,6 +70,11 @@
     <liquibase.version>4.8.0</liquibase.version>
     <postgres.version>42.3.3</postgres.version>
     <rest-assured.version>2.9.0</rest-assured.version>
+    <ocfl.java.core.version>1.5.0</ocfl.java.core.version>
+    <ocfl.java.aws.version>1.5.0</ocfl.java.aws.version>
+    <springframework.spring.web.version>5.3.12</springframework.spring.web.version>
+    <apache.commons.io.version>2.8.0</apache.commons.io.version>
+    <apache.commons-lang.version>2.4</apache.commons-lang.version>
   </properties>
 
   <dependencyManagement>
@@ -113,7 +118,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <pluginManagement>
       <plugins>

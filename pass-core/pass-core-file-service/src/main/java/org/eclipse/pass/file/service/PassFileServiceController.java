@@ -16,7 +16,6 @@
  */
 package org.eclipse.pass.file.service;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.eclipse.pass.file.service.storage.StorageConfiguration;
@@ -26,19 +25,18 @@ import org.eclipse.pass.file.service.storage.StorageServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+
 
 /**
  * PassFileServiceController is the controller class responsible for the File Service endpoints, which allows pass-core
@@ -50,10 +48,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class PassFileServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassFileServiceController.class);
     private StorageService storageService;
+
     @Autowired
     StorageConfiguration storageConfiguration;
-    @Autowired
-    StorageServiceFactory storageFactory;
 
     /**
      *   Class constructor.
@@ -65,24 +62,23 @@ public class PassFileServiceController {
      * Handles a file upload and will call the StorageService to determine the repository where the file is to be
      * deposited.
      *
-     * @param file
+     * @param fileName
      * @return return a File object that has been uploaded.
      * @throws FileServiceException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     @PostMapping("/file")
-    public ResponseEntity<?> fileUpload(@RequestParam("file") MultipartFile file)
+    public ResponseEntity<StorageFile> fileUpload(@RequestParam("file") MultipartFile file,
+                                                  @RequestParam("fileName") String fileName)
             throws FileServiceException {
-        LOG.info("Pass File Service: Uploading New File");
-        try {
-            if (file.getBytes().length == 0) {
-                return ResponseEntity.badRequest().build();
-            }
-        } catch (IOException e) {
-            LOG.error("File Service: Error processing file upload: " + e);
-            return ResponseEntity.notFound().build();
-        }
+        LOG.info("Uploading New File");
+        StorageServiceFactory storageFactory = new StorageServiceFactory();
         storageService = storageFactory.createStorage(storageConfiguration.getStorageProperties());
-        StorageFile returnStorageFile = storageService.store(file);
+        if (fileName == null) {
+            throw new FileServiceException(HttpStatus.NOT_FOUND, "Missing File Name");
+        }
+        LOG.info("Storing File");
+        StorageFile returnStorageFile = storageService.store(file, fileName);
+        LOG.info("Storing File");
         return ResponseEntity.created(URI.create(returnStorageFile.getId())).body(returnStorageFile);
     }
 
@@ -93,29 +89,17 @@ public class PassFileServiceController {
      * @return Bitstream
      * @throws FileServiceException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    @GetMapping("/file/{fileId:.+}")
-    @ResponseBody
-    public ResponseEntity<?> getFileById(@PathVariable String fileId) throws FileServiceException {
-        LOG.info("Get file by ID. File ID: " + fileId);
-        ByteArrayResource fileResource;
+    @GetMapping("/file/{fileId}")
+    public ResponseEntity<String> getFileById(@PathVariable String fileId) throws FileServiceException {
+        System.out.println("Get file by ID");
+        LOG.info("Get file by ID.");
         if (fileId == null) {
             LOG.error("File ID not provided to get a file.");
-            return ResponseEntity.badRequest().body("File ID not provided to get a file.");
+            throw new FileServiceException(HttpStatus.NOT_FOUND, "Missing File ID");
         }
-        storageService = storageFactory.createStorage(storageConfiguration.getStorageProperties());
-        try {
-            fileResource = storageService.loadAsResource(fileId);
-        } catch (Exception e) {
-            LOG.error("File Service: File not found: " + e);
-            return ResponseEntity.notFound().build();
-        }
-        LOG.info("File Service: Filename= " + storageService.getResourceFileName(fileId));
-        String headerAttachment = "attachment; filename=\"" + storageService.getResourceFileName(fileId) + "\"";
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerAttachment)
-                .contentLength(fileResource.contentLength())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(fileResource);
+        //TODO implement
+        //testing
+        return ResponseEntity.ok().body("All good.");
     }
 
     /**
@@ -126,14 +110,13 @@ public class PassFileServiceController {
      * @throws FileServiceException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     @DeleteMapping("/file/{fileId}")
-    public ResponseEntity<?> deleteFileById(@PathVariable String fileId) throws FileServiceException {
-        LOG.info("Delete file by ID.");
+    public ResponseEntity<Resource> deleteFileById(@PathVariable String fileId) throws FileServiceException {
+        LOG.info("Get file by ID.");
         if (fileId == null) {
             LOG.error("File ID not provided to delete file.");
             throw new FileServiceException(HttpStatus.NOT_FOUND, "Missing File ID");
         }
-        storageService = storageFactory.createStorage(storageConfiguration.getStorageProperties());
-        storageService.delete(fileId);
-        return ResponseEntity.ok().body("Deleted");
+        //TODO implement
+        return null;
     }
 }
