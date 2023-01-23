@@ -75,6 +75,7 @@
     <springframework.spring.web.version>5.3.12</springframework.spring.web.version>
     <apache.commons.io.version>2.8.0</apache.commons.io.version>
     <apache.commons-lang.version>2.4</apache.commons-lang.version>
+    <s3mock.version>0.2.6</s3mock.version>
   </properties>
 
   <dependencyManagement>

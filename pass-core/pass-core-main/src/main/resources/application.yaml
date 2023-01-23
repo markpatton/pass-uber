@@ -62,10 +62,13 @@ spring:
     broker-url: 'vm://embedded?broker.persistent=false,useShutdownHook=false'
     in-memory: true
   file-service:
-    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE}
-    ocfl-root-dir: ${PASS_CORE_FILE_SERVICE_OCFL_ROOT}
-    ocfl-work-dir: ${PASS_CORE_FILE_SERVICE_OCFL_WORK}
-    temp-dir: ${PASS_CORE_FILE_SERVICE_TEMP}
+    storage-type: 'S3'
+    root-dir: '/pass-core-file-service-root'
+    s3-bucket-name: 'bucket-test-name'
+    s3-repo-prefix: 'pass-core'
+    s3-region: 'us-east-1'
+    s3-endpoint: 'http://localhost:8001'
+
 
 server:
   port: 8080
@@ -100,9 +103,12 @@ spring:
     enabled: false
   file-service:
     storage-type: ${PASS_CORE_FILE_SERVICE_TYPE}
-    ocfl-root-dir: ${PASS_CORE_FILE_SERVICE_OCFL_ROOT}
-    ocfl-work-dir: ${PASS_CORE_FILE_SERVICE_OCFL_WORK}
-    temp-dir: ${PASS_CORE_FILE_SERVICE_TEMP}
+    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR}
+    s3-bucket-name: ${PASS_CORE_S3_BUCKET_NAME}
+    s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX}
+    s3-region: ${PASS_CORE_S3_REGION}
+    s3-endpoint: ${PASS_CORE_S3_ENDPOINT}
+
 server:
   port: ${PASS_CORE_PORT}
 
