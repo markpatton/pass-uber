@@ -70,7 +70,6 @@ public class PassFileServiceController {
     @PostMapping("/file")
     public ResponseEntity<?> fileUpload(@RequestParam("file") MultipartFile file) {
         StorageFile returnStorageFile;
-
         try {
             if (file.getBytes().length == 0) {
                 return ResponseEntity.badRequest().build();
@@ -102,7 +101,6 @@ public class PassFileServiceController {
     @GetMapping("/file/{fileId:.+}")
     @ResponseBody
     public ResponseEntity<?> getFileById(@PathVariable String fileId) {
-        LOG.info("Get file by ID. File ID: " + fileId);
         if (fileId == null) {
             LOG.error("File ID not provided to get a file.");
             return ResponseEntity.badRequest().body("File ID not provided to get a file.");
@@ -112,7 +110,7 @@ public class PassFileServiceController {
         try {
             fileName = Paths.get(fileStorageService.getResourceFileRelativePath(fileId)).getFileName().toString();
         } catch (Exception e) {
-            LOG.info("Get file by ID. File ID not found: " + fileId);
+            LOG.error("Get file by ID. File ID not found: " + fileId);
             return ResponseEntity.notFound().build();
         }
 
@@ -123,7 +121,6 @@ public class PassFileServiceController {
             return ResponseEntity.notFound().build();
         }
 
-        LOG.info("File Service: Filename= " + fileName);
         String headerAttachment = "attachment; filename=\"" + fileName + "\"";
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerAttachment)
@@ -140,7 +137,6 @@ public class PassFileServiceController {
      */
     @DeleteMapping("/file/{fileId}")
     public ResponseEntity<?> deleteFileById(@PathVariable String fileId) {
-        LOG.info("Delete file by ID.");
         if (fileId == null) {
             LOG.error("File ID not provided to delete file.");
             return ResponseEntity.notFound().build();

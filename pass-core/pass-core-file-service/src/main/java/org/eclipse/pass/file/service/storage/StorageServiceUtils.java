@@ -28,6 +28,11 @@ import java.security.SecureRandom;
  */
 public final class StorageServiceUtils {
 
+    /**
+     * The StorageServiceType enum defines the type of storage supported by the File Service. The two types of
+     * persistence are supported: File Systems and S3 buckets. These values are to be used in the environment var
+     * configuration. If a new type of persistence is to be added, it must be added to this enum.
+     */
     public enum StorageServiceType {
         FILE_SYSTEM("FILE_SYSTEM"),
         S3("S3");
@@ -62,6 +67,11 @@ public final class StorageServiceUtils {
         return sb.toString();
     }
 
+    /**
+     * Helper method for the StorageFile class. Returns the absolute path of the file name.
+     * @param path The path to the file
+     * @return The absolute path of the file name
+     */
     public static Path getAbsoluteFileNamePath(Path path) {
         File[] listOfFiles = path.toFile().listFiles();
         return listOfFiles[0].toPath();

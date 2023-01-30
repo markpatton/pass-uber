@@ -31,6 +31,9 @@ public class FileStorageServiceTest {
     private final int idLength = 25;
     private final String idCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+    /**
+     * Setup the FileStorageService for testing. Uses the system temp directory for the root directory.
+     */
     @BeforeEach
     void setUp() {
         properties.setStorageType(fileSystemType);
@@ -43,6 +46,9 @@ public class FileStorageServiceTest {
         }
     }
 
+    /**
+     * Cleanup the FileStorageService after testing. Deletes the root directory.
+     */
     @AfterEach
     void tearDown() {
         try {
@@ -52,6 +58,10 @@ public class FileStorageServiceTest {
         }
     }
 
+    /**
+     * Test that the file is stored and the relative path is returned. If the file didn't exist then
+     * its relative path would not be found.
+     */
     @Test
     public void storeFileThatExists() {
         try {
@@ -63,6 +73,9 @@ public class FileStorageServiceTest {
         }
     }
 
+    /**
+     * File doesn't exist and should throw an exception.
+     */
     @Test
     void storeFileNotExistsShouldThrowException() {
         Exception exception = assertThrows(IOException.class,
@@ -76,6 +89,9 @@ public class FileStorageServiceTest {
         assertTrue(actualExceptionText.contains(expectedExceptionText));
     }
 
+    /**
+     * File is stored and then retrieved.
+     */
     @Test
     void getFileShouldReturnFile() {
         try {
@@ -88,25 +104,24 @@ public class FileStorageServiceTest {
         }
     }
 
+    /**
+     * Should throw exception because file ID does not exist
+     */
     @Test
     void getFileShouldThrowException() {
-        try {
-            StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
-
-            Exception exception = assertThrows(IOException.class,
-                    () -> {
-                        ByteArrayResource file = fileStorageService.getFile("12345");
-                    }
-            );
-            String expectedExceptionText = "File Service: The file could not be loaded";
-            String actualExceptionText = exception.getMessage();
-            assertTrue(actualExceptionText.contains(expectedExceptionText));
-        } catch (IOException e) {
-            assertEquals("Exception during getFileShouldThrowException", e.getMessage());
-        }
+        Exception exception = assertThrows(IOException.class,
+                () -> {
+                    ByteArrayResource file = fileStorageService.getFile("12345");
+                }
+        );
+        String expectedExceptionText = "File Service: The file could not be loaded";
+        String actualExceptionText = exception.getMessage();
+        assertTrue(actualExceptionText.contains(expectedExceptionText));
     }
 
+    /**
+     * Store file, then delete it. Should throw exception because the file was deleted.
+     */
     @Test
     void deleteShouldThrowExceptionFileNotExist() {
         try {
@@ -124,6 +139,9 @@ public class FileStorageServiceTest {
         }
     }
 
+    /**
+     * Generate an ID based on the charset and length and verify that it is a valid ID.
+     */
     @Test
     void generateIdShouldBeValidId() {
         String id = StorageServiceUtils.generateId(idCharSet, idLength);

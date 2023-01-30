@@ -20,6 +20,7 @@ import java.util.Objects;
 
 /**
  * A FileService StorageFile is a representation of a file (bytes) that is persisted into storage or repository.
+ * When a request is made to the controller to retrieve a file, the controller will return a StorageFile object.
  *
  * @author Tim Sanders
  */

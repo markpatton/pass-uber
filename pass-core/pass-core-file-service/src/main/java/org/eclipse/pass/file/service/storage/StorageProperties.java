@@ -54,7 +54,6 @@ public class StorageProperties {
 
     /**
      * Get the relative path of the OCFL storage directory. This directory is a child of the root directory.
-     *
      * @return The logical path of the OCFL storage directory
      */
     public String getStorageOcflDir() {

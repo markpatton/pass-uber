@@ -191,7 +191,7 @@ public class FileStorageService {
                         .credentialsProvider(AnonymousCredentialsProvider.create())
                         .region(region)
                         .build();
-                LOG.info("File Service: S3 client built without custom endpoint");
+                LOG.info("File Service: S3 client built");
             }
 
             if (!cloudS3Client.listBuckets().buckets().stream().anyMatch(b -> b.name().equals(bucketName))) {
@@ -348,7 +348,7 @@ public class FileStorageService {
 
     /**
      * Gets the relative path in the OCFL repository from the fileID supplied. It will return the most recent version
-     * file path.
+     * file path. When using S3, this will provide the path of the file in the S3 bucket.
      * @param fileId The fileId of the file path to be returned.
      * @return The relative path of the file.
      */

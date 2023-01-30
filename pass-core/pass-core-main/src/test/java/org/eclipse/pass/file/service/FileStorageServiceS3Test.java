@@ -36,6 +36,9 @@ class FileStorageServiceS3Test {
     private final String s3Prefix = "s3-repo-prefix";
     private S3Mock s3MockApi;
 
+    /**
+     * Setup the test environment. Uses custom endpoint for the in-memory S3 mock.
+     */
     @BeforeEach
     void setUp() {
         s3MockApi = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
@@ -54,12 +57,18 @@ class FileStorageServiceS3Test {
         }
     }
 
+    /**
+     * Tear down the test environment. Deletes the temporary directory.
+     */
     @AfterEach
     void tearDown() {
         s3MockApi.stop();
         FileSystemUtils.deleteRecursively(Paths.get(rootDir).toFile());
     }
 
+    /**
+     * Test that the file is stored in the S3 mock.
+     */
     @Test
     void storeFileToS3ThatExists() {
         try {
@@ -71,6 +80,9 @@ class FileStorageServiceS3Test {
         }
     }
 
+    /**
+     * This test should throw an exception because the file does not exist.
+     */
     @Test
     void storeFileToS3ThatNotExistsShouldThrowException() {
         Exception exception = assertThrows(IOException.class,
@@ -84,6 +96,9 @@ class FileStorageServiceS3Test {
         assertTrue(actualExceptionText.contains(expectedExceptionText));
     }
 
+    /**
+     * Should get the file from the S3 bucket and return it.
+     */
     @Test
     void getFileFromS3ShouldReturnFile() {
         try {
@@ -96,25 +111,24 @@ class FileStorageServiceS3Test {
         }
     }
 
+    /**
+     * Should throw an exception because the file ID does not exist.
+     */
     @Test
     void getFileShouldThrowException() {
-        try {
-            StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test S3 Pass-core".getBytes()));
-
-            Exception exception = assertThrows(IOException.class,
-                    () -> {
-                        ByteArrayResource file = fileStorageService.getFile("12345");
-                    }
-            );
-            String expectedExceptionText = "File Service: The file could not be loaded";
-            String actualExceptionText = exception.getMessage();
-            assertTrue(actualExceptionText.contains(expectedExceptionText));
-        } catch (IOException e) {
-            assertEquals("Exception during getFileShouldThrowException", e.getMessage());
-        }
+        Exception exception = assertThrows(IOException.class,
+                () -> {
+                    ByteArrayResource file = fileStorageService.getFile("12345");
+                }
+        );
+        String expectedExceptionText = "File Service: The file could not be loaded";
+        String actualExceptionText = exception.getMessage();
+        assertTrue(actualExceptionText.contains(expectedExceptionText));
     }
 
+    /**
+     * Stores file, then deletes it. Should throw an exception because the file does not exist.
+     */
     @Test
     void deleteShouldThrowExceptionFileNotExist() {
         try {
