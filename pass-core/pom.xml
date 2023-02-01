@@ -59,19 +59,26 @@
   <properties>
     <javax.json.version>1.1.4</javax.json.version>
     <javax.json.api.version>1.1.4</javax.json.api.version>
-    <elide.version>6.1.8</elide.version>
     <h2.version>2.1.210</h2.version>
-    <junit.jupiter.version>5.5.2</junit.jupiter.version>
     <liquibase.version>4.8.0</liquibase.version>
-    <okhttp.version>4.10.0</okhttp.version>
     <postgres.version>42.3.3</postgres.version>
     <rest-assured.version>2.9.0</rest-assured.version>
-    <spring.version>2.5.6</spring.version>
-    <maven.spring.plugin.version>2.7.4</maven.spring.plugin.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <!-- Test dependencies -->
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${junit.jupiter.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${junit.jupiter.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -86,67 +93,38 @@
     </repository>
   </repositories>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
   <build>
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>${maven-source-plugin.version}</version>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${maven.spring.plugin.version}</version>
+          <configuration>
+            <mainClass>org.eclipse.pass.main.Main</mainClass>
+            <finalName>pass-core-main</finalName>
+          </configuration>
           <executions>
             <execution>
               <goals>
-                <goal>jar</goal>
+                <goal>repackage</goal>
               </goals>
             </execution>
           </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven-surefire-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${maven-javadoc-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>attach-javadocs</id>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-              <configuration>
-                <quiet>true</quiet>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-	
-        <plugin>
-          <groupId>io.fabric8</groupId>
-          <artifactId>docker-maven-plugin</artifactId>
-          <version>${docker-maven-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>${build-helper-maven-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${maven-failsafe-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>${maven-war-plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
