@@ -1,0 +1,82 @@
+# Release artifact will be pushed to Sonatype, which is synced to
+# Maven Central
+name: Publish a release to Maven Central
+
+on:
+  # We can use very similiar workflow to manually trigger a full publish
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
+  workflow_dispatch:
+    inputs:
+      releaseversion:
+        description: 'Release version'
+        required: true
+      nextversion:
+        description: 'Next dev version'
+        required: true
+
+# Will need to have someone with admin permissions to add some secrets:
+# Credentials for Sonatype, needs a Sonatype account. Use Jim's for testing?
+#   - OSSRH_USERNAME
+#   - OSSRH_TOKEN
+# Also need credentials for pushing Docker images to GHCR
+#   - GHCR_USERNAME (do usernames need to be in secrets?)
+#   - GHCR_TOKEN
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Can we check to make sure $NEXT doesn't already exist as a tag?
+    steps:
+      - name: Configure git
+        run: |
+          git config user.name "GH Action | Release"
+          git config user.email "<>"
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Java & Maven
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          server-id: ossrh
+          # User/pass refer to ENV VARs set below
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+            
+      - name: Bump version to release
+        run: mvn versions:update-parent
+
+      - name: Commit release version bump
+        run: |
+          git add **/pom.xml
+          git commit -m "Update parent version to ${{ inputs.releaseversion }}"
+          git push origin main
+
+      - name: Publish release
+        run: |
+          mvn --batch-mode release:prepare -DreleaseVersion=$RELEASE -Dtag=$RELEASE -DdevelopmentVersion=$NEXT -DautoVersionSubmodules=true
+          mvn release:perform -Dgoals=deploy 
+        env:
+          # Add OSSRH_USERNAME and OSSRH_TOKEN as GH secrets
+          # https://docs.github.com/en/actions/security-guides/encrypted-secrets
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          RELEASE: ${{ inputs.releaseversion }}
+          NEXT: ${{ inputs.nextversion }}
+
+      - name: Push release tag
+        run: git push origin --tags
+
+      - name: Update to new dev version and push to GH
+        # TODO: Don't we need to `git add ...` the POMs first?
+        run: |
+          mvn versions:update-parent -DallowSnapshots=true
+          git push origin main
+
+      # TODO: need to update username / credentials
+      - name: Login to GHCR
+        run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io --username ${{ secrets.GHCR_USERNAME }} --password-stdin
+
+      - name: Push Docker image to GHCR
+        run: docker push ghcr.io/eclipse-pass/pass-core-main:${{ inputs.releaseversion }}
