@@ -34,11 +34,11 @@ import software.amazon.awssdk.regions.Region;
 @ConfigurationProperties(prefix = "spring.file-service")
 public class StorageProperties {
     private static final Logger LOG = LoggerFactory.getLogger(StorageProperties.class);
-    private final String ocflDir = "pass-core-ocfl";
-    private final String ocflWorkDir = "pass-core-ocfl-work";
-    private final String tempDir = "pass-core-temp";
+    private final String ocflDir = "ocfl";
+    private final String ocflWorkDir = "ocfl-work";
+    private final String tempDir = "temp";
     private String rootDir;
-    private String storageType;
+    private StorageServiceType storageType;
     private String s3BucketName;
     private String s3Region;
     private String s3Endpoint;
@@ -79,9 +79,10 @@ public class StorageProperties {
 
     /**
      * Get the storage type that is configured for the File Service
-     * @return The storage type of the File Service
+     * @return The StorageServiceType of the File Service
+     * @see StorageServiceType
      */
-    public String getStorageType() {
+    public StorageServiceType getStorageType() {
         return storageType;
     }
 
@@ -126,7 +127,7 @@ public class StorageProperties {
         this.rootDir = rootDir;
     }
 
-    public void setStorageType(String storageType) {
+    public void setStorageType(StorageServiceType storageType) {
         this.storageType = storageType;
     }
 

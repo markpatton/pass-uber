@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
+import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import edu.wisc.library.ocfl.api.model.FileDetails;
 import edu.wisc.library.ocfl.api.model.ObjectVersionId;
 import edu.wisc.library.ocfl.api.model.VersionDetails;
@@ -86,7 +87,7 @@ public class FileStorageService {
     private Path tempLoc;
     private final int idLength = 25;
     private final String idCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private String storageType = "";
+    private StorageServiceType storageType;
     private OcflRepository ocflRepository;
     private S3Client cloudS3Client;
     private StorageProperties storageProperties;
@@ -118,7 +119,7 @@ public class FileStorageService {
 
         // The ocflLoc only needs to be set if the storage type is file system.
         // If the storageType is S3 then workLoc and tempLoc are used because they are used with FILE_SYSTEM AND S3
-        if (storageType.equals(StorageServiceUtils.StorageServiceType.FILE_SYSTEM.label)) {
+        if (storageType.equals(StorageServiceType.FILE_SYSTEM)) {
             ocflLoc = Paths.get(this.rootLoc.toString(),this.storageProperties.getStorageOcflDir());
         }
         this.workLoc = Paths.get(this.rootLoc.toString(),this.storageProperties.getStorageWorkDir());
@@ -141,7 +142,8 @@ public class FileStorageService {
             throw new IOException("File Service: Unable to setup File Storage directories: " + e);
         }
 
-        if (storageType.equals(StorageServiceUtils.StorageServiceType.FILE_SYSTEM.label)) {
+        if (storageType.equals(StorageServiceType.FILE_SYSTEM)) {
+            LOG.info("File Service: FILE_SYSTEM Storage Type");
             try {
                 if (!Files.exists(ocflLoc)) {
                     Files.createDirectory(ocflLoc);
@@ -157,7 +159,7 @@ public class FileStorageService {
             } catch (IOException e) {
                 throw new IOException("File Service: Unable to setup File Storage directories: " + e);
             }
-        } else if (storageType.equals(StorageServiceUtils.StorageServiceType.S3.label)) {
+        } else if (storageType.equals(StorageServiceType.S3)) {
             LOG.info("File Service: S3 Storage Type");
             if (storageProperties.getBucketName().isPresent()) {
                 bucketName = storageProperties.getBucketName().get();
@@ -249,9 +251,6 @@ public class FileStorageService {
         StorageFile storageFile = null;
         //NOTE: the work directory on the ocfl-java client should be located on the same mount as the OCFL storage root.
         try {
-            if (mFile.isEmpty()) {
-                throw new FileSystemException("File Service: File is empty or missing.");
-            }
             String origFileNameExt = mFile.getOriginalFilename();
             String origFileName = FilenameUtils.removeExtension(origFileNameExt);
             String fileExt = FilenameUtils.getExtension(origFileNameExt);
@@ -263,11 +262,11 @@ public class FileStorageService {
             }
             Path tempPathAndFileName = Paths.get(tempLoc.toString(),(origFileName + fileId + "." + fileExt));
             mFile.transferTo(tempPathAndFileName);
-            if (storageType.equals(StorageServiceUtils.StorageServiceType.FILE_SYSTEM.label)) {
+            if (storageType.equals(StorageServiceType.FILE_SYSTEM)) {
                 ocflRepository.putObject(ObjectVersionId.head(fileId), tempPathAndFileName,
                         new VersionInfo().setMessage("Pass-Core File Service: Initial commit"));
                 LOG.info("File Service: File with ID " + fileId + " was stored in the file system repo");
-            } else if (storageType.equals(StorageServiceUtils.StorageServiceType.S3.label)) {
+            } else if (storageType.equals(StorageServiceType.S3)) {
                 ocflRepository.putObject(ObjectVersionId.head(fileId), tempPathAndFileName,
                         new VersionInfo().setMessage("Pass-Core File Service: Initial commit"));
                 LOG.info("File Service: File with ID " + fileId + " was stored in the S3 repo");
@@ -277,7 +276,7 @@ public class FileStorageService {
                     fileId,
                     origFileNameExt,
                     mimeType,
-                    storageType,
+                    storageType.label,
                     mFile.getSize(),
                     fileExt
             );
@@ -299,19 +298,11 @@ public class FileStorageService {
      * IOException will be thrown.
      */
     public ByteArrayResource getFile(String fileId) throws IOException {
-        LOG.info("File Service: init get file storageType " + storageType);
         ByteArrayResource loadedResource;
         Path tempLoadDir = Paths.get(this.tempLoc.toString(), fileId,
                 Instant.now().toString().replace(":","-").replace(".","-"));
         Path tempLoadParentDir = Paths.get(this.tempLoc.toString(), fileId);
         try {
-            if (storageType.equals(StorageServiceUtils.StorageServiceType.FILE_SYSTEM.label)) {
-                String filePath = getResourceFileRelativePath(fileId);
-                Path filePathAbs = Paths.get(this.ocflLoc.toString(), filePath);
-            }
-            LOG.info("File Service: get file storageType " + storageType);
-            LOG.info("File Service: get file tempLoadDir " + tempLoadDir.toString());
-
             //need the parent directory for the OCFL getObject to work
             if (!Files.exists(tempLoadParentDir)) {
                 Files.createDirectories(tempLoadParentDir);
@@ -319,10 +310,10 @@ public class FileStorageService {
             // the output path for getObject must not exist, hence temp dir is created on the fly
             ocflRepository.getObject(ObjectVersionId.head(fileId), tempLoadDir);
             LOG.info("File Service: File with ID " + fileId + " was loaded from the repo");
-            Path fileNamePath = StorageServiceUtils.getAbsoluteFileNamePath(tempLoadDir);
+            Path fileNamePath = tempLoadDir.toFile().listFiles()[0].toPath();
             loadedResource = new ByteArrayResource(Files.readAllBytes(fileNamePath));
 
-        } catch (Exception e) {
+        } catch (NotFoundException e) {
             throw new IOException("File Service: The file could not be loaded, file ID: " + fileId + " " + e);
         }
 

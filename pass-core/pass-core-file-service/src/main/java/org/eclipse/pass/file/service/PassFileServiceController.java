@@ -71,22 +71,19 @@ public class PassFileServiceController {
     public ResponseEntity<?> fileUpload(@RequestParam("file") MultipartFile file) {
         StorageFile returnStorageFile;
         try {
-            if (file.getBytes().length == 0) {
+            if (file.getBytes().length == 0 || file.isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
         } catch (IOException e) {
             LOG.error("File Service: Error processing file upload: " + e);
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
 
         try {
             returnStorageFile = fileStorageService.storeFile(file);
         } catch (IOException e) {
             LOG.error("File Service: Error storing file upload: " + e);
-            return ResponseEntity.notFound().build();
-        } catch (NullPointerException e) {
-            LOG.error("File Service: Error storing file upload: " + e);
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
         }
 
         return ResponseEntity.created(URI.create(returnStorageFile.getId())).body(returnStorageFile);

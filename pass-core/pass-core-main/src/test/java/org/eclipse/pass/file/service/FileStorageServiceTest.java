@@ -13,6 +13,7 @@ import org.eclipse.pass.file.service.storage.FileStorageService;
 import org.eclipse.pass.file.service.storage.StorageConfiguration;
 import org.eclipse.pass.file.service.storage.StorageFile;
 import org.eclipse.pass.file.service.storage.StorageProperties;
+import org.eclipse.pass.file.service.storage.StorageServiceType;
 import org.eclipse.pass.file.service.storage.StorageServiceUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,6 @@ public class FileStorageServiceTest {
     StorageConfiguration storageConfiguration;
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
-    private final String fileSystemType = "FILE_SYSTEM";
     private final String rootDir = System.getProperty("java.io.tmpdir") + "/pass-file-system-test";
     private final int idLength = 25;
     private final String idCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -36,7 +36,7 @@ public class FileStorageServiceTest {
      */
     @BeforeEach
     void setUp() {
-        properties.setStorageType(fileSystemType);
+        properties.setStorageType(StorageServiceType.FILE_SYSTEM);
         properties.setRootDir(rootDir);
         storageConfiguration =  new StorageConfiguration(properties);
         try {
@@ -71,22 +71,6 @@ public class FileStorageServiceTest {
         } catch (Exception e) {
             assertEquals("An exception was thrown in storeFileThatExists.", e.getMessage());
         }
-    }
-
-    /**
-     * File doesn't exist and should throw an exception.
-     */
-    @Test
-    void storeFileNotExistsShouldThrowException() {
-        Exception exception = assertThrows(IOException.class,
-                () -> {
-                    fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                            MediaType.TEXT_PLAIN_VALUE, "".getBytes()));
-                }
-        );
-        String expectedExceptionText = "File Service: The file system was unable to store the uploaded file";
-        String actualExceptionText = exception.getMessage();
-        assertTrue(actualExceptionText.contains(expectedExceptionText));
     }
 
     /**

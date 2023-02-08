@@ -37,12 +37,12 @@ public class StorageFile {
      *
      */
     public StorageFile() {
-        this.id = "999";
-        this.fileName = "DefaultFileName";
-        this.mimeType = "DefaultMineType";
-        this.storageType = "DefaultStorageType";
+        this.id = "0";
+        this.fileName = "0";
+        this.mimeType = "0";
+        this.storageType = "0";
         this.size = 0L;
-        this.extension = "DefaultExtension";
+        this.extension = "0";
     }
 
     /**

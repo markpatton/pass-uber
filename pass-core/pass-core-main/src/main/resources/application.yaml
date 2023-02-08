@@ -62,12 +62,7 @@ spring:
     broker-url: 'vm://embedded?broker.persistent=false,useShutdownHook=false'
     in-memory: true
   file-service:
-    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE}
-    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR}
-    s3-bucket-name: ${PASS_CORE_S3_BUCKET_NAME}
-    s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX}
-    s3-region: ${PASS_CORE_S3_REGION}
-    s3-endpoint: ${PASS_CORE_S3_ENDPOINT}
+    storage-type: 'FILE_SYSTEM'
 
 
 server:
@@ -102,12 +97,12 @@ spring:
   liquibase:
     enabled: false
   file-service:
-    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE}
-    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR}
-    s3-bucket-name: ${PASS_CORE_S3_BUCKET_NAME}
-    s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX}
-    s3-region: ${PASS_CORE_S3_REGION}
-    s3-endpoint: ${PASS_CORE_S3_ENDPOINT}
+    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE:FILE_SYSTEM}
+    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR:/root-dir}
+    s3-bucket-name: ${PASS_CORE_S3_BUCKET_NAME:pass-core-s3-bucket}
+    s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX:pass-core-s3-repo-prefix}
+    s3-region: ${PASS_CORE_S3_REGION:us-east-1}
+    s3-endpoint: ${PASS_CORE_S3_ENDPOINT:http://localhost:9090}
 
 server:
   port: ${PASS_CORE_PORT}

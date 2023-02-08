@@ -14,6 +14,7 @@ import org.eclipse.pass.file.service.storage.FileStorageService;
 import org.eclipse.pass.file.service.storage.StorageConfiguration;
 import org.eclipse.pass.file.service.storage.StorageFile;
 import org.eclipse.pass.file.service.storage.StorageProperties;
+import org.eclipse.pass.file.service.storage.StorageServiceType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,6 @@ class FileStorageServiceS3Test {
     StorageConfiguration storageConfiguration;
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
-    private final String fileSystemType = "S3";
     private final String rootDir = System.getProperty("java.io.tmpdir") + "/pass-s3-test";
     private final int idLength = 25;
     private final String idCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -43,7 +43,7 @@ class FileStorageServiceS3Test {
     void setUp() {
         s3MockApi = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
         s3MockApi.start();
-        properties.setStorageType(fileSystemType);
+        properties.setStorageType(StorageServiceType.S3);
         properties.setRootDir(rootDir);
         properties.setS3Endpoint(s3Endpoint);
         properties.setS3BucketName(s3Bucket);
@@ -78,22 +78,6 @@ class FileStorageServiceS3Test {
         } catch (Exception e) {
             assertEquals("An exception was thrown in storeFileThatExists.", e.getMessage());
         }
-    }
-
-    /**
-     * This test should throw an exception because the file does not exist.
-     */
-    @Test
-    void storeFileToS3ThatNotExistsShouldThrowException() {
-        Exception exception = assertThrows(IOException.class,
-                () -> {
-                    fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                            MediaType.TEXT_PLAIN_VALUE, "".getBytes()));
-                }
-        );
-        String expectedExceptionText = "File Service: The file system was unable to store the uploaded file";
-        String actualExceptionText = exception.getMessage();
-        assertTrue(actualExceptionText.contains(expectedExceptionText));
     }
 
     /**
