@@ -37,14 +37,3 @@ jobs:
           # https://docs.github.com/en/actions/security-guides/encrypted-secrets
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-
-      # Update pass-core-main:latest Docker image
-      - name: Login to GHCR
-        run: echo ${{ secrets.PASS_DOCKER_TOKEN }} | docker login ghcr.io --username ${{ secrets.PASS_DOCKER_USER }} --password-stdin
-      - name: Get newly built Docker image tag
-        id: image_tag
-        run: echo "IMAGE_TAG=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.Tag}}`" >> $GITHUB_OUTPUT
-      - name: Push new image as :latest
-        run: |
-          docker tag ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }} ghcr.io/eclipse-pass/pass-core-main:latest
-          docker push ghcr.io/eclipse-pass/pass-core-main:latest
