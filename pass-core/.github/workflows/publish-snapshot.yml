@@ -1,11 +1,9 @@
 name: Publish SNAPSHOT to Sonatype
-# TODO: Not quite complete. Need to make sure current version is a SNAPSHOT version
-# before proceeding with the publishing - because there will be some commits on `main`
-# that will be associated with full releases
+
 on:
-  # push:
-  #   branches:
-  #     - 'main'
+  push:
+    branches:
+      - 'main'
   workflow_dispatch:
 
 jobs:
@@ -22,15 +20,31 @@ jobs:
           java-version: 11
           server-id: ossrh
           # User/pass refer to ENV VARs set below
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
+          server-username: MAVEN_USERNAME # Sonatype user
+          server-password: MAVEN_PASSWORD # Sonatype password # env variable for GPG private key passphrase
+      
+      - name: Get project version
+        id: project_version
+        # run: echo ::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        run: echo "VERSION=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout`" >> $GITHUB_OUTPUT
 
       - name: Publish SNAPSHOT
-        run: |
-          cat ~/.m2/settings.xml
-          mvn -B --no-transfer-progress clean deploy
+        # Only execute for -SNAPSHOT versions
+        if:  ${{ endsWith(steps.project_version.outputs.version, '-SNAPSHOT') }}
+        run: mvn -B --no-transfer-progress clean deploy
         env:
           # Add OSSRH_USERNAME and OSSRH_PASSWORD as GH secrets
           # https://docs.github.com/en/actions/security-guides/encrypted-secrets
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+
+      # Update pass-core-main:latest Docker image
+      - name: Login to GHCR
+        run: echo ${{ secrets.PASS_DOCKER_TOKEN }} | docker login ghcr.io --username ${{ secrets.PASS_DOCKER_USER }} --password-stdin
+      - name: Get newly built Docker image tag
+        id: image_tag
+        run: echo "IMAGE_TAG=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.Tag}}`" >> $GITHUB_OUTPUT
+      - name: Push new image as :latest
+        run: |
+          docker tag ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }} ghcr.io/eclipse-pass/pass-core-main:latest
+          docker push ghcr.io/eclipse-pass/pass-core-main:latest
