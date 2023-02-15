@@ -26,6 +26,7 @@ import java.util.Objects;
  */
 public class StorageFile {
     private String id;
+    private String uuid;
     private String fileName;
     private String mimeType;
     private String storageType;
@@ -49,18 +50,21 @@ public class StorageFile {
      * Initializes the StorageFile with the supplied arguments.
      *
      * @param id The identifier of the StorageFile.
+     * @param uuid The uuid of the file that is the name of the physical file stored and comprised of the fileId.
      * @param fileName The name of the file that is loaded into the repository.
      * @param mimeType The mime tye of the file that is loaded into the repository.
      * @param storageType The storage type associated with the file. If a file was stored into a file system, this
-     *                    value would be FILE_SYSTEM. See the StorageServiceUtils class for the enum that has all the
+     *                    value would be FILE_SYSTEM. See the StorageServiceType enum that has all the
      *                    valid storageType values.
      * @param size The size of the file that is loaded into the repository
      * @param extension The extension of the file that is loaded into the repository
      *
-     * @see StorageServiceUtils
+     * @see StorageServiceType
      */
-    public StorageFile(String id, String fileName, String mimeType, String storageType, Long size, String extension) {
+    public StorageFile(String id, String uuid, String fileName, String mimeType, String storageType, Long size,
+                       String extension) {
         this.id = id;
+        this.uuid = uuid;
         this.fileName = fileName;
         this.mimeType = mimeType;
         this.storageType = storageType;
@@ -82,6 +86,22 @@ public class StorageFile {
      **/
     public void setId(String id) {
         this.id = id;
+    }
+
+    /**
+     * Get uuid
+     * @return uuid of the StorageFile
+     **/
+    public String getUuid() {
+        return uuid;
+    }
+
+    /**
+     * Set uuid
+     * @param uuid of the StorageFile
+     **/
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     /**

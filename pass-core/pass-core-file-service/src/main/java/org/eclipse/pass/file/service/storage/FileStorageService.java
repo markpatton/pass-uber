@@ -16,6 +16,7 @@
  */
 package org.eclipse.pass.file.service.storage;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLConnection;
@@ -26,6 +27,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
@@ -38,6 +40,8 @@ import edu.wisc.library.ocfl.core.OcflRepositoryBuilder;
 import edu.wisc.library.ocfl.core.extension.storage.layout.config.HashedNTupleLayoutConfig;
 import edu.wisc.library.ocfl.core.path.constraint.ContentPathConstraints;
 import org.apache.commons.io.FilenameUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,13 +57,14 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 
 /**
  * The FileStorageService is responsible for the implementation of the persistence of files to their respective
- * storage or repository. The types of storage are defined in the StorageServiceUtils. The FileStorageService depends
- * on a properly configured repository. The environment variables are externalized in the .ENV file. The
- * FileStorageService is lazily loaded to ensure that the configuration is properly loaded and to minimize the startup
- * time. The FileStorageService currently supports File System and S3 storage. A configuration of File System requires
- * that the environment variables are properly set in the env file and the respective directories have read/write
- * access. For a S3 configuration to work the client needs the following permissions: s3:PutObject, s3:GetObject,
- * s3:DeleteObject, s3:ListBucket, s3:AbortMultipartUpload.
+ * storage or repository. The types of storage are defined in the
+ * {@link org.eclipse.pass.file.service.storage.StorageServiceType StorageServiceType} enum.
+ * The FileStorageService depends on a properly configured repository. The environment variables are externalized
+ * in the .ENV file. The FileStorageService is lazily loaded to ensure that the configuration is properly loaded and
+ * to minimize the startup time. The FileStorageService currently supports File System and S3 storage.
+ * A configuration of File System requires that the environment variables are properly set in the env file and
+ * the respective directories have read/write access. For a S3 configuration to work the client needs the
+ * following permissions: s3:PutObject, s3:GetObject,s3:DeleteObject, s3:ListBucket, s3:AbortMultipartUpload.
  *
  * The directory structure for the File System is as follows:
  *  - rootDir: This is the root directory for the File System. This is set in the
@@ -74,7 +79,7 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
  * system implementation, most notably on large files.
  *
  * @author Tim Sanders
- * @see StorageServiceUtils
+ * @see StorageServiceType
  */
 @Lazy
 @Service
@@ -85,8 +90,6 @@ public class FileStorageService {
     private Path ocflLoc;
     private Path workLoc;
     private Path tempLoc;
-    private final int idLength = 25;
-    private final String idCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private StorageServiceType storageType;
     private OcflRepository ocflRepository;
     private S3Client cloudS3Client;
@@ -112,7 +115,8 @@ public class FileStorageService {
 
         if (this.storageProperties.getStorageRootDir() == null
                 || this.storageProperties.getStorageRootDir().isEmpty()) {
-            this.rootLoc = Paths.get(System.getProperty("java.io.tmpdir"));
+            //when a storage root is not specified, then it should be: system_temp/create_temp_dir
+            this.rootLoc = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")),null);
         } else {
             this.rootLoc = Paths.get(this.storageProperties.getStorageRootDir());
         }
@@ -248,32 +252,46 @@ public class FileStorageService {
      * @see StorageFile
      */
     public StorageFile storeFile(MultipartFile mFile) throws IOException {
+        //TODO: refactor so that file is not stored with original file name, but with a UUID
         StorageFile storageFile = null;
         //NOTE: the work directory on the ocfl-java client should be located on the same mount as the OCFL storage root.
         try {
-            String origFileNameExt = mFile.getOriginalFilename();
-            String origFileName = FilenameUtils.removeExtension(origFileNameExt);
+            //remove any unsafe characters from the original file name and the hyphen, since it is used as a delimiter
+            String origFileNameExt = Jsoup.clean(mFile.getOriginalFilename(), Safelist.basic())
+                    .replace("-","");
             String fileExt = FilenameUtils.getExtension(origFileNameExt);
-            String fileId = StorageServiceUtils.generateId(idCharSet, idLength);
+            String fileUuid = UUID.randomUUID().toString();
+            String fileId = fileUuid + "-" + origFileNameExt;
             String mimeType = URLConnection.guessContentTypeFromName(origFileNameExt);
+            //changing the stored file name to UUID to prevent any issues with long file names
+            //e.g. 260 char limit on the path in Windows. Original filename is preserved in the fileId.
+            String ocflRepoFileName = fileUuid.replace("-", "") + "." + fileExt;
 
             if (!Files.exists(Paths.get(tempLoc.toString()))) {
                 Files.createDirectory(Paths.get(tempLoc.toString()));
             }
-            Path tempPathAndFileName = Paths.get(tempLoc.toString(),(origFileName + fileId + "." + fileExt));
+            Path tempPathAndFileName = Paths.get(tempLoc.toString(), ocflRepoFileName);
             mFile.transferTo(tempPathAndFileName);
             if (storageType.equals(StorageServiceType.FILE_SYSTEM)) {
                 ocflRepository.putObject(ObjectVersionId.head(fileId), tempPathAndFileName,
                         new VersionInfo().setMessage("Pass-Core File Service: Initial commit"));
-                LOG.info("File Service: File with ID " + fileId + " was stored in the file system repo");
+                String fileRepoRelPath = ocflRepository.describeVersion(ObjectVersionId.head(fileId))
+                        .getFileMap().entrySet().iterator().next().getValue().getStorageRelativePath();
+                LOG.info("File Service: File with ID " + fileId + " was stored in the file system repo at the " +
+                        "location:" + Paths.get(this.ocflLoc.toString(),fileRepoRelPath));
+
             } else if (storageType.equals(StorageServiceType.S3)) {
                 ocflRepository.putObject(ObjectVersionId.head(fileId), tempPathAndFileName,
                         new VersionInfo().setMessage("Pass-Core File Service: Initial commit"));
-                LOG.info("File Service: File with ID " + fileId + " was stored in the S3 repo");
+                String fileRepoRelPath = ocflRepository.describeVersion(ObjectVersionId.head(fileId))
+                        .getFileMap().entrySet().iterator().next().getValue().getStorageRelativePath();
+                LOG.info("File Service: File with ID " + fileId + " was stored in the S3 repo at location: " +
+                        Paths.get(this.repoPrefix,this.bucketName,fileRepoRelPath));
             }
 
             storageFile = new StorageFile(
                     fileId,
+                    fileUuid,
                     origFileNameExt,
                     mimeType,
                     storageType.label,
@@ -348,6 +366,22 @@ public class FileStorageService {
         Collection<FileDetails> allVersionFiles = versionDetails.getFiles();
         Optional<FileDetails> fileDetails = allVersionFiles.stream().findFirst();
         return fileDetails.get().getStorageRelativePath();
+    }
+
+    public String getFileContentType(String fileId) {
+        VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
+        FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().get();
+        Path fileDetailPath = Paths.get(fileDetails.getPath());
+        String fileDetailRelPath = fileDetails.getStorageRelativePath();
+        File file = fileDetailPath.toFile();
+        //get the content type from the file
+        try {
+            String contentType = Files.probeContentType(file.toPath());
+            return contentType;
+        } catch (IOException e) {
+            LOG.info("File Service: Unable to determine the content type of the file with ID: " + fileId);
+            return "UNKNOWN_FILE_TYPE";
+        }
     }
 }
 

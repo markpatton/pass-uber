@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import io.findify.s3mock.S3Mock;
@@ -28,8 +30,6 @@ class FileStorageServiceS3Test {
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
     private final String rootDir = System.getProperty("java.io.tmpdir") + "/pass-s3-test";
-    private final int idLength = 25;
-    private final String idCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private final String s3Endpoint = "http://localhost:8001";
     private final String s3Bucket = "bucket-test-name";
     private final String s3Region = "us-east-1";
@@ -108,6 +108,41 @@ class FileStorageServiceS3Test {
         String expectedExceptionText = "File Service: The file could not be loaded";
         String actualExceptionText = exception.getMessage();
         assertTrue(actualExceptionText.contains(expectedExceptionText));
+    }
+
+    @Test
+    void storeFileWithDifferentLangFilesNames() {
+        //generate long string of all english characters
+        String engFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:\"<>?`~[]\\;',./.txt";
+        String frFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝßàáâãäå" +
+                "çèéêëìíîïñòóôõöùúûüýÿœŒæÆ.txt";
+        String spFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÑÓÚÜáéíñóúü¡¿.txt";
+        String arFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZءآأؤإئابةتثجحخدذرزسشصضطظعغ" +
+                "ـفقكلمنهوي.txt";
+        String chFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ我 爱 你 我爱你 家庭 家人 我想你 我想你 " +
+                "我喜欢你 的 shì yí de 一个人 - yí gè rén 是 shì wǒ 我 .txt";
+        String ruFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZАа Бб Вв Гг Дд Ее Ёё Жж Зз Ии Йй Кк " +
+                "Лл Мм Нн Оо Пп Рр Сс Тт Уу Фф Хх Цц Чч Шш Щщ Ъъ Ыы Ьь Ээ Юю Яя .txt";
+
+        Map<String, String> allCharSets = new HashMap<>();
+        allCharSets.put("eng", engFileName);
+        allCharSets.put("fr", frFileName);
+        allCharSets.put("sp", spFileName);
+        allCharSets.put("ar", arFileName);
+        allCharSets.put("ch", chFileName);
+        allCharSets.put("ru", ruFileName);
+
+        //test each character set
+        allCharSets.forEach((k,v) -> {
+            try {
+                StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", v,
+                        MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
+                assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
+            } catch (IOException e) {
+                assertEquals("An exception was thrown in storeFileWithDifferentLangFilesNames. On charset=" + k,
+                        e.getMessage());
+            }
+        });
     }
 
     /**

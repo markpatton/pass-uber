@@ -18,7 +18,8 @@ package org.eclipse.pass.file.service;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.pass.file.service.storage.FileStorageService;
 import org.eclipse.pass.file.service.storage.StorageFile;
@@ -86,7 +87,7 @@ public class PassFileServiceController {
             return ResponseEntity.internalServerError().build();
         }
 
-        return ResponseEntity.created(URI.create(returnStorageFile.getId())).body(returnStorageFile);
+        return ResponseEntity.created(URI.create(returnStorageFile.getUuid())).body(returnStorageFile);
     }
 
     /**
@@ -103,13 +104,14 @@ public class PassFileServiceController {
             return ResponseEntity.badRequest().body("File ID not provided to get a file.");
         }
         ByteArrayResource fileResource;
-        String fileName = "";
-        try {
-            fileName = Paths.get(fileStorageService.getResourceFileRelativePath(fileId)).getFileName().toString();
-        } catch (Exception e) {
-            LOG.error("Get file by ID. File ID not found: " + fileId);
-            return ResponseEntity.notFound().build();
+        Pattern origFileNamePattern = Pattern.compile("(.*-)(.*)");
+        Matcher origFileNameMatcher = origFileNamePattern.matcher(fileId);
+        String origFileName = fileId; //if the regex fails, default to fileId
+        if (origFileNameMatcher.find()) {
+            origFileName = origFileNameMatcher.group(2);
         }
+        String contentType = "";
+        contentType = fileStorageService.getFileContentType(fileId);
 
         try {
             fileResource = fileStorageService.getFile(fileId);
@@ -118,11 +120,11 @@ public class PassFileServiceController {
             return ResponseEntity.notFound().build();
         }
 
-        String headerAttachment = "attachment; filename=\"" + fileName + "\"";
+        String headerAttachment = "attachment; filename=\"" + origFileName + "\"";
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerAttachment)
                 .contentLength(fileResource.contentLength())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentType(MediaType.parseMediaType(contentType))
                 .body(fileResource);
     }
 

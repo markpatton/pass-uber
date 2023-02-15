@@ -6,13 +6,16 @@ configured persistence store. The service is currently designed to persist to a 
 
 ## Configuration
 The service is configured via environment variables in the .env file in the pass-core-main module. The service by 
-default will use a filesystem based persistence store and does not require any additional configuration. The following
-environment variables are available for configuring the service:
+default will use a filesystem based persistence store and does not require any additional configuration. If the variable
+PASS_CORE_FILE_SERVICE_ROOT_DIR does not have any value, the File Service will default to the system temp folder and 
+create a temporary root folder of a random value in the system temp. The following environment variables are available 
+for configuring the service:
 
 - PASS_CORE_FILE_SERVICE_TYPE=`FILE_SYSTEM`
   - Currently supports [`FILE_SYSTEM` | `S3`]
 - PASS_CORE_FILE_SERVICE_ROOT_DIR=`/path/to/root/dir`
   - The root directory of the service that is used to support file uploads and downloads.
+  - Default: system_tmp/17318424270250529523
 - PASS_CORE_S3_BUCKET_NAME=`bucket-test-name`
 - PASS_CORE_S3_REPO_PREFIX=`s3-repo-prefix`
 - PASS_CORE_S3_REGION=`us-east-1`

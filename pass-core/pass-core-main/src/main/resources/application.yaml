@@ -98,7 +98,7 @@ spring:
     enabled: false
   file-service:
     storage-type: ${PASS_CORE_FILE_SERVICE_TYPE:FILE_SYSTEM}
-    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR:/root-dir}
+    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR}
     s3-bucket-name: ${PASS_CORE_S3_BUCKET_NAME:pass-core-s3-bucket}
     s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX:pass-core-s3-repo-prefix}
     s3-region: ${PASS_CORE_S3_REGION:us-east-1}

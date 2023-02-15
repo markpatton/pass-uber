@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import org.eclipse.pass.file.service.storage.FileStorageService;
@@ -14,7 +16,6 @@ import org.eclipse.pass.file.service.storage.StorageConfiguration;
 import org.eclipse.pass.file.service.storage.StorageFile;
 import org.eclipse.pass.file.service.storage.StorageProperties;
 import org.eclipse.pass.file.service.storage.StorageServiceType;
-import org.eclipse.pass.file.service.storage.StorageServiceUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +29,6 @@ public class FileStorageServiceTest {
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
     private final String rootDir = System.getProperty("java.io.tmpdir") + "/pass-file-system-test";
-    private final int idLength = 25;
-    private final String idCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     /**
      * Setup the FileStorageService for testing. Uses the system temp directory for the root directory.
@@ -103,6 +102,41 @@ public class FileStorageServiceTest {
         assertTrue(actualExceptionText.contains(expectedExceptionText));
     }
 
+    @Test
+    void storeFileWithDifferentLangFilesNames() {
+        //generate long string of all english characters
+        String engFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:\"<>?`~[]\\;',./.txt";
+        String frFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝßàáâãäå" +
+                "çèéêëìíîïñòóôõöùúûüýÿœŒæÆ.txt";
+        String spFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÑÓÚÜáéíñóúü¡¿.txt";
+        String arFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZءآأؤإئابةتثجحخدذرزسشصضطظعغ" +
+                "ـفقكلمنهوي.txt";
+        String chFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ我 爱 你 我爱你 家庭 家人 我想你 我想你 " +
+                "我喜欢你 的 shì yí de 一个人 - yí gè rén 是 shì wǒ 我 .txt";
+        String ruFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZАа Бб Вв Гг Дд Ее Ёё Жж Зз Ии Йй Кк " +
+                "Лл Мм Нн Оо Пп Рр Сс Тт Уу Фф Хх Цц Чч Шш Щщ Ъъ Ыы Ьь Ээ Юю Яя .txt";
+
+        Map<String, String> allCharSets = new HashMap<>();
+        allCharSets.put("eng", engFileName);
+        allCharSets.put("fr", frFileName);
+        allCharSets.put("sp", spFileName);
+        allCharSets.put("ar", arFileName);
+        allCharSets.put("ch", chFileName);
+        allCharSets.put("ru", ruFileName);
+
+        //test each character set
+        allCharSets.forEach((k,v) -> {
+            try {
+                StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", v,
+                        MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
+                assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
+            } catch (IOException e) {
+                assertEquals("An exception was thrown in storeFileWithDifferentLangFilesNames. On charset=" + k,
+                        e.getMessage());
+            }
+        });
+    }
+
     /**
      * Store file, then delete it. Should throw exception because the file was deleted.
      */
@@ -121,16 +155,6 @@ public class FileStorageServiceTest {
         } catch (IOException e) {
             assertEquals("Exception during deleteShouldThrowExceptionFileNotExist", e.getMessage());
         }
-    }
-
-    /**
-     * Generate an ID based on the charset and length and verify that it is a valid ID.
-     */
-    @Test
-    void generateIdShouldBeValidId() {
-        String id = StorageServiceUtils.generateId(idCharSet, idLength);
-        assertTrue(id.matches("(\\w)+"));
-        assertEquals(id.length(), 25);
     }
 
 }
