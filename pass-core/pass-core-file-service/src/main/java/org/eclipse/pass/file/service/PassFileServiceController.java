@@ -18,8 +18,6 @@ package org.eclipse.pass.file.service;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.pass.file.service.storage.FileStorageService;
 import org.eclipse.pass.file.service.storage.StorageFile;
@@ -93,23 +91,19 @@ public class PassFileServiceController {
     /**
      * Gets a file by the fileId and returns a single file. Implicitly supports HTTP HEAD.
      *
-     * @param fileId ID of the file to return (required)
+     * @param uuid of the file to return (required), is one part of the fileId
+     * @param origFileName of the file to return (required), is one part of the fileId
      * @return Bitstream The file requested by the fileId
      */
-    @GetMapping("/file/{fileId:.+}")
+    @GetMapping("/file/{uuid:.+}/{origFileName:.+}")
     @ResponseBody
-    public ResponseEntity<?> getFileById(@PathVariable String fileId) {
-        if (fileId == null) {
+    public ResponseEntity<?> getFileById(@PathVariable String uuid, @PathVariable String origFileName) {
+        String fileId = uuid + "/" + origFileName;
+        if (uuid == null || origFileName == null) {
             LOG.error("File ID not provided to get a file.");
             return ResponseEntity.badRequest().body("File ID not provided to get a file.");
         }
         ByteArrayResource fileResource;
-        Pattern origFileNamePattern = Pattern.compile("(.*-)(.*)");
-        Matcher origFileNameMatcher = origFileNamePattern.matcher(fileId);
-        String origFileName = fileId; //if the regex fails, default to fileId
-        if (origFileNameMatcher.find()) {
-            origFileName = origFileNameMatcher.group(2);
-        }
         String contentType = "";
         contentType = fileStorageService.getFileContentType(fileId);
 
@@ -131,11 +125,13 @@ public class PassFileServiceController {
     /**
      * Deletes a file by the provided file ID
      *
-     * @param fileId ID of the file to delete (required)
+     * @param uuid ID of the file to delete (required), is one part of the fileId
+     * @param origFileName ID of the file to delete (required), is one part of the fileId
      * @return File
      */
-    @DeleteMapping("/file/{fileId}")
-    public ResponseEntity<?> deleteFileById(@PathVariable String fileId) {
+    @DeleteMapping("/file/{uuid:.+}/{origFileName:.+}")
+    public ResponseEntity<?> deleteFileById(@PathVariable String uuid, @PathVariable String origFileName) {
+        String fileId = uuid + "/" + origFileName;
         if (fileId == null) {
             LOG.error("File ID not provided to delete file.");
             return ResponseEntity.notFound().build();

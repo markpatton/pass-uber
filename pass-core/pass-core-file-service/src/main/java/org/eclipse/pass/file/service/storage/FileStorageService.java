@@ -257,15 +257,14 @@ public class FileStorageService {
         //NOTE: the work directory on the ocfl-java client should be located on the same mount as the OCFL storage root.
         try {
             //remove any unsafe characters from the original file name and the hyphen, since it is used as a delimiter
-            String origFileNameExt = Jsoup.clean(mFile.getOriginalFilename(), Safelist.basic())
-                    .replace("-","");
+            String origFileNameExt = Jsoup.clean(mFile.getOriginalFilename(), Safelist.basic());
             String fileExt = FilenameUtils.getExtension(origFileNameExt);
             String fileUuid = UUID.randomUUID().toString();
-            String fileId = fileUuid + "-" + origFileNameExt;
+            String fileId = fileUuid + "/" + origFileNameExt;
             String mimeType = URLConnection.guessContentTypeFromName(origFileNameExt);
             //changing the stored file name to UUID to prevent any issues with long file names
             //e.g. 260 char limit on the path in Windows. Original filename is preserved in the fileId.
-            String ocflRepoFileName = fileUuid.replace("-", "") + "." + fileExt;
+            String ocflRepoFileName = fileUuid + "." + fileExt;
 
             if (!Files.exists(Paths.get(tempLoc.toString()))) {
                 Files.createDirectory(Paths.get(tempLoc.toString()));
@@ -303,7 +302,6 @@ public class FileStorageService {
             LOG.error(e.toString());
             throw new IOException("File Service: The file system was unable to store the uploaded file", e);
         }
-
         return storageFile;
     }
 
@@ -372,7 +370,6 @@ public class FileStorageService {
         VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
         FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().get();
         Path fileDetailPath = Paths.get(fileDetails.getPath());
-        String fileDetailRelPath = fileDetails.getStorageRelativePath();
         File file = fileDetailPath.toFile();
         //get the content type from the file
         try {

@@ -44,11 +44,11 @@ curl -X POST "http://localhost:8080/file" -H "accept: application/json" -H "Cont
 ### Download a file
 
 ```
-curl -X GET "http://localhost:8080/file/{fileId}" -H "accept: application/octet-stream" --output /path/to/file"
+curl -X GET "http://localhost:8080/file/{uuid}/{origFileName}" -H "accept: application/octet-stream" --output /path/to/file"
 ```
 
 ### Delete a file
 
 ```
-curl -X DELETE "http://localhost:8080/file/{fileId}" -H "accept: application/json"
+curl -X DELETE "http://localhost:8080/file/{fileId}/{origFileName}" -H "accept: application/json"
 ```

@@ -104,7 +104,6 @@ public class FileStorageServiceTest {
 
     @Test
     void storeFileWithDifferentLangFilesNames() {
-        //generate long string of all english characters
         String engFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:\"<>?`~[]\\;',./.txt";
         String frFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝßàáâãäå" +
                 "çèéêëìíîïñòóôõöùúûüýÿœŒæÆ.txt";
@@ -124,7 +123,6 @@ public class FileStorageServiceTest {
         allCharSets.put("ch", chFileName);
         allCharSets.put("ru", ruFileName);
 
-        //test each character set
         allCharSets.forEach((k,v) -> {
             try {
                 StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", v,
