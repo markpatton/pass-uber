@@ -22,6 +22,8 @@ jobs:
           # User/pass refer to ENV VARs set below
           server-username: MAVEN_USERNAME # Sonatype user
           server-password: MAVEN_PASSWORD # Sonatype password # env variable for GPG private key passphrase
+          gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
       
       - name: Get project version
         id: project_version
@@ -37,3 +39,4 @@ jobs:
           # https://docs.github.com/en/actions/security-guides/encrypted-secrets
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
