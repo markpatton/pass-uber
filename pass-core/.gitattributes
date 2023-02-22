@@ -1,1 +1,2 @@
+# in case image is built on Windows to force Linux-style shell line-endings for shell scripts: Entrypoint, init_postgres
 *.sh text eol=lf
