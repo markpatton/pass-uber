@@ -54,6 +54,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Config git user
+        run: |
+          git config user.name ${{ github.actor }}
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
       - name: Setup Java & Maven
         uses: actions/setup-java@v3
         with:
