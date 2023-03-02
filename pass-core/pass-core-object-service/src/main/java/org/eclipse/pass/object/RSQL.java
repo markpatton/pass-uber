@@ -73,6 +73,24 @@ public class RSQL {
         return comparison_group(name, "=out=", values);
     }
 
+    /**
+     * @param name Name of a collection field
+     * @param value Value potentially in the collection
+     * @return RSQL expression testing that an object collection field does not contain a value
+     */
+    public static String hasNoMember(String name, String value) {
+        return comparison(name, "=hasnomember=", value);
+    }
+
+    /**
+     * @param name Name of a collection field
+     * @param value Value potentially in the collection
+     * @return RSQL expression testing that object an collection field contains a value
+     */
+    public static String hasMember(String name, String value) {
+        return comparison(name, "=hasmember=", value);
+    }
+
     private static String group_expressions(String op, String...expressions) {
         StringBuilder result = new StringBuilder();
 
