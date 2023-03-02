@@ -19,15 +19,28 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * Main Spring Boot application.
+ */
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.eclipse.pass.main", "org.eclipse.pass.doi.service",
-    "org.eclipse.pass.file.service", "org.eclipse.pass.file.service.storage"})
+@EnableScheduling
+@ComponentScan(basePackages = {"org.eclipse.pass", "org.eclipse.pass.doi.service",
+    "org.eclipse.pass.file.service", "org.eclipse.pass.user"})
 @EntityScan(basePackages = { "org.eclipse.pass.object.model" })
 public class Main {
+    /**
+     * Default constructor.
+     */
     protected Main() {}
 
-    public static void main(String[] args) throws Exception {
+    /**
+     * Start the Spring Boot application.
+     *
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
 }
