@@ -5,7 +5,7 @@
 ################################################
 
 elide:
-  baseUrl: ${PASS_CORE_BASE_URL}
+  baseUrl: ${PASS_CORE_BASE_URL:http://localhost:8080}
   json-api:
     path: /data
     enabled: true
@@ -63,16 +63,22 @@ spring:
     in-memory: true
   file-service:
     storage-type: 'FILE_SYSTEM'
-
+  security:
+    user:
+      name: ${PASS_CORE_BACKEND_USER:backend}
+      password: ${PASS_CORE_BACKEND_PASSWORD:moo}
+      roles: BACKEND
 
 server:
   port: 8080
 
 logging:
-  path: /tmp
+  path: ${PASS_CORE_LOG_DIR:${java.io.tmpdir}/pass-core}
 
-security:
-  origin: "*"
+pass:
+  auth:
+    max-cache-size: 100
+    cache-duration: 30
 
 ---
 elide:
@@ -103,9 +109,11 @@ spring:
     s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX:pass-core-s3-repo-prefix}
     s3-region: ${PASS_CORE_S3_REGION:us-east-1}
     s3-endpoint: ${PASS_CORE_S3_ENDPOINT:http://localhost:9090}
+  security:
+    user:
+      name: ${PASS_CORE_BACKEND_USER}
+      password: ${PASS_CORE_BACKEND_PASSWORD}
+      roles: BACKEND
 
 server:
   port: ${PASS_CORE_PORT}
-
-security:
-  origin: "*"
