@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
-import org.eclipse.pass.object.converter.ListToStringConverter;
 import org.eclipse.pass.object.converter.SetToStringConverter;
 import org.eclipse.pass.object.converter.UserRoleListToStringConverter;
 
@@ -84,7 +84,7 @@ public class User extends PassEntity {
      * For example, @{code ["johnshopkins.edu:hopkinsid:DRA2D", "johnshopkins.edu:employeeid:12345",
      * "johnshopkins.edu:jhed:bostaur1"]}
      */
-    @Convert(converter = ListToStringConverter.class)
+    @ElementCollection(targetClass = String.class)
     private List<String> locatorIds = new ArrayList<String>();
 
     /**
@@ -275,9 +275,10 @@ public class User extends PassEntity {
             return false;
         }
         User other = (User) obj;
+
         return Objects.equals(affiliation, other.affiliation) && Objects.equals(displayName, other.displayName)
                 && Objects.equals(email, other.email) && Objects.equals(firstName, other.firstName)
-                && Objects.equals(lastName, other.lastName) && Objects.equals(locatorIds, other.locatorIds)
+                && Objects.equals(lastName, other.lastName) && listEquals(locatorIds, other.locatorIds)
                 && Objects.equals(middleName, other.middleName) && Objects.equals(orcidId, other.orcidId)
                 && Objects.equals(roles, other.roles) && Objects.equals(username, other.username);
     }

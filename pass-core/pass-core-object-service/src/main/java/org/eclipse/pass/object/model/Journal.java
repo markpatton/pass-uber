@@ -18,7 +18,7 @@ package org.eclipse.pass.object.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -26,8 +26,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
-import org.eclipse.pass.object.converter.ListToStringConverter;
-
 
 /**
  * Describes a Journal and the path of it's participation in PubMedCentral
@@ -48,7 +46,7 @@ public class Journal extends PassEntity {
     /**
      * Array of ISSN(s) for Journal
      */
-    @Convert(converter = ListToStringConverter.class)
+    @ElementCollection(targetClass = String.class)
     private List<String> issns = new ArrayList<>();
 
     /**
@@ -171,7 +169,7 @@ public class Journal extends PassEntity {
             return false;
         }
         Journal other = (Journal) obj;
-        return Objects.equals(issns, other.issns) && Objects.equals(journalName, other.journalName)
+        return listEquals(issns, other.issns) && Objects.equals(journalName, other.journalName)
                 && Objects.equals(nlmta, other.nlmta) && pmcParticipation == other.pmcParticipation
                 && Objects.equals(publisher, other.publisher);
     }

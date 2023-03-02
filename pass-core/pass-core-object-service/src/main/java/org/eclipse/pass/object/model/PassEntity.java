@@ -15,6 +15,7 @@
  */
 package org.eclipse.pass.object.model;
 
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,6 +30,36 @@ import javax.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 public abstract class PassEntity {
+    /**
+     * Needed because Hibernate does not correctly implement list equality when ElementCollection annotation is used.
+     *
+     * @param list1
+     * @param list2
+     * @return list equality
+     */
+    protected static boolean listEquals(List<?> list1, List<?> list2) {
+        if (list1 == list2) {
+            return true;
+        }
+
+        if (list1 == null || list2 == null) {
+            return false;
+        }
+
+        int size = list1.size();
+
+        if (size != list2.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (!Objects.equals(list1.get(i), list2.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Unique id for the resource.
