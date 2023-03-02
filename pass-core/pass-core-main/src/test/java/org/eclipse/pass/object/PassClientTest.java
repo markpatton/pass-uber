@@ -40,6 +40,7 @@ import org.eclipse.pass.object.model.Submission;
 import org.eclipse.pass.object.model.SubmissionEvent;
 import org.eclipse.pass.object.model.SubmissionStatus;
 import org.eclipse.pass.object.model.User;
+import org.eclipse.pass.object.model.UserRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,9 @@ public abstract class PassClientTest extends IntegrationTest {
     @Test
     public void testCreateObject() throws IOException {
         Journal journal = new Journal();
+
+        assertNull(journal.getId());
+
         journal.setJournalName("Test journal");
         journal.setNlmta("hmm");
         journal.setPmcParticipation(PmcParticipation.A);
@@ -275,5 +279,76 @@ public abstract class PassClientTest extends IntegrationTest {
             assertNotNull(p.getJournal());
             assertTrue(p.getJournal().getJournalName().startsWith("Journal"));
         });
+    }
+
+    @Test
+    public void testHasMember() throws IOException {
+        User user = new User();
+
+        user.setFirstName("Bob");
+        user.setDisplayName("Bobby B. Good");
+        user.setLastName("Boboson");
+
+        String locatorid1 = UUID.randomUUID().toString();
+        String locatorid2 = UUID.randomUUID().toString();
+
+        user.setLocatorIds(java.util.Arrays.asList(locatorid1, locatorid2));
+
+        client.createObject(user);
+
+        PassClientSelector<User> selector = new PassClientSelector<>(User.class);
+        selector.setFilter(RSQL.hasMember("locatorIds", locatorid1));
+
+        List<User> result = client.streamObjects(selector).collect(Collectors.toList());
+
+        assertEquals(1, result.size());
+        assertEquals(user, result.get(0));
+
+        refreshClient();
+        selector = new PassClientSelector<>(User.class);
+        selector.setFilter(RSQL.hasMember("locatorIds", "badvalue"));
+        result = client.streamObjects(selector).collect(Collectors.toList());
+
+        assertEquals(0, result.size());
+
+        refreshClient();
+
+        selector = new PassClientSelector<>(User.class);
+        selector.setFilter(RSQL.hasMember("locatorIds", locatorid2));
+        result = client.streamObjects(selector).collect(Collectors.toList());
+        assertEquals(1, result.size());
+        assertEquals(user, result.get(0));
+    }
+
+    @Test
+    public void testListMemberEquality() throws IOException {
+        User user = new User();
+        user.setDisplayName("Listy Lister");
+
+        user.setRoles(List.of(UserRole.ADMIN, UserRole.SUBMITTER));
+        user.setLocatorIds(List.of("test1", "test2"));
+
+        client.createObject(user);
+
+        User test_user = client.getObject(user.getClass(), user.getId());
+
+        // Hibernate list implementation triggered by ElementCollection does not support equals
+        // assertEquals(user.getLocatorIds(), test_user.getLocatorIds());
+
+        assertEquals(user.getRoles(), test_user.getRoles());
+        assertEquals(user, test_user);
+
+        Journal journal = new Journal();
+        journal.setJournalName("Hibernate list testing");
+        journal.setIssns(List.of("a", "b", "c", "d"));
+
+        client.createObject(journal);
+
+        Journal test_journal = client.getObject(Journal.class, journal.getId());
+
+        // Hibernate list implementation triggered by ElementCollection does not support equals
+        // assertEquals(journal.getIssns(), test_journal.getIssns());
+
+        assertEquals(journal, test_journal);
     }
 }
