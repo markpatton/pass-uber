@@ -37,6 +37,11 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.pass</groupId>
+      <artifactId>pass-core-user-service</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.pass</groupId>
       <artifactId>pass-core-file-service</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
