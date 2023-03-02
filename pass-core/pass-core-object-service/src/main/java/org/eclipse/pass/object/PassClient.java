@@ -22,7 +22,10 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.yahoo.elide.ElideSettings;
 import com.yahoo.elide.RefreshableElide;
+import com.yahoo.elide.core.dictionary.EntityDictionary;
+import com.yahoo.elide.core.type.ClassType;
 import org.eclipse.pass.object.model.PassEntity;
 
 /**
@@ -39,6 +42,26 @@ public interface PassClient extends Closeable {
      */
     static PassClient newInstance(RefreshableElide elide) {
         return new ElideDataStorePassClient(elide);
+    }
+
+    /**
+     * @return Base URL to make JSON API requests. Will end with a /.
+     */
+    static String getBaseUrl(RefreshableElide elide) {
+        ElideSettings settings = elide.getElide().getElideSettings();
+
+        return settings.getBaseUrl() + settings.getJsonApiPath() + "/";
+    }
+
+    /**
+     * @param elide
+     * @param entity
+     * @return URL to make JSON API requests about a PASS entity.
+     */
+    static String getUrl(RefreshableElide elide, PassEntity entity) {
+        String type = EntityDictionary.getEntityName(ClassType.of(entity.getClass()));
+
+        return getBaseUrl(elide) + type + "/" + entity.getId();
     }
 
     /**
