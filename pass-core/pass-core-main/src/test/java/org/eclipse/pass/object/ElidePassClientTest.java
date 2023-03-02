@@ -24,6 +24,6 @@ public class ElidePassClientTest extends PassClientTest {
 
     @Override
     protected PassClient getNewClient() {
-        return new ElideDataStorePassClient(refreshableElide);
+        return new ElidePassClient(refreshableElide);
     }
 }
