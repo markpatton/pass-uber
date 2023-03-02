@@ -21,6 +21,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
 
 /**
@@ -28,6 +29,8 @@ import com.yahoo.elide.annotation.Include;
  *
  * @author Karen Hanson
  */
+
+@CreatePermission(expression = "User is Backend OR User is Submitter")
 @Include
 @Entity
 @Table(name = "pass_publication")

@@ -27,7 +27,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.UpdatePermission;
 import org.eclipse.pass.object.converter.AggregatedDepositStatusToStringConverter;
 import org.eclipse.pass.object.converter.SourceToStringConverter;
 import org.eclipse.pass.object.converter.SubmissionStatusToStringConverter;
@@ -38,6 +40,8 @@ import org.eclipse.pass.object.converter.SubmissionStatusToStringConverter;
  * @author Karen Hanson
  */
 
+@CreatePermission(expression = "User is Backend OR User is Submitter")
+@UpdatePermission(expression = "User is Backend OR Object part of User Submission")
 @Include
 @Entity
 @Table(name = "pass_submission")

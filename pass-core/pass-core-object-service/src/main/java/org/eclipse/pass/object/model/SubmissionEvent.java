@@ -23,6 +23,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
 import org.eclipse.pass.object.converter.EventTypeToStringConverter;
 import org.eclipse.pass.object.converter.PerformerRoleToStringConverter;
@@ -33,6 +34,7 @@ import org.eclipse.pass.object.converter.PerformerRoleToStringConverter;
  * @author Karen Hanson
  */
 
+@CreatePermission(expression = "User is Backend OR Object part of User Submission")
 @Include
 @Entity
 @Table(name = "pass_submission_event")
@@ -133,7 +135,7 @@ public class SubmissionEvent extends PassEntity {
     /**
      * @return the performedBy
      */
-    public User getPerformedBy() {
+    public PassEntity getPerformedBy() {
         return performedBy;
     }
 
