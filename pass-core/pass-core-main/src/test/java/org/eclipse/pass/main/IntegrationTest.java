@@ -24,12 +24,23 @@ import org.springframework.boot.web.server.LocalServerPort;
 /**
  * Run Elide with in memory database.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class,
+    properties = {"PASS_CORE_BACKEND_PASSWORD=test"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class IntegrationTest {
+    public static final String BACKEND_USER = "backend";
+    public static final String BACKEND_PASSWORD = "test";
 
     @LocalServerPort
-    int port;
+    private int port;
+
+    public String getBaseUrl() {
+        return "http://localhost:" + port + "/";
+    }
+
+    public int getPort() {
+        return port;
+    }
 
     @BeforeAll
     public void setup() {

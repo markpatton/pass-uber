@@ -1,6 +1,5 @@
 package org.eclipse.pass.doi.service;
 
-import static com.jayway.restassured.RestAssured.port;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -12,6 +11,7 @@ import javax.json.JsonReader;
 
 import com.yahoo.elide.RefreshableElide;
 import okhttp3.Call;
+import okhttp3.Credentials;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -35,7 +35,8 @@ public class DoiServiceTest extends IntegrationTest {
         return new ElideDataStorePassClient(refreshableElide);
     }
 
-    OkHttpClient httpClient = new OkHttpClient();
+    private OkHttpClient httpClient = new OkHttpClient();
+    private String credentials = Credentials.basic(BACKEND_USER, BACKEND_PASSWORD);
 
     /**
      * throw in a "moo" doi, expect a 400 error
@@ -44,11 +45,10 @@ public class DoiServiceTest extends IntegrationTest {
      */
     @Test
     public void invalidDoiTest() throws Exception {
-
         HttpUrl url = formDoiUrl("moo");
 
         Request okHttpRequest = new Request.Builder()
-            .url(url)
+            .url(url).header("Authorization", credentials)
             .build();
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
@@ -67,11 +67,10 @@ public class DoiServiceTest extends IntegrationTest {
      */
     @Test
     public void nullDoiTest() throws Exception {
-
         HttpUrl url = formDoiUrl(null);
 
         Request okHttpRequest = new Request.Builder()
-            .url(url)
+            .url(url).header("Authorization", credentials)
             .build();
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
@@ -94,7 +93,7 @@ public class DoiServiceTest extends IntegrationTest {
         HttpUrl url = formDoiUrl( "10.1212/abc.DEF");
 
         Request okHttpRequest = new Request.Builder()
-            .url(url)
+            .url(url).header("Authorization", credentials)
             .build();
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
@@ -120,7 +119,7 @@ public class DoiServiceTest extends IntegrationTest {
         HttpUrl url = formDoiUrl("10.1002/0470841559.ch1");
 
         Request okHttpRequest = new Request.Builder()
-            .url(url)
+            .url(url).header("Authorization", credentials)
             .build();
         Call call = httpClient.newCall(okHttpRequest);
         try (Response okHttpResponse = call.execute()) {
@@ -157,7 +156,7 @@ public class DoiServiceTest extends IntegrationTest {
             assertEquals(0, result.getObjects().size());
 
             Request okHttpRequest = new Request.Builder()
-                .url(url)
+                .url(url).header("Authorization", credentials)
                 .build();
 
             Call call = httpClient.newCall(okHttpRequest);
@@ -202,11 +201,10 @@ public class DoiServiceTest extends IntegrationTest {
     }
 
     private HttpUrl formDoiUrl(String doi) {
-
         return new HttpUrl.Builder()
             .scheme("http")
             .host("localhost")
-            .port(port)
+            .port(getPort())
             .addPathSegment("doi")
             .addPathSegment("journal")
             .addQueryParameter("doi", doi)
