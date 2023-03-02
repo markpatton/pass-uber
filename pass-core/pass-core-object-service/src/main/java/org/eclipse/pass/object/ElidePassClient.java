@@ -39,6 +39,7 @@ import com.yahoo.elide.jsonapi.models.Relationship;
 import com.yahoo.elide.jsonapi.models.Resource;
 import com.yahoo.elide.jsonapi.models.ResourceIdentifier;
 import org.eclipse.pass.object.model.PassEntity;
+import org.eclipse.pass.object.security.WebSecurityRole;
 
 /**
  * PASS client which uses the HTTP verb methods of the main Elide class.
@@ -60,6 +61,25 @@ public class ElidePassClient implements PassClient {
         this.user = user;
         this.api_version = settings.getDictionary().getApiVersions().iterator().next();
         this.read_tx = elide.getDataStore().beginReadTransaction();
+    }
+
+    /**
+     * Act as a backend user.
+     *
+     * @param refreshableElide
+     */
+    public ElidePassClient(RefreshableElide refreshableElide) {
+        this(refreshableElide, new User(null) {
+            @Override
+            public String getName() {
+                return ElidePassClient.class.getName();
+            }
+
+            @Override
+            public boolean isInRole(String role) {
+                return role.equals(WebSecurityRole.BACKEND.getValue());
+            }
+        });
     }
 
     private RequestScope get_scope(String path, DataStoreTransaction tx) {
