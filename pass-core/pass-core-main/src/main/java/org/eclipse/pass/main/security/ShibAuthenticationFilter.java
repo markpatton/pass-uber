@@ -136,7 +136,7 @@ public class ShibAuthenticationFilter extends OncePerRequestFilter implements Sh
         }
 
         if (!pass_user.getDisplayName().equals(shib_user.getDisplayName())) {
-            pass_user.setEmail(shib_user.getDisplayName());
+            pass_user.setDisplayName(shib_user.getDisplayName());
             update = true;
         }
 
