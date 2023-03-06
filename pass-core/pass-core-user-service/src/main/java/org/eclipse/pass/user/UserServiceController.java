@@ -57,7 +57,7 @@ public class UserServiceController {
                         HttpStatus.INTERNAL_SERVER_ERROR);
                 return;
             }
-            System.err.println("HMMMM " + result.getObjects().size());
+
             if (result.getObjects().size() > 1) {
                 set_error_response(response, "Multiple users matching principal: " + user_name,
                         HttpStatus.INTERNAL_SERVER_ERROR);
