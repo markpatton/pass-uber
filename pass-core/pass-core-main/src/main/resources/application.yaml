@@ -38,7 +38,7 @@ elide:
 
 spring:
   application:
-    name: Pass
+    name: pass-core
   jpa:
     properties:
       hibernate:
