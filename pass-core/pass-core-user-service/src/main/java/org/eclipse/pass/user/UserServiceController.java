@@ -3,6 +3,9 @@ package org.eclipse.pass.user;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,7 +15,6 @@ import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.PassClientSelector;
 import org.eclipse.pass.object.RSQL;
 import org.eclipse.pass.object.model.User;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,24 +67,23 @@ public class UserServiceController {
 
             User user = result.getObjects().get(0);
 
-            JSONObject json = new JSONObject();
-            json.put("id", user.getId().toString());
-            json.put("type", "user");
-            json.put("uri", PassClient.getUrl(refreshableElide, user));
+            String url = PassClient.getUrl(refreshableElide, user);
+            JsonObject obj = Json.createObjectBuilder().
+                    add("id", user.getId().toString()).
+                    add("type", "user").add("uri", url).build();
 
-            set_response(response, json, HttpStatus.OK);
+            set_response(response, obj, HttpStatus.OK);
         }
     }
 
-    private void set_response(HttpServletResponse response, JSONObject obj, HttpStatus status) throws IOException {
+    private void set_response(HttpServletResponse response, JsonObject obj, HttpStatus status) throws IOException {
         response.getWriter().print(obj.toString());
         response.setStatus(status.value());
     }
 
     private void set_error_response(HttpServletResponse response, String message,
             HttpStatus status) throws IOException {
-        JSONObject obj = new JSONObject();
-        obj.put("message", message);
+        JsonObject obj = Json.createObjectBuilder().add("message", message).build();
 
         set_response(response, obj, status);
         LOG.error(message);
