@@ -3,7 +3,6 @@ package org.eclipse.pass.user;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
