@@ -38,7 +38,7 @@ docker-compose up -d
 The application is configured by its application.yaml which in turn references a number of environment variables.
 
 By default, pass-core-main, will run with an in memory database. In order to use Postgres, switch to the production profile and set the database environment variables as below.
-Note that the system property javax.persistence.schema-generation.database.action can be used to automatically create database tables.
+Note that the system property `javax.persistence.schema-generation.database.action` can be used to automatically create database tables.
 
 Environment variables:
 * spring_profiles_active=production
@@ -71,7 +71,19 @@ client will have a submitter role.
 If a request has not gone through the proxy, it must be authenticated with HTTP basic. This is used for requests coming from the backend.
 Note the environment variables above which set the backend user credentials.
 
-# Using JSON API
+# User service
+
+The [user service](pass-core-user-service/README.md) provides information about the logged in user.
+
+# DOI service
+
+The [DOI service](pass-core-doi-service/README.md) provides the ability to interact with DOIs.
+
+# File service
+
+The [file service](pass-core-file-service/README.md) provides a mechanism to persist files.
+
+# JSON API
 
 JSON API is deployed at `/data`. All of our data model is available, just divided into attributes and relationshiops. Note that identifiers are now integers, not URIs.
 See https://elide.io/pages/guide/v6/10-jsonapi.html for information on how Elide provides support for filtering and and sorting.
@@ -79,7 +91,7 @@ See https://elide.io/pages/guide/v6/10-jsonapi.html for information on how Elide
 ## Creating a RepositoryCopy
 
 ```
-curl -v -u admin:moo -X POST "http://localhost:8080/data/repositoryCopy" -H "accept: application/vnd.api+json" -H "Content-Type: application/vnd.api+json" -d @rc1.json
+curl -v -u backend:moo -X POST "http://localhost:8080/data/repositoryCopy" -H "accept: application/vnd.api+json" -H "Content-Type: application/vnd.api+json" -d @rc1.json
 ```
 
 *rc1.json:*
@@ -100,7 +112,7 @@ curl -v -u admin:moo -X POST "http://localhost:8080/data/repositoryCopy" -H "acc
 Add a publisher object to the publisher relationship in a journal. Note that both the journal and publisher objects must already exist.
 
 ```
-curl -u admin:moo -X PATCH "http://localhost:8080/data/journal/1" -H "accept: application/vnd.api+json" -H "Content-Type: application/vnd.api+json" -d @patch.json
+curl -u backend:moo -X PATCH "http://localhost:8080/data/journal/1" -H "accept: application/vnd.api+json" -H "Content-Type: application/vnd.api+json" -d @patch.json
 ```
 
 *patch.json:*
