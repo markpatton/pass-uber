@@ -1,0 +1,18 @@
+{
+    "$schema": "http://example.org/example/schemas/schema",
+    "$id": "http://example.org/example/schemas/schema2",
+    "title": "bar",
+    "description": "bar schema",
+    "$comment": "two",
+    "b": "2",
+    "x": {
+        "title": "x",
+        "description": "an awesome letter",
+        "$comment": "displays nicely",
+        "type": "letter"
+    },
+    "array": ["b", "c", "d"],
+    "complexarray": [{"a": ["b", {"c": "d"}]}, "e"],
+    "aa": "b",
+	"cc": ["e", "f", "g"]
+}

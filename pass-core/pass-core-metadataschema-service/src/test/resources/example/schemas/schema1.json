@@ -1,0 +1,17 @@
+{
+    "$schema": "http://example.org/example/schemas/schema",
+    "$id": "http://example.org/example/schemas/foo",
+    "title": "foo",
+    "description": "foo schema",
+    "$comment": "one",
+    "a": "1",
+    "x": {
+        "title": "X",
+        "description": "a letter",
+        "$comment": "displays good",
+        "type": "letter"
+    },
+    "array": ["a", "b", "c"],
+    "aa": "b",
+	"cc": ["d", "e"]
+}

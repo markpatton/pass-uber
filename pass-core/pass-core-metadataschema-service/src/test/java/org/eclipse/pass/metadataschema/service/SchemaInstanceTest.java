@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ class SchemaInstanceTest {
      * first in the initial list will be first in the result.
      */
     @Test
-    void testSort() throws JsonMappingException, JsonProcessingException {
+    void testSort() throws JsonProcessingException {
         String one = "{\r\n" + "        \"$id\": \"http://example.org/schemas/one.json\",\r\n"
                 + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
                 + "                \"properties\": {\r\n" + "                    \"foo\": \"bar\"\r\n"
@@ -96,9 +95,9 @@ class SchemaInstanceTest {
         SchemaInstance schema_six = new SchemaInstance(map.readTree(six));
         SchemaInstance schema_seven = new SchemaInstance(map.readTree(seven));
 
-        ArrayList<SchemaInstance> toSort = new ArrayList<SchemaInstance>(Arrays.asList(schema_five, schema_two,
+        ArrayList<SchemaInstance> toSort = new ArrayList<>(Arrays.asList(schema_five, schema_two,
                 schema_seven, schema_one, schema_six, schema_three, schema_four));
-        ArrayList<SchemaInstance> expected = new ArrayList<SchemaInstance>(Arrays.asList(schema_one, schema_two,
+        ArrayList<SchemaInstance> expected = new ArrayList<>(Arrays.asList(schema_one, schema_two,
                 schema_three, schema_four, schema_five, schema_six, schema_seven));
 
         Collections.sort(toSort);
@@ -106,8 +105,8 @@ class SchemaInstanceTest {
     }
 
     @Test
-    void dereferenceTest() throws JsonMappingException, JsonProcessingException {
-        /*String example_schema_json = "{\r\n" + "  \"$schema\": \"http://example.org/schema_to_dereference\",\r\n"
+    void dereferenceTest() throws JsonProcessingException {
+        String example_schema_json = "{\r\n" + "  \"$schema\": \"http://example.org/schema_to_dereference\",\r\n"
                 + "  \"$id\": \"https://example.org/example/schemas/deref\",\r\n"
                 + "  \"copySchemaName\": {\"$ref\": \"#/$schema\"},\r\n"
                 + "  \"title\": {\"$ref\": \"schema1.json#/x/title\"},\r\n"
@@ -127,7 +126,7 @@ class SchemaInstanceTest {
         SchemaInstance testSchema = new SchemaInstance(map.readTree(example_schema_json));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expected));
         testSchema.dereference(testSchema.getSchema(), "");
-        assertEquals(expectedSchema.getSchema(), testSchema.getSchema());*/
+        assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
 }

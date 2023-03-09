@@ -1,0 +1,17 @@
+{
+    "$schema": "http://example.org/example/schemas/schema",
+    "$id": "http://example.org/example/schemas/schema3",
+    "title": "test",
+    "description": "test schema",
+    "$comment": "three",
+    "c": "3",
+    "array": ["c", "d", "e"],
+    "complexarray": [{"a": ["b", {"c": "d"}]}, "f"],
+    "h": {
+        "i": "j",
+        "k": ["l", "m"],
+        "n": {
+            "o": "p"
+        }
+    }
+}

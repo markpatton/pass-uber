@@ -1,0 +1,5 @@
+{
+  "$schema": "http://example.org/example/schemas/schema_to_dereference",
+  "$id": "http://example.org/example/schemas/deref_err",
+  "loop_ref": {"$ref": "schema5.json#/loopref"}
+}

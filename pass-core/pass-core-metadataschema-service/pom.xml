@@ -25,6 +25,16 @@
             <version>${javax.json.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Test dependencies -->
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

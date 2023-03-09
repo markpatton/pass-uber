@@ -19,13 +19,10 @@ package org.eclipse.pass.metadataschema.service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-//import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,7 +31,12 @@ import org.eclipse.pass.object.PassClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -44,7 +46,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class PassSchemaServiceController {
-    private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
     @Autowired
     private PassClient passClient;
@@ -62,7 +63,7 @@ public class PassSchemaServiceController {
 
     protected List<String> readText(BufferedReader r) throws IOException {
         String next;
-        List<String> repository_list = new ArrayList<String>();
+        List<String> repository_list = new ArrayList<>();
         while ((next = r.readLine()) != null) {
             repository_list.add(next);
         }
@@ -85,26 +86,29 @@ public class PassSchemaServiceController {
      * Handle POST requests by invoking the SchemaService to handle the business
      * logic of generating a merged schema from the list of relevant repository
      * schemas to a PASS submission
+     *
+     * @param repoIds a list of repository URIs
+     * @param request the HTTP request
+     * @throws IOException if the request cannot be read or schema cannot be merged
+     * @return a merged schema in JSON format
      */
-    @PostMapping
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        List<String> repository_list = new ArrayList<String>();
-
-        response.setHeader("Accept-Post", "application/json, text/plain");
-        response.setHeader("Server", "PASS schema service");
+    @PostMapping("/schemaservice")
+    protected ResponseEntity<?> getSchema(@RequestParam("id") String repoIds, HttpServletRequest request)
+            throws IOException {
+        LOG.info("PassSchemaServiceController received POST request");
+        List<String> repository_list = new ArrayList<>();
 
         // Create SchemaService instance to handle business logic
         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
 
-        if (request.getContentType() == "text/plain") {
+        if (request.getContentType().equals("text/plain")) {
             repository_list = readText(br);
         } else {
             try {
                 repository_list = readJson(br);
             } catch (Exception e) {
                 LOG.error("Failed to parse list of repository URIs", e);
-                response.sendError(HttpServletResponse.SC_CONFLICT, "Failed to parse list of repository URIs");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed to parse list of repository URIs");
             }
         }
 
@@ -115,9 +119,9 @@ public class PassSchemaServiceController {
         String jsonResponse = "";
         try {
             mergedSchema = s.getMergedSchema(repository_list);
-        } catch (IllegalArgumentException | URISyntaxException | IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             LOG.error("Failed to parse schemas", e);
-            response.sendError(HttpServletResponse.SC_CONFLICT, "Failed to parse schemas");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed to parse schemas");
         } catch (MergeFailException e) { // if the merge was unsuccessful
             List<JsonNode> individual_schemas;
             try {
@@ -130,18 +134,16 @@ public class PassSchemaServiceController {
                 }
             } catch (IllegalArgumentException | URISyntaxException | IOException e1) {
                 LOG.error("Failed to retrieve schemas", e);
-                response.sendError(HttpServletResponse.SC_CONFLICT, "Failed to retrieve schemas");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed to retrieve schemas");
             }
 
         }
         jsonResponse += m.writeValueAsString(mergedSchema);
-
-        // Encode resulting schema(s) into a JSON response object
-        PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        out.print(jsonResponse);
-        out.flush();
+        HttpHeaders headers = new HttpHeaders();
+        //APPLICATION_JSON_UTF8 is deprecated and APPLICATION_JSON is preferred, will be interpreted as UTF-8
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        LOG.debug("PassSchemaServiceController content type: " + headers.getContentType());
+        return ResponseEntity.ok().headers(headers).body(jsonResponse);
     }
 
 }

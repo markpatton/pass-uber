@@ -1,0 +1,35 @@
+{
+    "a": "1",
+    "b": "2",
+    "c": "3",
+    "d": "4",
+    "x": {
+        "title": "x",
+        "$comment": "displays nicely",
+        "description": "an awesome letter",
+        "type": "letter"
+    },
+    "array": ["a", "b", "c", "d", "e", "f"],
+    "complexarray": [{"a": ["b", {"c": "d"}]}, "e", "f", {"g": "h"}],
+    "aa": "b",
+	"cc": ["d", "e", "f", "g"],
+	"h": {
+		"i": "j",
+		"k": ["l", "m", "m'"],
+		"n": {
+			"o": "p",
+			"q": "r"
+		}
+	},
+    "copySchemaName": "http://example.org/example/schemas/schema_to_dereference",
+    "schema1_title": "X",
+    "schema2_x": {
+      "title": "x",
+      "description": "an awesome letter",
+      "$comment": "displays nicely",
+      "type": "letter"
+    },
+    "schema3_array": ["c", "d", "e"],
+    "schema4_complexarray": ["e", "f", {"g": "h"}],
+    "schema4_hk": ["l", "m", "m'"]
+}

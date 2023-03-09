@@ -32,8 +32,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class SchemaMerger {
 
-    private ObjectNode merged;
-    private Set<String> ignorable = new HashSet<>(Arrays.asList("title", "description", "$id", "$schema", "$comment"));
+    private final ObjectNode merged;
+    private final Set<String> ignorable =
+            new HashSet<>(Arrays.asList("title", "description", "$id", "$schema", "$comment"));
 
     public SchemaMerger() {
         merged = new ObjectMapper().createObjectNode();
@@ -43,10 +44,10 @@ public class SchemaMerger {
      * Merges a list of SchemaInstance object into a single one. Field:value pairs
      * should only be added if not already present
      *
-     * @param schemas list of schemas to be merged
+     * @param schemasToMerge list of schemas to be merged
      * @return SchemaInstance of merged schemas
      */
-    JsonNode mergeSchemas(List<JsonNode> schemasToMerge) throws MergeFailException {
+    JsonNode mergeSchemas(List<JsonNode> schemasToMerge) {
         for (JsonNode schema : schemasToMerge) {
             Iterator<String> fieldnames = schema.fieldNames();
             fieldnames.forEachRemaining(f -> {
@@ -62,8 +63,7 @@ public class SchemaMerger {
      * Merges a field:value pair into the schema If there is already a value in this
      * field, it should be the same type. Else error. In case
      *
-     * @throws MergeFailException
-     * @throws FetchFailException
+     * @throws MergeFailException, if the field:value pair cannot be merged
      */
     private void mergeIn(String fieldName, JsonNode value, ObjectNode schema) throws MergeFailException {
 
@@ -89,7 +89,7 @@ public class SchemaMerger {
             }
             // iterate through array and add elements that are not already in merged schema
             for (JsonNode element : value) {
-                Iterator<JsonNode> existing_elements = ((ArrayNode) schema.get(fieldName)).elements();
+                Iterator<JsonNode> existing_elements = schema.get(fieldName).elements();
                 boolean hasElement = false;
                 while (existing_elements.hasNext()) {
                     if (existing_elements.next().equals(element)) {
@@ -108,10 +108,7 @@ public class SchemaMerger {
                         + schema.get(fieldName).getNodeType() + " vs OBJECT");
             }
             Iterator<String> fieldnames = value.fieldNames();
-            fieldnames.forEachRemaining(f -> {
-                mergeIn(f, value.get(f), (ObjectNode) schema.get(fieldName));
-            });
-            return;
+            fieldnames.forEachRemaining(f -> mergeIn(f, value.get(f), (ObjectNode) schema.get(fieldName)));
         }
     }
 }

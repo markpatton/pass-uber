@@ -79,6 +79,7 @@
     <apache.commons-lang.version>2.4</apache.commons-lang.version>
     <s3mock.version>0.2.6</s3mock.version>
     <jsoup.version>1.15.3</jsoup.version>
+    <mockito.core.version>4.8.1</mockito.core.version>
   </properties>
 
   <dependencyManagement>

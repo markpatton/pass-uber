@@ -1,0 +1,16 @@
+{
+    "$schema": "http://example.org/example/schemas/schema",
+    "$id": "http://example.org/example/schemas/schema4",
+    "title": "example",
+    "description": "example schema",
+    "$comment": "four",
+    "d": "4",
+    "array": ["d", "e", "f"],
+    "complexarray": ["e", "f", {"g": "h"}],
+    "h": {
+        "k": ["l", "m", "m'"],
+        "n": {
+            "q": "r"
+        }
+    }
+}

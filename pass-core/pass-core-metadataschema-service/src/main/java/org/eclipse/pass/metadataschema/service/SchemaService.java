@@ -48,15 +48,12 @@ public class SchemaService {
     /**
      * Get a merged schema composed of all the repository schemas provided as input
      *
-     * @param repositoryUris List of repository URIs containing schemas to be merged
+     * @param repository_list List of repository URIs containing schemas to be merged
      * @return JsonSchema merged schema
-     * @throws IOException
-     * @throws IllegalArgumentException
-     * @throws URISyntaxException
-     * @throws FetchFailException
+     * @throws MergeFailException, if the schemas cannot be merged
+     * @throws IOException, if the schemas cannot be fetched
      */
-    JsonNode getMergedSchema(List<String> repository_list)
-            throws MergeFailException, IllegalArgumentException, URISyntaxException, IOException {
+    JsonNode getMergedSchema(List<String> repository_list) throws MergeFailException, IOException {
 
         // Create a SchemaFetcher instance to get the schemas from the repository URIs
         SchemaFetcher f = new SchemaFetcher(passClient);
