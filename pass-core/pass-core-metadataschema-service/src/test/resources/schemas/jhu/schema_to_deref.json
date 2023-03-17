@@ -1,6 +1,6 @@
 {
-  "$schema": "http://example.org/example/schemas/schema_to_dereference",
-  "$id": "http://example.org/example/schemas/deref",
+  "$schema": "http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference",
+  "$id": "http://example.org/metadata-schemas/schemas/jhu/deref",
   "copySchemaName": {"$ref": "#/$schema"},
   "schema1_title": {"$ref": "schema1.json#/x/title"},
   "schema2_x": {"$ref": "schema2.json#/x"},

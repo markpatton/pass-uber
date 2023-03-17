@@ -21,7 +21,7 @@
 			"q": "r"
 		}
 	},
-    "copySchemaName": "http://example.org/example/schemas/schema_to_dereference",
+    "copySchemaName": "http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference",
     "schema1_title": "X",
     "schema2_x": {
       "title": "x",

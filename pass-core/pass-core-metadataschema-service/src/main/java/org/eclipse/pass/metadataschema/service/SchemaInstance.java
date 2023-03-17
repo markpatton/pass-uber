@@ -118,7 +118,6 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
      * schema
      *
      * @return List<String> List of URIs to schemas referenced by this schema
-     * @throws FetchFailException
      *
      */
     void dereference(JsonNode node, String pointer) {
@@ -177,8 +176,6 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
     /**
      * Finds dependencies of this schema on other schemas. Find by going through
      * $ref tags in the schema and adding only those that point to different schemas
-     *
-     * @return List<String> List of URIs to schemas depended on by this schema
      *
      */
     private void findDeps() {

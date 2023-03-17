@@ -1,5 +1,5 @@
 {
-    "$schema": "http://example.org/example/schemas/schema",
+    "$schema": "http://example.org/metadata-schemas/jhu/schema",
     "$id": "http://example.org/example/schemas/schema4",
     "cycleref": "#/cycleref",
     "loop_ref": {"$ref": "schema6.json#/loopref"}

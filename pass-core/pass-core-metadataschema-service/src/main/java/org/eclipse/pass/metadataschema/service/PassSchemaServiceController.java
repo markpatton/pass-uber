@@ -27,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yahoo.elide.RefreshableElide;
+import org.eclipse.pass.object.ElideDataStorePassClient;
 import org.eclipse.pass.object.PassClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -47,18 +48,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PassSchemaServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
-    @Autowired
-    private PassClient passClient;
+    private final PassClient passClient;
 
-    /**
-     * PassSchemaServiceController constructor.
-     */
-    public PassSchemaServiceController() {
+    @Autowired
+    public PassSchemaServiceController(RefreshableElide refreshableElide) {
+        this.passClient = new ElideDataStorePassClient(refreshableElide);
     }
 
-    // used for unit testing to insert a mock client
-    public PassSchemaServiceController(PassClient client) {
-        this.passClient = client;
+    /**
+     * This constructor is used for unit testing to inject a mock client
+     */
+    protected PassSchemaServiceController(PassClient passClient) {
+        this.passClient = passClient;
     }
 
     protected List<String> readText(BufferedReader r) throws IOException {
@@ -87,19 +88,23 @@ public class PassSchemaServiceController {
      * logic of generating a merged schema from the list of relevant repository
      * schemas to a PASS submission
      *
-     * @param repoIds a list of repository URIs
-     * @param request the HTTP request
+     * @param request the HTTP request which contains the list of repository IDs
      * @throws IOException if the request cannot be read or schema cannot be merged
      * @return a merged schema in JSON format
      */
     @PostMapping("/schemaservice")
-    protected ResponseEntity<?> getSchema(@RequestParam("id") String repoIds, HttpServletRequest request)
+    public ResponseEntity<?> getSchema(HttpServletRequest request)
             throws IOException {
-        LOG.info("PassSchemaServiceController received POST request");
         List<String> repository_list = new ArrayList<>();
 
         // Create SchemaService instance to handle business logic
         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+
+        if (request.getContentType() == null) {
+            LOG.error("Content type is null");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Content type is null. " +
+                    "Please specify content type as text/plain or application/json");
+        }
 
         if (request.getContentType().equals("text/plain")) {
             repository_list = readText(br);
@@ -142,7 +147,6 @@ public class PassSchemaServiceController {
         HttpHeaders headers = new HttpHeaders();
         //APPLICATION_JSON_UTF8 is deprecated and APPLICATION_JSON is preferred, will be interpreted as UTF-8
         headers.setContentType(MediaType.APPLICATION_JSON);
-        LOG.debug("PassSchemaServiceController content type: " + headers.getContentType());
         return ResponseEntity.ok().headers(headers).body(jsonResponse);
     }
 

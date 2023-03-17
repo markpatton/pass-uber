@@ -22,7 +22,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.eclipse.pass.object.PassClient;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The SchemaService class handles the business logic of the metadata schema
@@ -31,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SchemaService {
 
-    @Autowired
     private PassClient passClient;
 
     /**
@@ -43,6 +41,7 @@ public class SchemaService {
     // Used in unit tests for inserting a mock client
     public SchemaService(PassClient client) {
         this.passClient = client;
+
     }
 
     /**

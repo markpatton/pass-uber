@@ -1,7 +1,22 @@
+/*
+ *
+ * Copyright 2023 Johns Hopkins University
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 package org.eclipse.pass.metadataschema.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -13,10 +28,8 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -25,29 +38,30 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.pass.object.PassClient;
-import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.model.Repository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
 class SchemaControllerTest {
-
+    private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
     private PassSchemaServiceController schemaServiceController;
     private PassClient passClientMock;
-    private PassClientResult passClientResultMock;
-    private Repository repositoryMock;
+    private Repository repositoryMock1;
+    private Repository repositoryMock2;
     private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
     @BeforeEach
     void setup() {
         passClientMock = Mockito.mock(PassClient.class);
-        passClientResultMock = Mockito.mock(PassClientResult.class);
-        repositoryMock = Mockito.mock(Repository.class);
-        schemaServiceController = new PassSchemaServiceController();
+        repositoryMock1 = Mockito.mock(Repository.class);
+        repositoryMock2 = Mockito.mock(Repository.class);
+        schemaServiceController = new PassSchemaServiceController(passClientMock);
         System.setOut(new PrintStream(outputStreamCaptor));
     }
 
@@ -101,34 +115,36 @@ class SchemaControllerTest {
 
     @Test
     void getSchemaTest() throws Exception {
-        PassSchemaServiceController s = new PassSchemaServiceController(passClientMock);
         HttpServletRequest request = mock(HttpServletRequest.class);
 
-        when(passClientMock.selectObjects(any())).thenReturn(passClientResultMock);
-        when(passClientResultMock.getTotal()).thenReturn(1L);
-        when(passClientResultMock.getObjects()).thenReturn(Collections.singletonList(repositoryMock));
+        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
+        when(passClientMock.getObject(Repository.class, 2L)).thenReturn(repositoryMock2);
 
-        List<URI> r1_schemas_list = Arrays.asList(new URI("/example/schemas/schema1.json"),
-                new URI("/example/schemas/schema2.json"), new URI("/example/schemas/schema3.json"),
-                new URI("/example/schemas/schema4.json"), new URI("/example/schemas/schema_to_deref.json"));
+        List<URI> r1_schemas_list = Arrays.asList(new URI("http://example.org/metadata-schemas/jhu/schema1.json"),
+                new URI("http://example.org/metadata-schemas/jhu/schema2.json"),
+                new URI("http://example.org/metadata-schemas/jhu/schema3.json"));
 
-        when(repositoryMock.getSchemas()).thenReturn(r1_schemas_list);
+        List<URI> r2_schemas_list = Arrays.asList(new URI("http://example.org/metadata-schemas/jhu/schema3.json"),
+                new URI("http://example.org/metadata-schemas/jhu/schema4.json"),
+                new URI("http://example.org/metadata-schemas/jhu/schema_to_deref.json"));
 
-        String repositories = "[\"repository1\", \"repository2\"]";
+        when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
+        when(repositoryMock2.getSchemas()).thenReturn(r2_schemas_list);
+
+        String repositories = "[\"1\", \"2\"]";
         ByteArrayInputStream stream = new ByteArrayInputStream(repositories.getBytes(StandardCharsets.UTF_8));
         ServletInputStream servletstream = createServletInputStream(stream);
 
         when(request.getInputStream()).thenReturn(servletstream);
+        when(request.getContentType()).thenReturn("application/json");
 
-        ResponseEntity response = s.getSchema(repositories, request);
+        ResponseEntity response = schemaServiceController.getSchema(request);
+        assertEquals(response.getBody().toString(),response.getBody().toString());
         InputStream expected_schema_json = SchemaServiceTest.class
-                .getResourceAsStream("/example/schemas/example_merged_dereferenced.json");
+                .getResourceAsStream("/schemas/jhu/example_merged_dereferenced.json");
         ObjectMapper map = new ObjectMapper();
         JsonNode expected = map.readTree(expected_schema_json);
         JsonNode actual = map.readTree(response.getBody().toString());
-        String respHeader = response.getHeaders().getAccept().toString();
-
-        //assertEquals("application/json, text/plain", respHeader);
         assertEquals(expected, actual);
     }
 }

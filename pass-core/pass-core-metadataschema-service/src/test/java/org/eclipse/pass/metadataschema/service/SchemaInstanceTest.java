@@ -107,7 +107,7 @@ class SchemaInstanceTest {
     @Test
     void dereferenceTest() throws JsonProcessingException {
         String example_schema_json = "{\r\n" + "  \"$schema\": \"http://example.org/schema_to_dereference\",\r\n"
-                + "  \"$id\": \"https://example.org/example/schemas/deref\",\r\n"
+                + "  \"$id\": \"https://example.org/schemas/jhu/deref\",\r\n"
                 + "  \"copySchemaName\": {\"$ref\": \"#/$schema\"},\r\n"
                 + "  \"title\": {\"$ref\": \"schema1.json#/x/title\"},\r\n"
                 + "  \"x\": {\"$ref\": \"schema2.json#/x\"},\r\n"
@@ -116,7 +116,7 @@ class SchemaInstanceTest {
                 + "  \"k\": {\"$ref\": \"schema4.json#/h/k\"}\r\n" + "}";
 
         String expected = "{\r\n" + "  \"$schema\": \"http://example.org/schema_to_dereference\",\r\n"
-                + "  \"$id\": \"https://example.org/example/schemas/deref\",\r\n"
+                + "  \"$id\": \"https://example.org/schemas/jhu/deref\",\r\n"
                 + "  \"copySchemaName\": \"http://example.org/schema_to_dereference\",\r\n" + "  \"title\": \"X\",\r\n"
                 + "  \"x\": {\r\n" + "    \"title\": \"x\",\r\n" + "    \"description\": \"an awesome letter\",\r\n"
                 + "    \"$comment\": \"displays nicely\",\r\n" + "    \"type\": \"letter\"\r\n" + "  },\r\n"

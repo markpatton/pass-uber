@@ -1,6 +1,6 @@
 {
-    "$schema": "http://example.org/example/schemas/schema",
-    "$id": "http://example.org/example/schemas/schema4",
+    "$schema": "http://example.org/metadata-schemas/schemas/jhu",
+    "$id": "http://example.org/metadata-schemas/schemas/jhu/schema4",
     "title": "example",
     "description": "example schema",
     "$comment": "four",

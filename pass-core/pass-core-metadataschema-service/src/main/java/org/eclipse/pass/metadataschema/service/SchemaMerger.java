@@ -61,7 +61,7 @@ public class SchemaMerger {
 
     /**
      * Merges a field:value pair into the schema If there is already a value in this
-     * field, it should be the same type. Else error. In case
+     * field, it should be the same type, else error.
      *
      * @throws MergeFailException, if the field:value pair cannot be merged
      */

@@ -18,6 +18,7 @@ package org.eclipse.pass.metadataschema.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StreamCorruptedException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.PassClientSelector;
-import org.eclipse.pass.object.RSQL;
 import org.eclipse.pass.object.model.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +40,11 @@ import org.slf4j.LoggerFactory;
 public class SchemaFetcher {
 
     private final PassClient passClient;
-    private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
     PassClientSelector selector;
 
     public SchemaFetcher(PassClient client) {
         this.passClient = client;
-        //required for unit tests, cannot be instantiated in methods. Use setFilter method to set filter
-        this.selector = new PassClientSelector<>(Repository.class, 0, 100, "",null);
     }
 
     /**
@@ -56,7 +54,6 @@ public class SchemaFetcher {
      * @throws IOException if the schemas cannot be fetched
      */
     List<JsonNode> getSchemas(List<String> repository_uris) throws IOException {
-
         List<JsonNode> schemas = new ArrayList<>();
         List<SchemaInstance> schema_instances = new ArrayList<>();
 
@@ -93,34 +90,21 @@ public class SchemaFetcher {
      * @return List<SchemaInstance> schemas from the repository
      * @throws IOException
      */
-    List<JsonNode> getRepositorySchemas(String repositoryUri) throws IOException {
+    List<JsonNode> getRepositorySchemas(String repositoryId) throws IOException {
+        //test the passclient
         Repository repo = null;
         PassClientResult<Repository> result;
         List<JsonNode> repository_schemas = new ArrayList<>();
-        String filter = RSQL.equals("url", repositoryUri);
-
         try {
-            selector.setFilter(filter);
-            result = passClient.selectObjects(selector);
+            repo = passClient.getObject(Repository.class, Long.parseLong(repositoryId));
+
+            List<URI> schema_uris = repo.getSchemas();
+            for (URI schema_uri : schema_uris) {
+                repository_schemas.add(getSchemaFromUri(schema_uri));
+            }
         } catch (NullPointerException e) {
-            throw new IOException("Repository not found at " + repositoryUri);
+            throw new IOException("Repository not found at ID: " + repositoryId);
         }
-
-        if (result.getTotal() == 1) {
-            repo = result.getObjects().get(0);
-        } else if (result.getTotal() > 1) {
-            LOG.error("Multiple repositories found at " + repositoryUri);
-            throw new IOException("Multiple repositories found at " + repositoryUri);
-        } else if (result.getTotal() == 0) {
-            LOG.error("No repository found at " + repositoryUri);
-            throw new IOException("No repository found at " + repositoryUri);
-        }
-
-        List<URI> schema_uris = repo.getSchemas();
-        for (URI schema_uri : schema_uris) {
-            repository_schemas.add(getSchemaFromUri(schema_uri));
-        }
-
         return repository_schemas;
     }
 
@@ -135,14 +119,18 @@ public class SchemaFetcher {
         // by loading it as a resource stream based on the last 2 parts of the $id
         // Create a SchemaInstance object from the json file and return it
         String path = schema_uri.getPath();
-        String[] path_segments = path.split("/pass-metadata-schemas");
-        String path_to_schema = path_segments[path_segments.length - 1];
+        String[] path_segments = path.split("/metadata-schemas");
+        String path_to_schema = "/schemas" + path_segments[path_segments.length - 1];
         return getLocalSchema(path_to_schema);
     }
 
     public static JsonNode getLocalSchema(String path) throws IOException {
-        InputStream schema_json = SchemaFetcher.class.getResourceAsStream(path);
-        ObjectMapper objmapper = new ObjectMapper();
-        return objmapper.readTree(schema_json);
+        try {
+            InputStream schema_json = SchemaFetcher.class.getResourceAsStream(path);
+            ObjectMapper objmapper = new ObjectMapper();
+            return objmapper.readTree(schema_json);
+        } catch (StreamCorruptedException | NullPointerException e) {
+            throw new IOException("Schema not found at " + path, e);
+        }
     }
 }

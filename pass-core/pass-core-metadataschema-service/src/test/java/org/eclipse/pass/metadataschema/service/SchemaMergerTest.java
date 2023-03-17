@@ -15,7 +15,6 @@
  */
 package org.eclipse.pass.metadataschema.service;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -150,12 +149,12 @@ class SchemaMergerTest {
 
     @Test
     void testMergerFull() throws Exception {
-        InputStream schema1 = SchemaMergerTest.class.getResourceAsStream("/example/schemas/schema1.json");
-        InputStream schema2 = SchemaMergerTest.class.getResourceAsStream("/example/schemas/schema2.json");
-        InputStream schema3 = SchemaMergerTest.class.getResourceAsStream("/example/schemas/schema3.json");
-        InputStream schema4 = SchemaMergerTest.class.getResourceAsStream("/example/schemas/schema4.json");
+        InputStream schema1 = SchemaMergerTest.class.getResourceAsStream("/schemas/jhu/schema1.json");
+        InputStream schema2 = SchemaMergerTest.class.getResourceAsStream("/schemas/jhu/schema2.json");
+        InputStream schema3 = SchemaMergerTest.class.getResourceAsStream("/schemas/jhu/schema3.json");
+        InputStream schema4 = SchemaMergerTest.class.getResourceAsStream("/schemas/jhu/schema4.json");
         InputStream expected_json = SchemaMergerTest.class
-                .getResourceAsStream("/example/schemas/example_merged_basic.json");
+                .getResourceAsStream("/schemas/jhu/example_merged_basic.json");
         JsonNode schema_one = map.readTree(schema1);
         JsonNode schema_two = map.readTree(schema2);
         JsonNode schema_three = map.readTree(schema3);
