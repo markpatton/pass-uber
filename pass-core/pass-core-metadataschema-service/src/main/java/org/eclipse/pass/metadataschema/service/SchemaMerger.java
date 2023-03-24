@@ -29,6 +29,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The SchemaMerger class merges a list of SchemaInstance objects into a single
  * SchemaInstance object
+ *
+ * @see SchemaInstance
  */
 public class SchemaMerger {
 

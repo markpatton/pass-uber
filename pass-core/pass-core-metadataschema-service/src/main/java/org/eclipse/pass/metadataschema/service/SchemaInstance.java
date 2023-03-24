@@ -53,18 +53,19 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         findDeps();
     }
 
-    @Override
-    /*
+    /**
      * Sort schemas based on the following rules: If one schema is referenced by
      * another in a $ref, then that schema appears before the other For schemas that
      * are independent of one another, the one with the greatest number of form
      * properties appears before those that have fewer. If two schemas have no
      * dependencies and have the same number of properties, the one that appears
      * first in the initial list will be first in the result.
+     *
      */
+    @Override
     public int compareTo(SchemaInstance s) {
-        // first check if this schema is referenced by schema s; if it is, then this
-        // schema should appear before s; ie. less than s
+        // first check if this schema is referenced by schema s; if it is, then this schema should appear before s;
+        // ie. less than s
         if (checkIfReferenced(s.getName(), schema_name) && !checkIfReferenced(schema_name, s.getName())) {
             return -1;
         } // vice versa
@@ -72,8 +73,7 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
             return 1;
         }
 
-        // for schemas independent of each other, the one with the most form properties
-        // should appear first
+        // for schemas independent of each other, the one with the most form properties should appear first
         int this_properties = countFormProperties();
         int s_properties = s.countFormProperties();
         if (this_properties > s_properties) {
@@ -98,7 +98,8 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
     }
 
     /**
-     * Counts the number of form properties in the schema
+     * Counts the number of form properties in the schema. The number of properties is used to
+     * determine the order of schemas in the form.
      *
      * @return int number of properties
      */
@@ -117,8 +118,6 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
      * Finds references in this schema. Find by going through $ref tags in the
      * schema
      *
-     * @return List<String> List of URIs to schemas referenced by this schema
-     *
      */
     void dereference(JsonNode node, String pointer) {
 
@@ -136,7 +135,7 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
                     // replace it by the value it is pointing to
                     if (stringval.charAt(0) == '#') {
                         ((ObjectNode) schema).replace(path.split("/")[1],
-                                resolveRef(path, stringval.split("#")[1], schema));
+                                resolveRef(stringval.split("#")[1], schema));
                     } else { // referencing another schema
                         JsonNode ext_schema = null;
                         try {
@@ -148,7 +147,7 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
                         }
 
                         ((ObjectNode) schema).replace(path.split("/")[1],
-                                resolveRef(path, stringval.split("#")[1], ext_schema));
+                                resolveRef(stringval.split("#")[1], ext_schema));
                     }
                 }
             } else if (value.isObject()) {
@@ -188,9 +187,8 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         orderedDeps.put(schema_name, deps.values());
     }
 
-    private JsonNode resolveRef(String path, String dep, JsonNode schema) {
-        JsonNode local_val = schema.at(dep);
-        return local_val;
+    private JsonNode resolveRef(String dep, JsonNode schema) {
+        return schema.at(dep);
     }
 
     public JsonNode getSchema() {

@@ -41,9 +41,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * RestController implementation class PassSchemaServiceController This class handles the web
- * request handling of GET and POST requests from the client. It interacts with the SchemaService class, which handles
- * the business logic
+ * RestController implementation class PassSchemaServiceController. This class handles the web
+ * request handling of POST requests from the client. It interacts with the SchemaService class, which handles
+ * the business logic of retrieving, sorting, and merging the metadata schemas.
+ *
+ * @see SchemaService
  */
 @RestController
 public class PassSchemaServiceController {
@@ -57,6 +59,7 @@ public class PassSchemaServiceController {
 
     /**
      * This constructor is used for unit testing to inject a mock client
+     * @param passClient PassClient to use for unit testing
      */
     protected PassSchemaServiceController(PassClient passClient) {
         this.passClient = passClient;
@@ -95,7 +98,7 @@ public class PassSchemaServiceController {
     @PostMapping("/schemaservice")
     public ResponseEntity<?> getSchema(HttpServletRequest request)
             throws IOException {
-        List<String> repository_list = new ArrayList<>();
+        List<String> repository_list;
 
         // Create SchemaService instance to handle business logic
         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));

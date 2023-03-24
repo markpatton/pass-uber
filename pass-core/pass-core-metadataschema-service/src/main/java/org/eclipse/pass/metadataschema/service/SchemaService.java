@@ -45,7 +45,9 @@ public class SchemaService {
     }
 
     /**
-     * Get a merged schema composed of all the repository schemas provided as input
+     * Get a merged schema composed of all the repository schemas provided as input. This uses the SchemaMerger
+     * class to merge the schemas into a single JSON schema. The schemas are fetched from the repository URIs,
+     * using the SchemaFetcher class, and then merged using the SchemaMerger class.
      *
      * @param repository_list List of repository URIs containing schemas to be merged
      * @return JsonSchema merged schema
