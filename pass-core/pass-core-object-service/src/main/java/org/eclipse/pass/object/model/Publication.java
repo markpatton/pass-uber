@@ -23,6 +23,7 @@ import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.UpdatePermission;
 
 /**
  * Publication model. Contains details of work being submitted, where it is being deposited to, related Grants etc.
@@ -31,6 +32,7 @@ import com.yahoo.elide.annotation.Include;
  */
 
 @CreatePermission(expression = "User is Backend OR User is Submitter")
+@UpdatePermission(expression = "User is Backend OR User is Submitter")
 @Include
 @Entity
 @Table(name = "pass_publication")
