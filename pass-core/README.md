@@ -48,7 +48,7 @@ Environment variables:
 * PASS_CORE_PORT=8080
 * PASS_CORE_LOG_DIR=${java.io.tmpdir}/pass-core
 * PASS_CORE_BACKEND_USER=backend
-* PASS_CORE_BACKEND_USER=moo
+* PASS_CORE_BACKEND_PASSWORD=moo
 * PASS_CORE_JAVA_OPTS="-Djavax.persistence.schema-generation.database.action=create"
 * PASS_CORE_BASE_URL=http://localhost:8080
   * Used when services send URLs to the client such as relationship links.
