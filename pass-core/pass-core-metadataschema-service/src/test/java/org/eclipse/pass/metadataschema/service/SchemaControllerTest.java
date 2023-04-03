@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;*/
 
-class SchemaServletTest {
+class SchemaControllerTest {
 
     /*private PassSchemaServiceController s;
     private PassClient passClientMock;

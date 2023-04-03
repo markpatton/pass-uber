@@ -23,8 +23,6 @@ import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 //import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +31,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.pass.object.PassClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PassSchemaServiceController {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = Logger.getLogger(PassSchemaServiceController.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
     @Autowired
     private PassClient passClient;
 
@@ -103,7 +103,7 @@ public class PassSchemaServiceController {
             try {
                 repository_list = readJson(br);
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Failed to parse list of repository URIs", e);
+                LOG.error("Failed to parse list of repository URIs", e);
                 response.sendError(HttpServletResponse.SC_CONFLICT, "Failed to parse list of repository URIs");
             }
         }
@@ -116,7 +116,7 @@ public class PassSchemaServiceController {
         try {
             mergedSchema = s.getMergedSchema(repository_list);
         } catch (IllegalArgumentException | URISyntaxException | IOException e) {
-            logger.log(Level.SEVERE, "Failed to parse schemas", e);
+            LOG.error("Failed to parse schemas", e);
             response.sendError(HttpServletResponse.SC_CONFLICT, "Failed to parse schemas");
         } catch (MergeFailException e) { // if the merge was unsuccessful
             List<JsonNode> individual_schemas;
@@ -129,7 +129,7 @@ public class PassSchemaServiceController {
                     }
                 }
             } catch (IllegalArgumentException | URISyntaxException | IOException e1) {
-                logger.log(Level.SEVERE, "Failed to retrieve schemas", e);
+                LOG.error("Failed to retrieve schemas", e);
                 response.sendError(HttpServletResponse.SC_CONFLICT, "Failed to retrieve schemas");
             }
 

@@ -55,7 +55,7 @@
     <module>pass-core-file-service</module>
     <module>pass-core-user-service</module>
     <module>pass-core-main</module>
-    <module>pass-core-metadata-schema-service</module>
+    <module>pass-core-metadataschema-service</module>
   </modules>
 
   <scm>

@@ -29,6 +29,12 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.pass.object.PassClient;
+import org.eclipse.pass.object.PassClientResult;
+import org.eclipse.pass.object.PassClientSelector;
+import org.eclipse.pass.object.RSQL;
+import org.eclipse.pass.object.model.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 //import org.eclipse.pass.object.model.Repository;
 
 /**
@@ -37,10 +43,11 @@ import org.eclipse.pass.object.PassClient;
  */
 public class SchemaFetcher {
 
-    private PassClient client;
+    private PassClient passClient;
+    private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
 
     public SchemaFetcher(PassClient client) {
-        this.client = client;
+        this.passClient = client;
     }
 
     /**
@@ -92,21 +99,29 @@ public class SchemaFetcher {
      * @throws URISyntaxException
      * @throws IllegalArgumentException
      */
-    List<JsonNode> getRepositorySchemas(String repository_uri)
+    List<JsonNode> getRepositorySchemas(String repositoryUri)
             throws URISyntaxException, IllegalArgumentException, IOException {
-        /*URI uri_r1;
-        Repository r1 = null;
+        //URI uriRepo;
+        Repository repo = null;
         List<JsonNode> repository_schemas = new ArrayList<JsonNode>();
-        uri_r1 = client.findByAttribute(Repository.class, "@id", new URI(repository_uri));
-        r1 = client.readResource(uri_r1, Repository.class);
-
-        List<URI> schema_uris = r1.getSchemas();
-        for (URI schema_uri : schema_uris) {
-            repository_schemas.add(getSchemaFromUri(schema_uri));
+        String filter = RSQL.equals("url", repositoryUri);
+        PassClientResult<Repository> result = passClient.
+                selectObjects(new PassClientSelector<>(Repository.class, 0, 100, filter, null));
+        if (result.getTotal() == 1) {
+            repo = result.getObjects().get(0);
+        } else if (result.getTotal() > 1) {
+            throw new IOException("Multiple repositories found at " + repositoryUri);
+        } else if (result.getTotal() == 0) {
+            throw new IOException("No repository found at " + repositoryUri);
         }
 
-        return repository_schemas;*/
-        return null;
+        List<URI> schema_uris = repo.getSchemas();
+        for (URI schema_uri : schema_uris) {
+            LOG.info("SchemaFetcher - Schema URI: " + schema_uri);
+            repository_schemas.add(getSchemaFromUri(schema_uri));
+        }
+        LOG.info("SchemaFetcher - Repository schemas: " + repository_schemas);
+        return repository_schemas;
     }
 
     /**
