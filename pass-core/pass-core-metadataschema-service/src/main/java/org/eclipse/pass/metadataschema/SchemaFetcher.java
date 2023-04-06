@@ -16,10 +16,12 @@
  */
 package org.eclipse.pass.metadataschema;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StreamCorruptedException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +49,7 @@ public class SchemaFetcher {
 
     private final PassClient passClient;
     private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
-    private static Map<String, JsonNode> localSchemaCache = new HashMap<>();
+    private static Map<String, CacheSchema> localSchemaCache = new HashMap<>();
 
     public SchemaFetcher(PassClient client) {
         this.passClient = client;
@@ -79,10 +81,12 @@ public class SchemaFetcher {
             schema_instances.add(s);
         }
 
-        //order independent dependencies
-        /*for (SchemaInstance s : schema_instances) {
-            s.orderDependencies();
-        }*/
+        //order schema dependencies
+        for (SchemaInstance s : schema_instances) {
+            for (SchemaInstance k: schema_instances) {
+                s.updateOrderDeps(k);
+            }
+        }
 
         //sort schemas
         Collections.sort(schema_instances);
@@ -137,16 +141,26 @@ public class SchemaFetcher {
 
     public static JsonNode getLocalSchema(String path) throws IOException {
         ObjectMapper objmapper = new ObjectMapper();
+        URL localSchemaURL = SchemaFetcher.class.getResource(path);
+        if (localSchemaURL == null) {
+            LOG.error("Schema not found at " + path);
+            throw new IOException("Schema not found at " + path);
+        }
+
+        File schemaFile = new File(localSchemaURL.getFile());
+        long lastModified = schemaFile.lastModified();
 
         if (localSchemaCache.containsKey(path)) {
-            JsonNode cachedSchema = localSchemaCache.get(path);
-            return objmapper.readValue(objmapper.writeValueAsString(cachedSchema), JsonNode.class);
+            CacheSchema cacheSchema = localSchemaCache.get(path);
+            if (cacheSchema.getLastModified() == lastModified) {
+                return cacheSchema.getSchema().deepCopy();
+            }
         }
 
         try {
             InputStream schema_json = SchemaFetcher.class.getResourceAsStream(path);
             JsonNode schema = objmapper.readTree(schema_json);
-            localSchemaCache.put(path, schema.deepCopy());
+            localSchemaCache.put(path, new CacheSchema(schema.deepCopy(), lastModified));
             return schema.deepCopy();
         } catch (StreamCorruptedException | NullPointerException e) {
             LOG.error("Schema not found at " + path, e);

@@ -80,24 +80,22 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         int this_properties = countFormProperties();
         int s_properties = s.countFormProperties();
         if (this_properties > s_properties) {
-            //orderedDeps.put(s.getName(), orderedDeps.get(schema_name));
             return -1;
         } else if (this_properties < s_properties) {
-            //orderedDeps.put(schema_name, orderedDeps.get(s.getName()));
             return 1;
         }
         return 0;
     }
 
-    //order schemas based on dependencies
-    public void updateOrderedDeps(SchemaInstance compareSchema) {
+    //update the dependencies of the schema that is being compared to this schema
+    public void updateOrderDeps(SchemaInstance compareSchema) {
         // for schemas independent of each other, the one with the most form properties should appear first
-        int thisProperties = countFormProperties();
-        int compareSchemaProperties = compareSchema.countFormProperties();
-        if (thisProperties > compareSchemaProperties) {
-            orderedDeps.put(compareSchema.getName(), orderedDeps.get(schema_name));
-        } else if (thisProperties < compareSchemaProperties) {
-            orderedDeps.put(schema_name, orderedDeps.get(compareSchema.getName()));
+        if (!checkIfReferenced(schema_name, compareSchema.getName())) {
+            int thisProperties = countFormProperties();
+            int compareSchemaProperties = compareSchema.countFormProperties();
+            if (thisProperties > compareSchemaProperties) {
+                orderedDeps.put(compareSchema.getName(), orderedDeps.get(schema_name));
+            }
         }
     }
 

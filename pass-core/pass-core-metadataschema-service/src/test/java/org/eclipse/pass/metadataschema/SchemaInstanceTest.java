@@ -35,56 +35,6 @@ class SchemaInstanceTest {
         map = new ObjectMapper();
     }
 
-    @Test
-    void testSort2() throws JsonProcessingException {
-        String one = "{\r\n" + "        \"$id\": \"http://example.org/schemas/one.json\",\r\n"
-                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
-                + "                \"properties\": {\r\n" + "                    \"foo\": \"bar\"\r\n"
-                + "                }\r\n" + "            }\r\n" + "        }\r\n" + "    }";
-
-        String two = "{\r\n" + "        \"$id\": \"http://example.org/schemas/two.json\",\r\n"
-                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
-                + "                \"properties\": {\r\n"
-                + "                    \"foo\": {\"$ref\": \"one.json#/definitions/form/properties/foo\"},\r\n"
-                + "                    \"bar\": \"baz\",\r\n"
-                + "                    \"baz\": {\"$ref\": \"#/definitions/form/properties/bar\"}\r\n"
-                + "                }\r\n" + "            }\r\n" + "        }\r\n" + "    }";
-
-        String three = "{\r\n" + "        \"$id\": \"http://example.org/schemas/three.json\",\r\n"
-                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
-                + "                \"properties\": {\r\n"
-                + "                    \"foo\": {\"$ref\": \"one.json#/definitions/form/properties/foo\"},\r\n"
-                + "                    \"bar\": {\"$ref\": \"two.json#/definitions/form/properties/foo\"},\r\n"
-                + "                    \"baz0\": \"value0\",\r\n" + "                    \"baz\": \"value\"\r\n"
-                + "                }\r\n" + "            }\r\n" + "        }\r\n" + "    }";
-
-        String four = "{\r\n" + "        \"$id\": \"http://example.org/schemas/four.json\",\r\n"
-                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
-                + "                \"properties\": {\r\n"
-                + "                    \"foo2\": {\"$ref\": \"one.json#/definitions/form/properties/foo\"},\r\n"
-                + "                    \"bar2\": {\"$ref\": \"two.json#/definitions/form/properties/foo\"},\r\n"
-                + "                    \"baz\": \"value\"\r\n" + "                }\r\n" + "            }\r\n"
-                + "        }\r\n" + "    }";
-
-        String five = "{\r\n" + "        \"$id\": \"http://example.org/schemas/five.json\",\r\n"
-                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
-                + "                \"properties\": {\r\n" + "                    \"one\": 1,\r\n"
-                + "                    \"two\": 2\r\n" + "                }\r\n" + "            }\r\n" + "        }\r\n"
-                + "    }";
-
-        SchemaInstance schema1 = new SchemaInstance(map.readTree(one));
-        SchemaInstance schema2 = new SchemaInstance(map.readTree(two));
-        SchemaInstance schema3 = new SchemaInstance(map.readTree(three));
-        SchemaInstance schema4 = new SchemaInstance(map.readTree(four));
-        SchemaInstance schema5 = new SchemaInstance(map.readTree(five));
-
-        ArrayList<SchemaInstance> toSort = new ArrayList<>(Arrays.asList(schema5, schema2, schema3, schema1, schema4));
-        ArrayList<SchemaInstance> expected = new ArrayList<>(Arrays.asList(schema1, schema2, schema3, schema4, schema5));
-
-        Collections.sort(toSort);
-        assertEquals(toSort, expected);
-    }
-
     /*
      * Sort schemas based on the following rules: If one schema is referenced by
      * another in a $ref, then that schema appears before the other For schemas that
@@ -150,6 +100,11 @@ class SchemaInstanceTest {
         ArrayList<SchemaInstance> expected = new ArrayList<>(Arrays.asList(schema1, schema2,
                 schema3, schema4, schema5, schema6, schema7));
 
+        for (SchemaInstance s : toSort) {
+            for (SchemaInstance k: toSort) {
+                s.updateOrderDeps(k);
+            }
+        }
         Collections.sort(toSort);
         assertEquals(toSort, expected);
     }
