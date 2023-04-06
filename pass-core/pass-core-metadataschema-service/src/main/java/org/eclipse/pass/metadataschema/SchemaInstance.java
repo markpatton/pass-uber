@@ -14,7 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.eclipse.pass.metadataschema.service;
+package org.eclipse.pass.metadataschema;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The SchemaInstance class represents a schema map, read from a schema URI.
@@ -39,6 +40,8 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
     private String schema_name;
     private String schema_dir;
     private static final Logger logger = Logger.getLogger(SchemaInstance.class.getName());
+    @Autowired
+    private SchemaFetcher schemaFetcher;
 
     // all dependencies of a schema on other schemas, as well as dependencies of the
     // schemas with "greater" value than the given schema
@@ -77,13 +80,25 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         int this_properties = countFormProperties();
         int s_properties = s.countFormProperties();
         if (this_properties > s_properties) {
-            orderedDeps.put(s.getName(), orderedDeps.get(schema_name));
+            //orderedDeps.put(s.getName(), orderedDeps.get(schema_name));
             return -1;
         } else if (this_properties < s_properties) {
-            orderedDeps.put(schema_name, orderedDeps.get(s.getName()));
+            //orderedDeps.put(schema_name, orderedDeps.get(s.getName()));
             return 1;
         }
         return 0;
+    }
+
+    //order schemas based on dependencies
+    public void updateOrderedDeps(SchemaInstance compareSchema) {
+        // for schemas independent of each other, the one with the most form properties should appear first
+        int thisProperties = countFormProperties();
+        int compareSchemaProperties = compareSchema.countFormProperties();
+        if (thisProperties > compareSchemaProperties) {
+            orderedDeps.put(compareSchema.getName(), orderedDeps.get(schema_name));
+        } else if (thisProperties < compareSchemaProperties) {
+            orderedDeps.put(schema_name, orderedDeps.get(compareSchema.getName()));
+        }
     }
 
     private boolean checkIfReferenced(String referencer, String schema) {

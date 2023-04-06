@@ -14,7 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.eclipse.pass.metadataschema.service;
+package org.eclipse.pass.metadataschema;
 
 public class MergeFailException extends RuntimeException {
     public MergeFailException(String errorMessage) {

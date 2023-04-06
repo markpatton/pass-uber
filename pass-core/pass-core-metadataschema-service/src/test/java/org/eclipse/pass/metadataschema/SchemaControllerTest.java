@@ -14,7 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.eclipse.pass.metadataschema.service;
+package org.eclipse.pass.metadataschema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -28,7 +28,6 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import javax.servlet.ReadListener;
@@ -131,14 +130,9 @@ class SchemaControllerTest {
         when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
         when(repositoryMock2.getSchemas()).thenReturn(r2_schemas_list);
 
-        String repositories = "[\"1\", \"2\"]";
-        ByteArrayInputStream stream = new ByteArrayInputStream(repositories.getBytes(StandardCharsets.UTF_8));
-        ServletInputStream servletstream = createServletInputStream(stream);
+        String repositories = "1,2";
 
-        when(request.getInputStream()).thenReturn(servletstream);
-        when(request.getContentType()).thenReturn("application/json");
-
-        ResponseEntity response = schemaServiceController.getSchema(request);
+        ResponseEntity response = schemaServiceController.getSchema(repositories);
         assertEquals(response.getBody().toString(),response.getBody().toString());
         InputStream expected_schema_json = SchemaServiceTest.class
                 .getResourceAsStream("/schemas/jhu/example_merged_dereferenced.json");

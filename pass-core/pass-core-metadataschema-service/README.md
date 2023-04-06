@@ -55,13 +55,9 @@ schema.
 ## Schema service
 
 The schema service is an http service that accepts a list of PASS [repository](https://oa-pass.github.io/pass-data-model/documentation/Repository.html) 
-entity IDs `application/json` or newline delimited `text/plain`, in a POST request.  for example:
+entity IDs in a comma separated values String, in a GET request.  for example:
 
-    [
-        "1",
-        "2",
-        "3"
-    ]
+`schemaservice?entityIds=1,2,3`
 
 For each repository, the schema service will retrieve the list of schemas relevant to the repository, place that list in the correct order (so
 that schemas that provide the most dependencies are displayed first), and resolves all `$ref` references that might appear in the schema.
@@ -75,7 +71,7 @@ The result is an `application/json` response that contains a JSON list of schema
 ## HTTP Error Responses
 The service will return the following HTTP error responses:
 - 400 - Bad Request
-  - This is returned when the request body is not valid JSON or when the request body is not a list of repository URIs.
+  - This is returned when the request body is not valid list of comma separated entity Ids
 - 409 - Conflict
   - This is returned when a schema is unable to be merged or when a schema fetch failed.
 - 500 - Internal Server Error

@@ -14,21 +14,19 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.eclipse.pass.metadataschema.service;
+package org.eclipse.pass.metadataschema;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yahoo.elide.RefreshableElide;
-import org.eclipse.pass.object.ElideDataStorePassClient;
 import org.eclipse.pass.object.PassClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +35,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -51,10 +50,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PassSchemaServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
     private final PassClient passClient;
+    private SchemaService schemaService;
 
     @Autowired
     public PassSchemaServiceController(RefreshableElide refreshableElide) {
-        this.passClient = new ElideDataStorePassClient(refreshableElide);
+        this.passClient = PassClient.newInstance(refreshableElide);
+        schemaService = new SchemaService(passClient);
     }
 
     /**
@@ -63,6 +64,7 @@ public class PassSchemaServiceController {
      */
     protected PassSchemaServiceController(PassClient passClient) {
         this.passClient = passClient;
+        schemaService = new SchemaService(passClient);
     }
 
     protected List<String> readText(BufferedReader r) throws IOException {
@@ -91,49 +93,29 @@ public class PassSchemaServiceController {
      * logic of generating a merged schema from the list of relevant repository
      * schemas to a PASS submission
      *
-     * @param request the HTTP request which contains the list of repository IDs
+     * @param entityIds A comma-separated list of repository entity IDs
      * @throws IOException if the request cannot be read or schema cannot be merged
      * @return a merged schema in JSON format
      */
-    @PostMapping("/schemaservice")
-    public ResponseEntity<?> getSchema(HttpServletRequest request)
-            throws IOException {
-        List<String> repository_list;
-
-        // Create SchemaService instance to handle business logic
-        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-
-        if (request.getContentType() == null) {
-            LOG.error("Content type is null");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Content type is null. " +
-                    "Please specify content type as text/plain or application/json");
+    @GetMapping("/schemaservice")
+    public ResponseEntity<?> getSchema(@RequestParam("entityIds") String entityIds) throws IOException {
+        if (entityIds == null || entityIds.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No entityIds provided");
         }
-
-        if (request.getContentType().equals("text/plain")) {
-            repository_list = readText(br);
-        } else {
-            try {
-                repository_list = readJson(br);
-            } catch (Exception e) {
-                LOG.error("Failed to parse list of repository URIs", e);
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed to parse list of repository URIs");
-            }
-        }
-
-        SchemaService s = new SchemaService(passClient);
+        List<String> repository_list = Arrays.asList(entityIds.split(","));
 
         ObjectMapper m = new ObjectMapper();
         JsonNode mergedSchema = null;
         String jsonResponse = "";
         try {
-            mergedSchema = s.getMergedSchema(repository_list);
+            mergedSchema = schemaService.getMergedSchema(repository_list);
         } catch (IllegalArgumentException | IOException e) {
             LOG.error("Failed to parse schemas", e);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed to parse schemas");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to parse schemas");
         } catch (MergeFailException e) { // if the merge was unsuccessful
             List<JsonNode> individual_schemas;
             try {
-                individual_schemas = s.getIndividualSchemas(repository_list);
+                individual_schemas = schemaService.getIndividualSchemas(repository_list);
                 for (int i = 0; i < individual_schemas.size(); i++) {
                     jsonResponse += m.writeValueAsString(individual_schemas.get(i));
                     if (i < individual_schemas.size() - 1) {
@@ -142,7 +124,7 @@ public class PassSchemaServiceController {
                 }
             } catch (IllegalArgumentException | URISyntaxException | IOException e1) {
                 LOG.error("Failed to retrieve schemas", e);
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed to retrieve schemas");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve schemas");
             }
 
         }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.eclipse.pass.metadataschema.service;
+package org.eclipse.pass.metadataschema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,6 +33,56 @@ class SchemaInstanceTest {
     @BeforeEach
     void setup() {
         map = new ObjectMapper();
+    }
+
+    @Test
+    void testSort2() throws JsonProcessingException {
+        String one = "{\r\n" + "        \"$id\": \"http://example.org/schemas/one.json\",\r\n"
+                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
+                + "                \"properties\": {\r\n" + "                    \"foo\": \"bar\"\r\n"
+                + "                }\r\n" + "            }\r\n" + "        }\r\n" + "    }";
+
+        String two = "{\r\n" + "        \"$id\": \"http://example.org/schemas/two.json\",\r\n"
+                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
+                + "                \"properties\": {\r\n"
+                + "                    \"foo\": {\"$ref\": \"one.json#/definitions/form/properties/foo\"},\r\n"
+                + "                    \"bar\": \"baz\",\r\n"
+                + "                    \"baz\": {\"$ref\": \"#/definitions/form/properties/bar\"}\r\n"
+                + "                }\r\n" + "            }\r\n" + "        }\r\n" + "    }";
+
+        String three = "{\r\n" + "        \"$id\": \"http://example.org/schemas/three.json\",\r\n"
+                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
+                + "                \"properties\": {\r\n"
+                + "                    \"foo\": {\"$ref\": \"one.json#/definitions/form/properties/foo\"},\r\n"
+                + "                    \"bar\": {\"$ref\": \"two.json#/definitions/form/properties/foo\"},\r\n"
+                + "                    \"baz0\": \"value0\",\r\n" + "                    \"baz\": \"value\"\r\n"
+                + "                }\r\n" + "            }\r\n" + "        }\r\n" + "    }";
+
+        String four = "{\r\n" + "        \"$id\": \"http://example.org/schemas/four.json\",\r\n"
+                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
+                + "                \"properties\": {\r\n"
+                + "                    \"foo2\": {\"$ref\": \"one.json#/definitions/form/properties/foo\"},\r\n"
+                + "                    \"bar2\": {\"$ref\": \"two.json#/definitions/form/properties/foo\"},\r\n"
+                + "                    \"baz\": \"value\"\r\n" + "                }\r\n" + "            }\r\n"
+                + "        }\r\n" + "    }";
+
+        String five = "{\r\n" + "        \"$id\": \"http://example.org/schemas/five.json\",\r\n"
+                + "        \"definitions\": {\r\n" + "            \"form\": {\r\n"
+                + "                \"properties\": {\r\n" + "                    \"one\": 1,\r\n"
+                + "                    \"two\": 2\r\n" + "                }\r\n" + "            }\r\n" + "        }\r\n"
+                + "    }";
+
+        SchemaInstance schema1 = new SchemaInstance(map.readTree(one));
+        SchemaInstance schema2 = new SchemaInstance(map.readTree(two));
+        SchemaInstance schema3 = new SchemaInstance(map.readTree(three));
+        SchemaInstance schema4 = new SchemaInstance(map.readTree(four));
+        SchemaInstance schema5 = new SchemaInstance(map.readTree(five));
+
+        ArrayList<SchemaInstance> toSort = new ArrayList<>(Arrays.asList(schema5, schema2, schema3, schema1, schema4));
+        ArrayList<SchemaInstance> expected = new ArrayList<>(Arrays.asList(schema1, schema2, schema3, schema4, schema5));
+
+        Collections.sort(toSort);
+        assertEquals(toSort, expected);
     }
 
     /*
@@ -87,18 +137,18 @@ class SchemaInstanceTest {
 
         String seven = "{\r\n" + "        \"$id\": \"http://example.org/schemas/seven.json\"\r\n" + "    }";
 
-        SchemaInstance schema_one = new SchemaInstance(map.readTree(one));
-        SchemaInstance schema_two = new SchemaInstance(map.readTree(two));
-        SchemaInstance schema_three = new SchemaInstance(map.readTree(three));
-        SchemaInstance schema_four = new SchemaInstance(map.readTree(four));
-        SchemaInstance schema_five = new SchemaInstance(map.readTree(five));
-        SchemaInstance schema_six = new SchemaInstance(map.readTree(six));
-        SchemaInstance schema_seven = new SchemaInstance(map.readTree(seven));
+        SchemaInstance schema1 = new SchemaInstance(map.readTree(one));
+        SchemaInstance schema2 = new SchemaInstance(map.readTree(two));
+        SchemaInstance schema3 = new SchemaInstance(map.readTree(three));
+        SchemaInstance schema4 = new SchemaInstance(map.readTree(four));
+        SchemaInstance schema5 = new SchemaInstance(map.readTree(five));
+        SchemaInstance schema6 = new SchemaInstance(map.readTree(six));
+        SchemaInstance schema7 = new SchemaInstance(map.readTree(seven));
 
-        ArrayList<SchemaInstance> toSort = new ArrayList<>(Arrays.asList(schema_five, schema_two,
-                schema_seven, schema_one, schema_six, schema_three, schema_four));
-        ArrayList<SchemaInstance> expected = new ArrayList<>(Arrays.asList(schema_one, schema_two,
-                schema_three, schema_four, schema_five, schema_six, schema_seven));
+        ArrayList<SchemaInstance> toSort = new ArrayList<>(Arrays.asList(schema5, schema2,
+                schema7, schema1, schema6, schema3, schema4));
+        ArrayList<SchemaInstance> expected = new ArrayList<>(Arrays.asList(schema1, schema2,
+                schema3, schema4, schema5, schema6, schema7));
 
         Collections.sort(toSort);
         assertEquals(toSort, expected);

@@ -14,7 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.eclipse.pass.metadataschema.service;
+package org.eclipse.pass.metadataschema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -49,7 +49,7 @@ class SchemaServiceTest {
 
     @Test
     void getMergedSchemaTest() throws Exception {
-        List<String> repository_uris = Arrays.asList("1", "2");
+        List<String> repositoryIds = Arrays.asList("1", "2");
         when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
         when(passClientMock.getObject(Repository.class, 2L)).thenReturn(repositoryMock2);
 
@@ -68,7 +68,7 @@ class SchemaServiceTest {
                 .getResourceAsStream("/schemas/jhu/example_merged_dereferenced.json");
         ObjectMapper map = new ObjectMapper();
         JsonNode expected = map.readTree(expected_schema_json);
-        JsonNode result = schemaService.getMergedSchema(repository_uris);
+        JsonNode result = schemaService.getMergedSchema(repositoryIds);
         assertEquals(expected, result);
     }
 }

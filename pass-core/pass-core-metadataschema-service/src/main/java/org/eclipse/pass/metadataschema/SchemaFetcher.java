@@ -14,7 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.eclipse.pass.metadataschema.service;
+package org.eclipse.pass.metadataschema;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +22,9 @@ import java.io.StreamCorruptedException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Fetches the schemas from a list of repository URIs and creates a corresponding list of SchemaInstance objects.
  * In order to fetch the schemas properly they need to have the following structure in the schema URL:
- * repository_uri/metadata-schemas/institution/schema_name.json. When the schemas are fetched the schemas instantiated
+ * repositoryId/metadata-schemas/institution/schema_name.json. When the schemas are fetched the schemas instantiated
  * as a SchemaInstance and then dereferenced. Schemas are located in the Resources /schemas directory and grouped by
  * their respective institution folder e.g. JHU, Harvard, etc. Adding a new institution needs to be done in the schemas
  * directory.
@@ -45,6 +47,7 @@ public class SchemaFetcher {
 
     private final PassClient passClient;
     private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
+    private static Map<String, JsonNode> localSchemaCache = new HashMap<>();
 
     public SchemaFetcher(PassClient client) {
         this.passClient = client;
@@ -56,13 +59,13 @@ public class SchemaFetcher {
      * @return List<SchemaInstance> ArrayList of relevant SchemaInstance objects
      * @throws IOException if the schemas cannot be fetched
      */
-    List<JsonNode> getSchemas(List<String> repository_uris) throws IOException {
+    List<JsonNode> getSchemas(List<String> entityIds) throws IOException {
         List<JsonNode> schemas = new ArrayList<>();
         List<SchemaInstance> schema_instances = new ArrayList<>();
 
-        for (String repository_uri : repository_uris) {
+        for (String entityId : entityIds) {
             List<JsonNode> repository_schemas;
-            repository_schemas = getRepositorySchemas(repository_uri);
+            repository_schemas = getRepositorySchemas(entityId);
             for (JsonNode schema : repository_schemas) {
                 if (!schemas.contains(schema)) {
                     schemas.add(schema);
@@ -76,6 +79,12 @@ public class SchemaFetcher {
             schema_instances.add(s);
         }
 
+        //order independent dependencies
+        /*for (SchemaInstance s : schema_instances) {
+            s.orderDependencies();
+        }*/
+
+        //sort schemas
         Collections.sort(schema_instances);
 
         schemas = new ArrayList<>();
@@ -93,19 +102,19 @@ public class SchemaFetcher {
      * @return List<SchemaInstance> schemas from the repository
      * @throws IOException if the repository cannot be found.
      */
-    List<JsonNode> getRepositorySchemas(String repositoryId) throws IOException {
+    List<JsonNode> getRepositorySchemas(String entityId) throws IOException {
         Repository repo;
         List<JsonNode> repository_schemas = new ArrayList<>();
         try {
-            repo = passClient.getObject(Repository.class, Long.parseLong(repositoryId));
+            repo = passClient.getObject(Repository.class, Long.parseLong(entityId));
 
             List<URI> schema_uris = repo.getSchemas();
             for (URI schema_uri : schema_uris) {
                 repository_schemas.add(getSchemaFromUri(schema_uri));
             }
         } catch (NullPointerException e) {
-            LOG.error("Repository not found at ID: " + repositoryId, e);
-            throw new IOException("Repository not found at ID: " + repositoryId);
+            LOG.error("Repository not found at ID: " + entityId, e);
+            throw new IOException("Repository not found at ID: " + entityId);
         }
         return repository_schemas;
     }
@@ -127,10 +136,18 @@ public class SchemaFetcher {
     }
 
     public static JsonNode getLocalSchema(String path) throws IOException {
+        ObjectMapper objmapper = new ObjectMapper();
+
+        if (localSchemaCache.containsKey(path)) {
+            JsonNode cachedSchema = localSchemaCache.get(path);
+            return objmapper.readValue(objmapper.writeValueAsString(cachedSchema), JsonNode.class);
+        }
+
         try {
             InputStream schema_json = SchemaFetcher.class.getResourceAsStream(path);
-            ObjectMapper objmapper = new ObjectMapper();
-            return objmapper.readTree(schema_json);
+            JsonNode schema = objmapper.readTree(schema_json);
+            localSchemaCache.put(path, schema.deepCopy());
+            return schema.deepCopy();
         } catch (StreamCorruptedException | NullPointerException e) {
             LOG.error("Schema not found at " + path, e);
             throw new IOException("Schema not found at " + path, e);

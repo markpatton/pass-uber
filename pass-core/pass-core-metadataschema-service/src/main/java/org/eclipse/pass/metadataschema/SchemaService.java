@@ -14,7 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.eclipse.pass.metadataschema.service;
+package org.eclipse.pass.metadataschema;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -31,6 +31,7 @@ import org.eclipse.pass.object.PassClient;
 public class SchemaService {
 
     private PassClient passClient;
+    private SchemaFetcher schemaFetcher;
 
     /**
      * SchemaService constructor
@@ -41,6 +42,7 @@ public class SchemaService {
     // Used in unit tests for inserting a mock client
     public SchemaService(PassClient client) {
         this.passClient = client;
+        schemaFetcher = new SchemaFetcher(passClient);
 
     }
 
@@ -57,9 +59,8 @@ public class SchemaService {
     JsonNode getMergedSchema(List<String> repository_list) throws MergeFailException, IOException {
 
         // Create a SchemaFetcher instance to get the schemas from the repository URIs
-        SchemaFetcher f = new SchemaFetcher(passClient);
         List<JsonNode> repository_schemas;
-        repository_schemas = f.getSchemas(repository_list);
+        repository_schemas = schemaFetcher.getSchemas(repository_list);
         SchemaMerger m = new SchemaMerger();
         JsonNode mergedSchema;
         mergedSchema = m.mergeSchemas(repository_schemas);
