@@ -94,25 +94,37 @@ public class PassSchemaServiceController {
      * schemas to a PASS submission
      *
      * @param entityIds A comma-separated list of repository entity IDs
+     * @param mergeSchemaOpt A boolean value indicating whether to merge schemas or return individual schemas
      * @throws IOException if the request cannot be read or schema cannot be merged
      * @return a merged schema in JSON format
      */
     @GetMapping("/schemaservice")
-    public ResponseEntity<?> getSchema(@RequestParam("entityIds") String entityIds) throws IOException {
+    public ResponseEntity<?> getSchema(@RequestParam("entityIds") String entityIds,
+                                       @RequestParam("merge") String mergeSchemaOpt) throws IOException {
         if (entityIds == null || entityIds.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No entityIds provided");
+        }
+        if (mergeSchemaOpt == null || mergeSchemaOpt.isEmpty()) {
+            mergeSchemaOpt = "false";
         }
         List<String> repository_list = Arrays.asList(entityIds.split(","));
 
         ObjectMapper m = new ObjectMapper();
         JsonNode mergedSchema = null;
         String jsonResponse = "";
-        try {
-            mergedSchema = schemaService.getMergedSchema(repository_list);
-        } catch (IllegalArgumentException | IOException e) {
-            LOG.error("Failed to parse schemas", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to parse schemas");
-        } catch (MergeFailException e) { // if the merge was unsuccessful
+
+        //front-end will first attempt to merge schemas, if that fails, it will attempt to retrieve individual schemas
+        if (mergeSchemaOpt.equalsIgnoreCase("true")) {
+            try {
+                mergedSchema = schemaService.getMergedSchema(repository_list);
+            } catch (IllegalArgumentException | IOException e) {
+                LOG.error("Failed to parse schemas", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to parse schemas");
+            } catch (MergeFailException e) {
+                LOG.error("Failed to merge schemas", e);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed to merge schemas");
+            }
+        } else {
             List<JsonNode> individual_schemas;
             try {
                 individual_schemas = schemaService.getIndividualSchemas(repository_list);
@@ -122,12 +134,13 @@ public class PassSchemaServiceController {
                         jsonResponse += ",";
                     }
                 }
-            } catch (IllegalArgumentException | URISyntaxException | IOException e1) {
-                LOG.error("Failed to retrieve schemas", e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve schemas");
+            } catch (IllegalArgumentException | URISyntaxException | IOException e) {
+                LOG.error("Failed to retrieve individual schemas", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to retrieve individual schemas");
             }
-
         }
+
         jsonResponse += m.writeValueAsString(mergedSchema);
         HttpHeaders headers = new HttpHeaders();
         //APPLICATION_JSON_UTF8 is deprecated and APPLICATION_JSON is preferred, will be interpreted as UTF-8

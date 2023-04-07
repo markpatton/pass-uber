@@ -132,7 +132,7 @@ class SchemaControllerTest {
 
         String repositories = "1,2";
 
-        ResponseEntity response = schemaServiceController.getSchema(repositories);
+        ResponseEntity response = schemaServiceController.getSchema(repositories, "true");
         assertEquals(response.getBody().toString(),response.getBody().toString());
         InputStream expected_schema_json = SchemaServiceTest.class
                 .getResourceAsStream("/schemas/jhu/example_merged_dereferenced.json");

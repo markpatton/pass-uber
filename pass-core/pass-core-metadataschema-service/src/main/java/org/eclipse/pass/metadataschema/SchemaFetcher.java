@@ -139,6 +139,12 @@ public class SchemaFetcher {
         return getLocalSchema(path_to_schema);
     }
 
+    /**
+     * Get the local schema from the path. If the schema is already in the cache, return the cached schema.
+     * Otherwise, read the schema from the path and add it to the cache.
+     * @param path the path to the local schema
+     * @return the local schema
+     */
     public static JsonNode getLocalSchema(String path) throws IOException {
         ObjectMapper objmapper = new ObjectMapper();
         URL localSchemaURL = SchemaFetcher.class.getResource(path);
