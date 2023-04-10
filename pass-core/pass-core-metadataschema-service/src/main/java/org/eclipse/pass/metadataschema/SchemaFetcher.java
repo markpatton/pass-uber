@@ -16,17 +16,14 @@
  */
 package org.eclipse.pass.metadataschema;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StreamCorruptedException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,7 +46,7 @@ public class SchemaFetcher {
 
     private final PassClient passClient;
     private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
-    private static Map<String, CacheSchema> localSchemaCache = new HashMap<>();
+    private static ConcurrentHashMap<String, JsonNode> localSchemaCache = new ConcurrentHashMap<>();
 
     public SchemaFetcher(PassClient client) {
         this.passClient = client;
@@ -58,10 +55,11 @@ public class SchemaFetcher {
     /**
      * Get all SchemaInstance objects corresponding to the repository URIs
      *
-     * @return List<SchemaInstance> ArrayList of relevant SchemaInstance objects
+     * @param entityIds a list of entity IDs
+     * @return an ArrayList of relevant JsonNode objects
      * @throws IOException if the schemas cannot be fetched
      */
-    List<JsonNode> getSchemas(List<String> entityIds) throws IOException {
+    public List<JsonNode> getSchemas(List<String> entityIds) throws IOException {
         List<JsonNode> schemas = new ArrayList<>();
         List<SchemaInstance> schema_instances = new ArrayList<>();
 
@@ -103,10 +101,11 @@ public class SchemaFetcher {
      * Gets the Repository PASS entity at the URI and generates the corresponding
      * SchemaInstance objects
      *
-     * @return List<SchemaInstance> schemas from the repository
+     * @param entityId the repository ID
+     * @return an Arraylist of schemas from the repository
      * @throws IOException if the repository cannot be found.
      */
-    List<JsonNode> getRepositorySchemas(String entityId) throws IOException {
+    public List<JsonNode> getRepositorySchemas(String entityId) throws IOException {
         Repository repo;
         List<JsonNode> repository_schemas = new ArrayList<>();
         try {
@@ -126,14 +125,15 @@ public class SchemaFetcher {
     /**
      * Gets the schema at the URI and creates a corresponding SchemaInstance object
      *
+     * @param schemaUri URI of the schema
      * @return SchemaInstance schema at URI
      * @throws IOException if the schema cannot be fetched
      */
-    JsonNode getSchemaFromUri(URI schema_uri) throws IOException {
+    public static JsonNode getSchemaFromUri(URI schemaUri) throws IOException {
         // Given the schema's $id url, go to the corresponding local json file
         // by loading it as a resource stream based on the last 2 parts of the $id
         // Create a SchemaInstance object from the json file and return it
-        String path = schema_uri.getPath();
+        String path = schemaUri.getPath();
         String[] path_segments = path.split("/metadata-schemas");
         String path_to_schema = "/schemas" + path_segments[path_segments.length - 1];
         return getLocalSchema(path_to_schema);
@@ -142,31 +142,22 @@ public class SchemaFetcher {
     /**
      * Get the local schema from the path. If the schema is already in the cache, return the cached schema.
      * Otherwise, read the schema from the path and add it to the cache.
+     *
      * @param path the path to the local schema
      * @return the local schema
+     * @throws IOException if the schema cannot be found or is corrupted
      */
     public static JsonNode getLocalSchema(String path) throws IOException {
         ObjectMapper objmapper = new ObjectMapper();
-        URL localSchemaURL = SchemaFetcher.class.getResource(path);
-        if (localSchemaURL == null) {
-            LOG.error("Schema not found at " + path);
-            throw new IOException("Schema not found at " + path);
-        }
-
-        File schemaFile = new File(localSchemaURL.getFile());
-        long lastModified = schemaFile.lastModified();
-
         if (localSchemaCache.containsKey(path)) {
-            CacheSchema cacheSchema = localSchemaCache.get(path);
-            if (cacheSchema.getLastModified() == lastModified) {
-                return cacheSchema.getSchema().deepCopy();
-            }
+            JsonNode cacheSchema = localSchemaCache.get(path);
+            return cacheSchema.deepCopy();
         }
 
         try {
             InputStream schema_json = SchemaFetcher.class.getResourceAsStream(path);
             JsonNode schema = objmapper.readTree(schema_json);
-            localSchemaCache.put(path, new CacheSchema(schema.deepCopy(), lastModified));
+            localSchemaCache.put(path, schema.deepCopy());
             return schema.deepCopy();
         } catch (StreamCorruptedException | NullPointerException e) {
             LOG.error("Schema not found at " + path, e);

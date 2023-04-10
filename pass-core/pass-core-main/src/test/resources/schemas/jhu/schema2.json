@@ -1,0 +1,18 @@
+{
+    "$schema": "http://example.org/metadata-schemas/schemas/jhu",
+    "$id": "http://example.org/metadata-schemas/schemas/jhu/schema2",
+    "title": "bar",
+    "description": "bar schema",
+    "$comment": "two",
+    "b": "2",
+    "x": {
+        "title": "x",
+        "description": "an awesome letter",
+        "$comment": "displays nicely",
+        "type": "letter"
+    },
+    "array": ["b", "c", "d"],
+    "complexarray": [{"a": ["b", {"c": "d"}]}, "e"],
+    "aa": "b",
+	"cc": ["e", "f", "g"]
+}

@@ -60,6 +60,7 @@ public class PassSchemaServiceController {
 
     /**
      * This constructor is used for unit testing to inject a mock client
+     *
      * @param passClient PassClient to use for unit testing
      */
     protected PassSchemaServiceController(PassClient passClient) {
@@ -96,7 +97,7 @@ public class PassSchemaServiceController {
      * @param entityIds A comma-separated list of repository entity IDs
      * @param mergeSchemaOpt A boolean value indicating whether to merge schemas or return individual schemas
      * @throws IOException if the request cannot be read or schema cannot be merged
-     * @return a merged schema in JSON format
+     * @return a merged schema in JSON format or a set of individual schemas in JSON format
      */
     @GetMapping("/schemaservice")
     public ResponseEntity<?> getSchema(@RequestParam("entityIds") String entityIds,

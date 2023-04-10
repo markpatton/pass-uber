@@ -29,7 +29,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * The SchemaInstance class represents a schema map, read from a schema URI.
+ * The SchemaInstance class represents a schema map, read from a schema URI that is fetched by the
+ * SchemaFetcher class. It contains the schema map, as well as a map of dependencies of the schema
+ *
+ * @see SchemaFetcher
  */
 public class SchemaInstance implements Comparable<SchemaInstance> {
 
@@ -64,21 +67,26 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
      * dependencies and have the same number of properties, the one that appears
      * first in the initial list will be first in the result.
      *
+     * @param compareSchema the schema that is being compared to this schema
+     * @return int 0 if the schemas are equal, -1 if this schema should appear before the schema that is being compared
+     *  to it, 1 if this schema should appear after the schema that is being compared to it
      */
     @Override
-    public int compareTo(SchemaInstance s) {
+    public int compareTo(SchemaInstance compareSchema) {
         // first check if this schema is referenced by schema s; if it is, then this schema should appear before s;
         // ie. less than s
-        if (checkIfReferenced(s.getName(), schema_name) && !checkIfReferenced(schema_name, s.getName())) {
+        if (checkIfReferenced(compareSchema.getName(), schema_name) &&
+                !checkIfReferenced(schema_name, compareSchema.getName())) {
             return -1;
         } // vice versa
-        if (checkIfReferenced(schema_name, s.getName()) && !checkIfReferenced(s.getName(), schema_name)) {
+        if (checkIfReferenced(schema_name, compareSchema.getName())
+                && !checkIfReferenced(compareSchema.getName(), schema_name)) {
             return 1;
         }
 
         // for schemas independent of each other, the one with the most form properties should appear first
         int this_properties = countFormProperties();
-        int s_properties = s.countFormProperties();
+        int s_properties = compareSchema.countFormProperties();
         if (this_properties > s_properties) {
             return -1;
         } else if (this_properties < s_properties) {
@@ -87,7 +95,14 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         return 0;
     }
 
-    //update the dependencies of the schema that is being compared to this schema
+    //
+    /**
+     * Update the dependencies of the schema that is being compared to this schema. If the schema that is being
+     * compared to this schema is referenced by this schema, then the dependencies of this schema should be
+     * updated to include the dependencies of the schema that is being compared to this schema.
+     *
+     * @param compareSchema the schema that is being compared to this schema
+     */
     public void updateOrderDeps(SchemaInstance compareSchema) {
         // for schemas independent of each other, the one with the most form properties should appear first
         if (!checkIfReferenced(schema_name, compareSchema.getName())) {
@@ -131,8 +146,10 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
      * Finds references in this schema. Find by going through $ref tags in the
      * schema
      *
+     * @param node the node that is being searched for references
+     * @param pointer the pointer to the node
      */
-    void dereference(JsonNode node, String pointer) {
+    public void dereference(JsonNode node, String pointer) {
 
         Iterator<String> it = node.fieldNames();
         it.forEachRemaining(k -> {

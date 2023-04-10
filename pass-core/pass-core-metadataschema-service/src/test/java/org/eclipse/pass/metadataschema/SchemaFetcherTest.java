@@ -74,12 +74,6 @@ class SchemaFetcherTest {
 
         when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
 
-        /*InputStream expectedJsonSchema1 = SchemaFetcherTest.class
-                .getResourceAsStream("/schemas/jhu/schema1.json");
-
-        InputStream expectedJsonSchema2 = SchemaFetcherTest.class
-                .getResourceAsStream("/schemas/jhu/schema2.json");*/
-
         String expectedJsonSchema1 = "{\r\n" + "    \"$schema\": \"http://example.org/metadata-schemas/schemas/jhu\",\r\n"
                 + "    \"$id\": \"http://example.org/metadata-schemas/schemas/jhu/foo\",\r\n" + "    \"title\": \"foo\",\r\n"
                 + "    \"description\": \"foo schema\",\r\n" + "    \"$comment\": \"one\",\r\n"

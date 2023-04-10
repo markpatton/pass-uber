@@ -82,4 +82,4 @@ The service will return the following HTTP error responses:
 
 ### Retrieve schemas for a list of repositories
 
-  `curl --location "http://localhost:8080/schemaservice" --header 'Content-Type: application/json' --data "[ "1", "2" ]"`
+  `curl --location 'http://localhost:8080/schemaservice?entityIds=1,2,3&merge=true'`
