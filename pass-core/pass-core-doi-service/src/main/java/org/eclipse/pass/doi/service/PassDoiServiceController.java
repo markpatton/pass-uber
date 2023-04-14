@@ -213,7 +213,11 @@ public class PassDoiServiceController {
                 response.setStatus(500);
                 LOG.info(message);
             }
-        } else if (unpaywallJsonObject.getValue("/error").toString().equals("true") ) {
+        } else if (
+            unpaywallJsonObject.containsKey("error") &&
+            unpaywallJsonObject.getValue("/error").toString().equals("true")
+        ) {
+            LOG.debug(unpaywallJsonObject.toString());
             int responseCode;
             String message;
 
