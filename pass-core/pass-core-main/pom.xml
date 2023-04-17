@@ -46,6 +46,11 @@
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.pass</groupId>
+      <artifactId>pass-core-metadataschema-service</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jetty</artifactId>
     </dependency>
@@ -114,6 +119,7 @@
       </exclusions>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
