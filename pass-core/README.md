@@ -83,6 +83,10 @@ The [DOI service](pass-core-doi-service/README.md) provides the ability to inter
 
 The [file service](pass-core-file-service/README.md) provides a mechanism to persist files.
 
+# Metadata Schema service
+
+The [metadata schema service](pass-core-metadataschema-service/README.md) provides a mechanism to persist files.
+
 # JSON API
 
 JSON API is deployed at `/data`. All of our data model is available, just divided into attributes and relationshiops. Note that identifiers are now integers, not URIs.

@@ -99,7 +99,7 @@ public class PassSchemaServiceController {
      * @throws IOException if the request cannot be read or schema cannot be merged
      * @return a merged schema in JSON format or a set of individual schemas in JSON format
      */
-    @GetMapping("/schemaservice")
+    @GetMapping("/schema")
     public ResponseEntity<?> getSchema(@RequestParam("entityIds") String entityIds,
                                        @RequestParam("merge") String mergeSchemaOpt) throws IOException {
         if (entityIds == null || entityIds.isEmpty()) {

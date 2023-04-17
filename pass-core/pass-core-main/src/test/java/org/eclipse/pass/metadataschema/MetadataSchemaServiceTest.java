@@ -51,7 +51,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
         List<URI> r1_schemas_list = Arrays.asList(new URI("https://example.com/metadata-schemas/jhu/schema1.json"),
                 new URI("https://example.com/metadata-schemas/jhu/schema2.json"));
 
-        String url = getBaseUrl() + "schemaservice?entityIds=" + repo1Id.toString() + "&merge=true";
+        String url = getBaseUrl() + "schema?entityIds=" + repo1Id.toString() + "&merge=true";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
                 .build();
@@ -64,7 +64,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
 
     @Test
     public void testSchemaControllerOneRepoWithMergeFalse() throws Exception {
-        String url = getBaseUrl() + "schemaservice?entityIds=" + repo1Id.toString() + "&merge=false";
+        String url = getBaseUrl() + "schema?entityIds=" + repo1Id.toString() + "&merge=false";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
                 .build();
@@ -77,7 +77,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
 
     @Test
     public void testSchemaControllerTwoRepoWithMergeTrue() throws Exception {
-        String url = getBaseUrl() + "schemaservice?entityIds=" + repo1Id.toString() + ","
+        String url = getBaseUrl() + "schema?entityIds=" + repo1Id.toString() + ","
                 + repo2Id.toString() + "&merge=true";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
@@ -91,7 +91,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
 
     @Test
     public void testSchemaControllerTwoRepoWithMergeFalse() throws Exception {
-        String url = getBaseUrl() + "schemaservice?entityIds=" + repo1Id.toString() + ","
+        String url = getBaseUrl() + "schema?entityIds=" + repo1Id.toString() + ","
                 + repo2Id.toString() + "&merge=false";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
@@ -105,7 +105,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
 
     @Test
     public void testSchemaControllerWithNoEntityId() throws Exception {
-        String url = getBaseUrl() + "schemaservice?entityIds=&merge=true";
+        String url = getBaseUrl() + "schema?entityIds=&merge=true";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
                 .build();
@@ -118,7 +118,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
 
     @Test
     public void testSchemaControllerWithMissingLocalSchema() throws Exception {
-        String url = getBaseUrl() + "schemaservice?entityIds=" + repo3Id.toString() + "&merge=true";
+        String url = getBaseUrl() + "schema?entityIds=" + repo3Id.toString() + "&merge=true";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
                 .build();
@@ -131,7 +131,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
 
     @Test
     public void testSchemaControllerWithBadLocalSchema() throws Exception {
-        String url = getBaseUrl() + "schemaservice?entityIds=" + repo4Id.toString() + "&merge=true";
+        String url = getBaseUrl() + "schema?entityIds=" + repo4Id.toString() + "&merge=true";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
                 .build();
@@ -144,7 +144,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
 
     @Test
     public void testSchemaControllerWithMergeConflict() throws Exception {
-        String url = getBaseUrl() + "schemaservice?entityIds=" + repo5Id.toString() + "&merge=true";
+        String url = getBaseUrl() + "schema?entityIds=" + repo5Id.toString() + "&merge=true";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
                 .build();
