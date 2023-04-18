@@ -15,53 +15,28 @@ jobs:
     steps:
       # Update pass-core-main Docker image in GHCR
       - name: Check out latest pass-core
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
       - name: "Set up JDK 11"
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 11
-      # Maybe switch to this, instead of Lines #34-37
-      # - name: Login to GHCR
-      #   uses: docker/login-action@v2.1
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
+          distribution: 'temurin'
+          cache: 'maven'
 
-      # - name: "Build new package"
-      #   run: mvn -U -B -V -ntp clean verify
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Log into GHCR"
-        run: echo ${{ secrets.PASS_DOCKER_TOKEN }} | docker login ghcr.io --username ${{ secrets.PASS_DOCKER_USER }} --password-stdin
-      - name: "Build and upload new package"
-        run: mvn clean verify
+      - name: "Build new package"
+        run: mvn -U -B -V -ntp clean verify
+
       - name: "Get image tag"
         id: image_tag
-        run: echo "IMAGE_TAG=`docker images ghcr.io/eclipse-pass/pass-core-main --no-trunc --format {{.Tag}}`" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout`" >> $GITHUB_OUTPUT
+
       - name: "Upload Docker image to GHCR"
         run: "docker push ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }}"
-
-      # The hash of the Docker image locally is different from the hash of the image on GHCR but can be parsed from the
-      #   info returned by 'docker inspect'. Sed is used to separate out the hash from the rest of the image identifier.
-      - name: "Get GHCR image hash"
-        id: image_hash
-        run: echo "IMAGE_HASH=`docker inspect ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }} | jq '.[0].RepoDigests[0]' | sed -r 's/.*@(.*)"/\1/'`" >> $GITHUB_OUTPUT
-
-      # Update pass-core config in pass-docker
-      - name: Return to root folder
-        run: cd ..
-      - name: Check out pass-docker
-        uses: actions/checkout@v2
-        with:
-          repository: eclipse-pass/pass-docker
-          token: ${{ secrets.PASS_DOCKER_TOKEN }}
-      - uses: oleksiyrudenko/gha-git-credentials@v2-latest
-        with:
-          token: ${{ secrets.PASS_DOCKER_TOKEN }}
-      - name: Update nightly server config
-        run: python tools/update-image.py eclipse-pass.nightly.yml pass-core "ghcr.io/eclipse-pass/pass-core-main:${{ steps.image_tag.outputs.IMAGE_TAG }}@${{ steps.image_hash.outputs.IMAGE_HASH }}"
-      - name: Commit change (if any)
-        # The 'git diff --quiet' ensures that the add/commit is only attempted if there is a change
-        run: git diff --quiet || git commit -am 'Update pass-core image to ${{ steps.image_tag.outputs.IMAGE_TAG }}@${{ steps.image_hash.outputs.IMAGE_HASH }}'
-      - name: Push update
-        run: git push

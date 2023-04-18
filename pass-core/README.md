@@ -87,10 +87,14 @@ The [file service](pass-core-file-service/README.md) provides a mechanism to per
 
 The [metadata schema service](pass-core-metadataschema-service/README.md) provides JSON schemas intended to describe PASS submission metadata
 
+# Metadata Schema service
+
+The [metadata schema service](pass-core-metadataschema-service/README.md) provides JSON schemas intended to describe PASS submission metadata
+
 # JSON API
 
-JSON API is deployed at `/data`. All of our data model is available, just divided into attributes and relationshiops. Note that identifiers are now integers, not URIs.
-See https://elide.io/pages/guide/v6/10-jsonapi.html for information on how Elide provides support for filtering and and sorting.
+JSON API is deployed at `/data`. All of our data model is available, just divided into attributes and relationships. Note that identifiers are now integers, not URIs.
+See https://elide.io/pages/guide/v6/10-jsonapi.html for information on how Elide provides support for filtering and sorting.
 
 ## Creating a RepositoryCopy
 

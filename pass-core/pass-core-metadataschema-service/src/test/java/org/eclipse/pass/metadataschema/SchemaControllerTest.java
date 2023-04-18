@@ -146,6 +146,32 @@ class SchemaControllerTest {
     }
 
     @Test
+    void getSchemaMergeTrueJhuSchemaTest() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
+        when(passClientMock.getObject(Repository.class, 2L)).thenReturn(repositoryMock2);
+
+        List<URI> r1_schemas_list = Arrays.asList(new URI("http://example.org/metadata-schemas/jhu/jscholarship.json"),
+                new URI("http://example.org/metadata-schemas/jhu/common.json"));
+
+        when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
+
+        String repositories = "1";
+
+        ResponseEntity response = schemaServiceController.getSchema(repositories, "true");
+        assertEquals(response.getBody().toString(),response.getBody().toString());
+        InputStream expected_schema_json = SchemaServiceTest.class
+                .getResourceAsStream("/schemas/jhu/expected_jscholarship_common_merge.json");
+        ObjectMapper map = new ObjectMapper();
+        JsonNode expected = map.readTree(expected_schema_json);
+        //ArrayNode expected_array = map.createArrayNode();
+        //expected_array.add(expected);
+        JsonNode actual = map.readTree(response.getBody().toString());
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void getSchemaMergeFalseTest() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
 

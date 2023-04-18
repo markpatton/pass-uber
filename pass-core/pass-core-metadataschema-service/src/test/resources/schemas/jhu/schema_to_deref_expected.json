@@ -1,0 +1,15 @@
+{
+	"$schema": "http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference",
+	"$id": "http://example.org/metadata-schemas/schemas/jhu/deref",
+	"copySchemaName": "http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference",
+	"title": "X",
+	"x": {
+		"title": "x",
+		"description": "an awesome letter",
+		"$comment": "displays nicely",
+		"type": "letter"
+	},
+	"array": ["c", "d", "e"],
+	"complexarray": ["e", "f", {"g": "h"}],
+	"k": ["l", "m", "m'"]
+}

@@ -73,7 +73,7 @@ public class ElidePassClient implements PassClient {
     /**
      * Act as a backend user.
      *
-     * @param refreshableElide
+     * @param refreshableElide Elide instance to use for the Elide PassClient
      */
     public ElidePassClient(RefreshableElide refreshableElide) {
         this(refreshableElide, new User(null) {

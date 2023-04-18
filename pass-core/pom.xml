@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.eclipse.pass</groupId>
     <artifactId>eclipse-pass-parent</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>pass-core</artifactId>
-  <version>0.5.0-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>PASS backend</name>
@@ -25,14 +25,14 @@
   <developers>
     <developer>
       <name>Jim Martino</name>
-      <email>jrm.jhu@jhu.edu</email>
+      <email>jrm@jhu.edu</email>
       <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
       <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
     </developer>
     <developer>
       <name>Mark Patton</name>
       <email>mpatton@jhu.edu</email>
-      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organization>The Sheridan Libraries, Johns Hopkins University</organization>
       <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
     </developer>
     <developer>
@@ -56,6 +56,7 @@
     <module>pass-core-user-service</module>
     <module>pass-core-main</module>
     <module>pass-core-metadataschema-service</module>
+    <module>pass-core-policy-service</module>
   </modules>
 
   <scm>
@@ -158,6 +159,24 @@
         <configuration>
           <source>11</source>
           <detectJavaApiLink>false</detectJavaApiLink>
+          <tags>
+          <tag>
+            <name>CreatePermission</name>
+            <placement>a</placement>
+          </tag>
+            <tag>
+              <name>ReadPermission</name>
+              <placement>a</placement>
+            </tag>
+            <tag>
+              <name>UpdatePermission</name>
+              <placement>a</placement>
+            </tag>
+            <tag>
+              <name>DeletePermission</name>
+              <placement>a</placement>
+            </tag>
+          </tags>
         </configuration>
       </plugin>
     </plugins>

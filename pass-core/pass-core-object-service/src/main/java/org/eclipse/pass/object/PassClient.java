@@ -45,6 +45,7 @@ public interface PassClient extends Closeable {
     }
 
     /**
+     * @param elide Elide client will connect to
      * @return Base URL to make JSON API requests. Will end with a /.
      */
     static String getBaseUrl(RefreshableElide elide) {
@@ -54,8 +55,8 @@ public interface PassClient extends Closeable {
     }
 
     /**
-     * @param elide
-     * @param entity
+     * @param elide Elide client will connect to
+     * @param entity Appends the entity type and id to the base URL.
      * @return URL to make JSON API requests about a PASS entity.
      */
     static String getUrl(RefreshableElide elide, PassEntity entity) {
