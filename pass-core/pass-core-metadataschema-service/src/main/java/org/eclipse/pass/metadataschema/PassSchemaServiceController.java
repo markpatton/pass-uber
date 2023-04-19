@@ -26,6 +26,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.yahoo.elide.RefreshableElide;
 import org.eclipse.pass.object.PassClient;
 import org.slf4j.Logger;
@@ -90,7 +91,7 @@ public class PassSchemaServiceController {
     }
 
     /**
-     * Handle POST requests by invoking the SchemaService to handle the business
+     * Handle GET requests by invoking the SchemaService to handle the business
      * logic of generating a merged schema from the list of relevant repository
      * schemas to a PASS submission
      *
@@ -110,14 +111,15 @@ public class PassSchemaServiceController {
         }
         List<String> repository_list = Arrays.asList(entityIds.split(","));
 
-        ObjectMapper m = new ObjectMapper();
-        JsonNode mergedSchema = null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode responseArray = objectMapper.createArrayNode();
         String jsonResponse = "";
 
         //front-end will first attempt to merge schemas, if that fails, it will attempt to retrieve individual schemas
         if (mergeSchemaOpt.equalsIgnoreCase("true")) {
             try {
-                mergedSchema = schemaService.getMergedSchema(repository_list);
+                JsonNode mergedSchema = schemaService.getMergedSchema(repository_list);
+                responseArray.add(mergedSchema);
             } catch (IllegalArgumentException | IOException e) {
                 LOG.error("Failed to parse schemas", e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to parse schemas");
@@ -129,11 +131,8 @@ public class PassSchemaServiceController {
             List<JsonNode> individual_schemas;
             try {
                 individual_schemas = schemaService.getIndividualSchemas(repository_list);
-                for (int i = 0; i < individual_schemas.size(); i++) {
-                    jsonResponse += m.writeValueAsString(individual_schemas.get(i));
-                    if (i < individual_schemas.size() - 1) {
-                        jsonResponse += ",";
-                    }
+                for (JsonNode schema : individual_schemas) {
+                    responseArray.add(schema);
                 }
             } catch (IllegalArgumentException | URISyntaxException | IOException e) {
                 LOG.error("Failed to retrieve individual schemas", e);
@@ -142,7 +141,7 @@ public class PassSchemaServiceController {
             }
         }
 
-        jsonResponse += m.writeValueAsString(mergedSchema);
+        jsonResponse = objectMapper.writeValueAsString(responseArray);
         HttpHeaders headers = new HttpHeaders();
         //APPLICATION_JSON_UTF8 is deprecated and APPLICATION_JSON is preferred, will be interpreted as UTF-8
         headers.setContentType(MediaType.APPLICATION_JSON);

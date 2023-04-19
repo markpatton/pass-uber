@@ -85,7 +85,7 @@ The [file service](pass-core-file-service/README.md) provides a mechanism to per
 
 # Metadata Schema service
 
-The [metadata schema service](pass-core-metadataschema-service/README.md) provides a mechanism to persist files.
+The [metadata schema service](pass-core-metadataschema-service/README.md) provides JSON schemas intended to describe PASS submission metadata
 
 # JSON API
 
