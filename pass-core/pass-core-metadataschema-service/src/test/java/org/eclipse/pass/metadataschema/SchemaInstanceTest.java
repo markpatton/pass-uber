@@ -132,7 +132,8 @@ class SchemaInstanceTest {
         SchemaInstance testSchema = new SchemaInstance(map.readTree(example_schema_json));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expected));
         //testSchema.dereference(testSchema.getSchema(), "");
-        testSchema.dereference2(testSchema.getSchema(), "");
+        //testSchema.dereference2(testSchema.getSchema(), "");
+        testSchema.dereference4(testSchema.getSchema());
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
@@ -147,7 +148,8 @@ class SchemaInstanceTest {
         SchemaInstance testSchema = new SchemaInstance(map.readTree(schemaDerefTest));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expectedDeref));
         //testSchema.dereference(testSchema.getSchema(), "");
-        testSchema.dereference2(testSchema.getSchema(), "");
+        //testSchema.dereference2(testSchema.getSchema(), "");
+        testSchema.dereference4(testSchema.getSchema());
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
@@ -162,7 +164,8 @@ class SchemaInstanceTest {
         SchemaInstance testSchema = new SchemaInstance(map.readTree(schemaDerefTest));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expectedDeref));
         //testSchema.dereference(testSchema.getSchema(), "");
-        testSchema.dereference2(testSchema.getSchema(), "");
+        //testSchema.dereference2(testSchema.getSchema(), "");
+        testSchema.dereference4(testSchema.getSchema());
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
@@ -177,7 +180,9 @@ class SchemaInstanceTest {
         SchemaInstance testSchema = new SchemaInstance(map.readTree(jscholarSchemaJson));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(jscholarExpected));
         //testSchema.dereference(testSchema.getSchema(), "");
-        testSchema.dereference2(testSchema.getSchema(), "");
+        //testSchema.dereference2(testSchema.getSchema(), "");
+        //testSchema.dereference3(testSchema.getSchema());
+        testSchema.dereference4(testSchema.getSchema());
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
     @Test
@@ -191,7 +196,8 @@ class SchemaInstanceTest {
         SchemaInstance testSchema = new SchemaInstance(map.readTree(jscholarSchemaJson));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(jscholarExpected));
         //testSchema.dereference(testSchema.getSchema(), "");
-        testSchema.dereference2(testSchema.getSchema(), "");
+        //testSchema.dereference2(testSchema.getSchema(), "");
+        testSchema.dereference4(testSchema.getSchema());
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
