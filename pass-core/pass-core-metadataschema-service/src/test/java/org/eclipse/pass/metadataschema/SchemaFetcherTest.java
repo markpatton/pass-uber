@@ -126,15 +126,8 @@ class SchemaFetcherTest {
                 .getResourceAsStream("/schemas/jhu/schema3.json");
 
         // dereferenced version of schema_to_deref.json
-        String expectedJsonSchemaInput4 = "{\r\n"
-                + "  \"$schema\": \"http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference\",\r\n"
-                + "  \"$id\": \"http://example.org/metadata-schemas/schemas/jhu/deref\",\r\n"
-                + "  \"copySchemaName\": \"http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference\",\r\n"
-                + "  \"schema1_title\": \"X\",\r\n" + "  \"schema2_x\": {\r\n" + "    \"title\": \"x\",\r\n"
-                + "    \"description\": \"an awesome letter\",\r\n" + "    \"$comment\": \"displays nicely\",\r\n"
-                + "    \"type\": \"letter\"\r\n" + "},\r\n" + "  \"schema3_array\": [\"c\", \"d\", \"e\"],\r\n"
-                + "  \"schema4_complexarray\": [\"e\", \"f\", {\"g\": \"h\"}],\r\n"
-                + "  \"schema4_hk\": [\"l\", \"m\", \"m'\"]\r\n" + "}";
+        InputStream expectedJsonSchemaInput4 = SchemaFetcherTest.class
+                .getResourceAsStream("/schemas/jhu/schema_to_deref_expected.json");
 
         JsonNode expectedschema1 = map.readTree(expectedJsonSchemaInput1);
         JsonNode expectedschema2 = map.readTree(expectedJsonSchemaInput2);

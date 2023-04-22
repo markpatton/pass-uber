@@ -17,6 +17,7 @@ package org.eclipse.pass.metadataschema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -130,7 +131,67 @@ class SchemaInstanceTest {
 
         SchemaInstance testSchema = new SchemaInstance(map.readTree(example_schema_json));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expected));
-        testSchema.dereference(testSchema.getSchema(), "");
+        //testSchema.dereference(testSchema.getSchema(), "");
+        testSchema.dereference2(testSchema.getSchema(), "");
+        assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
+    }
+
+    @Test
+    void dereferenceTest2() throws Exception {
+        InputStream schemaDerefTest = SchemaInstanceTest.class
+                .getResourceAsStream("/schemas/jhu/schema_to_deref.json");
+
+        InputStream expectedDeref = SchemaInstanceTest.class
+                .getResourceAsStream("/schemas/jhu/schema_to_deref_expected.json");
+
+        SchemaInstance testSchema = new SchemaInstance(map.readTree(schemaDerefTest));
+        SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expectedDeref));
+        //testSchema.dereference(testSchema.getSchema(), "");
+        testSchema.dereference2(testSchema.getSchema(), "");
+        assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
+    }
+
+    @Test
+    void dereferenceArrayObjTest() throws Exception {
+        InputStream schemaDerefTest = SchemaInstanceTest.class
+                .getResourceAsStream("/schemas/jhu/deref_obj_array.json");
+
+        InputStream expectedDeref = SchemaInstanceTest.class
+                .getResourceAsStream("/schemas/jhu/deref_obj_array_expected.json");
+
+        SchemaInstance testSchema = new SchemaInstance(map.readTree(schemaDerefTest));
+        SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expectedDeref));
+        //testSchema.dereference(testSchema.getSchema(), "");
+        testSchema.dereference2(testSchema.getSchema(), "");
+        assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
+    }
+
+    @Test
+    void dereferenceJscholarSimpleTest() throws Exception {
+        InputStream jscholarSchemaJson = SchemaInstanceTest.class
+                .getResourceAsStream("/schemas/jhu/jscholarship_simple.json");
+
+        InputStream jscholarExpected = SchemaInstanceTest.class
+                .getResourceAsStream("/schemas/jhu/jscholarship_simple_deref.json");
+
+        SchemaInstance testSchema = new SchemaInstance(map.readTree(jscholarSchemaJson));
+        SchemaInstance expectedSchema = new SchemaInstance(map.readTree(jscholarExpected));
+        //testSchema.dereference(testSchema.getSchema(), "");
+        testSchema.dereference2(testSchema.getSchema(), "");
+        assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
+    }
+    @Test
+    void dereferenceJscholarTest() throws Exception {
+        InputStream jscholarSchemaJson = SchemaInstanceTest.class
+                .getResourceAsStream("/schemas/jhu/jscholarship.json");
+
+        InputStream jscholarExpected = SchemaInstanceTest.class
+                .getResourceAsStream("/schemas/jhu/jscholarship_deref.json");
+
+        SchemaInstance testSchema = new SchemaInstance(map.readTree(jscholarSchemaJson));
+        SchemaInstance expectedSchema = new SchemaInstance(map.readTree(jscholarExpected));
+        //testSchema.dereference(testSchema.getSchema(), "");
+        testSchema.dereference2(testSchema.getSchema(), "");
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 

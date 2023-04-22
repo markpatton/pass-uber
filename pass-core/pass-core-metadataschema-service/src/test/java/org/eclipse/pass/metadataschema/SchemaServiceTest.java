@@ -246,4 +246,21 @@ class SchemaServiceTest {
         JsonNode result = schemaService.getMergedSchema(repositoryIds);
         assertEquals(expected, result);
     }
+
+    @Test
+    void getMergeJscholarSchemaTest() throws Exception {
+        List<String> repositoryIds = Arrays.asList("1");
+        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
+
+        List<URI> r1_schemas_list = Arrays.asList(new URI("https://example.com/metadata-schemas/jhu/jscholarship.json"));
+
+        when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
+
+        InputStream expected_schema_json = SchemaServiceTest.class
+                .getResourceAsStream("/schemas/jhu/jscholarship_deref.json");
+        ObjectMapper map = new ObjectMapper();
+        JsonNode expected = map.readTree(expected_schema_json);
+        JsonNode result = schemaService.getMergedSchema(repositoryIds);
+        assertEquals(expected, result);
+    }
 }

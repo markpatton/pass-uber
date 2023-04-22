@@ -72,18 +72,21 @@ public class SchemaFetcher {
                 }
             }
         }
-        // dereference each of the schemas
-        for (JsonNode schema : schemas) {
-            SchemaInstance s = new SchemaInstance(schema);
-            s.dereference(s.getSchema(), "");
-            schema_instances.add(s);
-        }
 
         //order schema dependencies
         for (SchemaInstance s : schema_instances) {
             for (SchemaInstance k: schema_instances) {
                 s.updateOrderDeps(k);
             }
+        }
+
+        // dereference each of the schemas - only perform after ordering dependencies
+        for (JsonNode schema : schemas) {
+            SchemaInstance s = new SchemaInstance(schema);
+            //pass in $ for root JSONpath
+            s.dereference(s.getSchema(), "$");
+            //s.dereference2(s.getSchema());
+            schema_instances.add(s);
         }
 
         //sort schemas

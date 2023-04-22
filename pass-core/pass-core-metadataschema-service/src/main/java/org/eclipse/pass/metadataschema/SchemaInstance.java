@@ -17,14 +17,17 @@
 package org.eclipse.pass.metadataschema;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -150,12 +153,13 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
      * @param pointer the pointer to the node
      */
     public void dereference(JsonNode node, String pointer) {
-
         Iterator<String> it = node.fieldNames();
         it.forEachRemaining(k -> {
             JsonNode value = node.get(k);
             String path;
             String stringval;
+            String propertyToReplace;
+            JsonNode replacement;
             if (value.isValueNode()) {
                 if (k.equals(keyRef)) {
                     path = pointer + "/" + k;
@@ -164,8 +168,9 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
                     // If the reference is pointing to the current schema,
                     // replace it by the value it is pointing to
                     if (stringval.charAt(0) == '#') {
-                        ((ObjectNode) schema).replace(path.split("/")[1],
-                                resolveRef(stringval.split("#")[1], schema));
+                        propertyToReplace = path.split("/")[1];
+                        replacement = resolveRef(stringval.split("#")[1], schema);
+                        ((ObjectNode) schema).replace(propertyToReplace, replacement);
                     } else { // referencing another schema
                         JsonNode ext_schema = null;
                         try {
@@ -175,16 +180,84 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
                         } catch (IOException e) {
                             logger.log(Level.SEVERE, "Failed to dereference schema", e);
                         }
-
-                        ((ObjectNode) schema).replace(path.split("/")[1],
-                                resolveRef(stringval.split("#")[1], ext_schema));
+                        propertyToReplace = path.split("/")[1];
+                        replacement = resolveRef(stringval.split("#")[1], ext_schema);
+                        ((ObjectNode) schema).replace(propertyToReplace, replacement);
                     }
                 }
             } else if (value.isObject()) {
                 dereference(value, pointer + "/" + k);
+            } else if (value.isArray()){ //need to iterate through array in the JSON node and check for references
+                for (int i = 0; i < value.size(); i++) {
+                    if(value.get(i).isObject()) {
+                        dereference(value.get(i), pointer + "/" + k + "[" + i + "]");
+                    }
+                }
             }
         });
     }
+
+    public void dereference2(JsonNode node, String parentKeyName) {
+        if (node.isArray()) {
+            for (JsonNode element : node) {
+                dereference2(element, "ParentIsArray");
+            }
+        } else if (node.isObject()) {
+            JsonNode replacement;
+            Iterator<String> fieldNames = node.fieldNames();
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                JsonNode fieldValue = node.get(fieldName);
+                if (fieldName.equals("$ref")) {
+                    if (fieldValue.asText().charAt(0) == '#') { //internal reference
+                        replacement = resolveRef(fieldValue.asText().split("#")[1], schema);
+                        if(parentKeyName.equals("ParentIsArray")) {
+                            ((ObjectNode) node).remove(fieldName);
+                            ((ObjectNode) node).setAll((ObjectNode) replacement); //replace the $ref node with the referenced
+                        } else {
+                            ((ObjectNode) schema).replace(parentKeyName, replacement);
+                        }
+
+                    } else { //external reference
+                        JsonNode ext_schema = null;
+                        try {
+                            ext_schema = SchemaFetcher.getLocalSchema(
+                                    "/" + schema_dir + "/" + fieldValue.asText().split("#")[0]);
+                        } catch (IllegalArgumentException e) {
+                            logger.log(Level.SEVERE, "Invalid Schema URI", e);
+                        } catch (IOException e) {
+                            logger.log(Level.SEVERE, "Failed to dereference schema", e);
+                        }
+                        replacement = resolveRef(fieldValue.asText().split("#")[1], ext_schema);
+                        if(parentKeyName.equals("ParentIsArray")) {
+                            ((ObjectNode) node).remove(fieldName);
+                            ((ObjectNode) node).setAll((ObjectNode) replacement); //replace the $ref node with the referenced
+                        } else {
+                            ((ObjectNode) schema).replace(parentKeyName, replacement);
+                        }
+                    }
+                } else {
+                    dereference2(fieldValue, fieldName);
+                }
+            }
+        }
+    }
+
+    /*private void getAllRefs(JsonNode jsonSchema, HashMap<String, String> refs){
+        Iterator<String> it = node.fieldNames();
+        it.forEachRemaining(k -> {
+            JsonNode value = node.get(k);
+            String path;
+            if (value.isValueNode()) {
+                if (k.equals(keyRef)) {
+                    path = pointer + "/" + k;
+                    refs.put(path, value.asText());
+                }
+            } else if (value.isObject()) {
+                findRefs(value, pointer + "/" + k);
+            }
+        });
+    }*/
 
     private void findRefs(JsonNode node, String pointer) {
         Iterator<String> it = node.fieldNames();

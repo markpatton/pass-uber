@@ -22,14 +22,5 @@
 		}
 	},
     "copySchemaName": "http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference",
-    "schema1_title": "X",
-    "schema2_x": {
-      "title": "x",
-      "description": "an awesome letter",
-      "$comment": "displays nicely",
-      "type": "letter"
-    },
-    "schema3_array": ["c", "d", "e"],
-    "schema4_complexarray": ["e", "f", {"g": "h"}],
-    "schema4_hk": ["l", "m", "m'"]
+    "k": ["l", "m", "m'"]
 }
