@@ -291,6 +291,7 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
             String path = entry.getKey();
             String ref = entry.getValue();
             JsonNode replacement;
+            String[] refParts = ref.split("#");
             String[] allNodePath = path.split("/");
             String parentNodePtr = path.substring(0, path.lastIndexOf("/"));
             String parentNodeName = allNodePath[allNodePath.length - 2];
@@ -298,18 +299,25 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
             JsonNode parentNode = node.at(parentNodePtr);
             JsonNode topNode = node.at(topNodePtr);
 
+
             if (ref.charAt(0) == '#') { //internal reference
-                replacement = resolveRef(ref.split("#")[1], schema);
+                replacement = resolveRef(refParts[1], schema);
             } else { //external reference
                 JsonNode ext_schema = null;
                 try {
-                    ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + ref.split("#")[0]);
+                    ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + refParts[0]);
                 } catch (IllegalArgumentException e) {
                     logger.log(Level.SEVERE, "Invalid Schema URI", e);
                 } catch (IOException e) {
                     logger.log(Level.SEVERE, "Failed to dereference schema", e);
                 }
-                replacement = resolveRef(ref.split("#")[1], ext_schema);
+                if (refParts.length == 2) {
+                    replacement = resolveRef(refParts[1], ext_schema);
+                } else if (refParts.length == 1) { //full schema reference
+                    replacement = ext_schema;
+                } else {
+                    throw new IllegalArgumentException("Invalid $ref value: " + ref);
+                }
             }
             if (topNode.isArray() && parentNode.isObject()) {
                 ((ObjectNode) parentNode).removeAll();
@@ -340,8 +348,11 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         if (schema.isArray()) {
             ArrayNode arrayNode = (ArrayNode) schema;
             for (int i = 0; i < arrayNode.size(); i++) {
-                //currentPath = currentPath + "[" + i + "]";
-                currentPath = currentPath + "/" + i ;
+                if (i > 0){
+                    currentPath = currentPath.substring(0, currentPath.lastIndexOf("/")) + "/" + i;
+                } else {
+                    currentPath = currentPath + "/" + i;
+                }
                 getRefAndPointerToObject(currentPath, refs, arrayNode.get(i));
             }
         }
