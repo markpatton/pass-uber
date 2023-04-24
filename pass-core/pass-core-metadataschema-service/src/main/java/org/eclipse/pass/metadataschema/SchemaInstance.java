@@ -254,8 +254,8 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         for (JsonNode ref : allRefs) {
             String key = ref.fieldNames().next();
             String val = ref.get(key).asText();
-            String path = getPointerToObject("", key, val, schema); //remove the leading slash (e.g. /definitions/form/properties/firstName
-            refs.put(path, val);
+            //String path = getPointerToObject("", key, val, schema); //remove the leading slash (e.g. /definitions/form/properties/firstName
+            //refs.put(path, val);
         }
 
         //iterate through all the $refs and replace them with the referenced object
@@ -283,61 +283,68 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
 
     public void dereference4(JsonNode node) {
         //collect all $refs in a hashmap in the schema and the JSONpath to the $ref
-        HashMap<String, String> refs = new HashMap<>();
-        List<JsonNode> allRefs = node.findParents("$ref");
+        HashMap<String, String> allRefs = new HashMap<>();
+        getRefAndPointerToObject("", allRefs, node);
 
-        for (JsonNode ref : allRefs) {
-            String key = ref.fieldNames().next();
-            String val = ref.get(key).asText();
+        //iterate through allRefs and replace the $ref with the referenced object
+        for (Map.Entry<String, String> entry : allRefs.entrySet()) {
+            String path = entry.getKey();
+            String ref = entry.getValue();
             JsonNode replacement;
-            if (val.charAt(0) == '#') {
-                replacement = resolveRef(val.split("#")[1], schema);
-            } else { // referencing another schema
+            String[] allNodePath = path.split("/");
+            String parentNodePtr = path.substring(0, path.lastIndexOf("/"));
+            String parentNodeName = allNodePath[allNodePath.length - 2];
+            String topNodePtr = parentNodePtr.substring(0, parentNodePtr.lastIndexOf("/"));
+            JsonNode parentNode = node.at(parentNodePtr);
+            JsonNode topNode = node.at(topNodePtr);
+
+            if (ref.charAt(0) == '#') { //internal reference
+                replacement = resolveRef(ref.split("#")[1], schema);
+            } else { //external reference
                 JsonNode ext_schema = null;
                 try {
-                    ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + val.split("#")[0]);
+                    ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + ref.split("#")[0]);
                 } catch (IllegalArgumentException e) {
                     logger.log(Level.SEVERE, "Invalid Schema URI", e);
                 } catch (IOException e) {
                     logger.log(Level.SEVERE, "Failed to dereference schema", e);
                 }
-                replacement = resolveRef(val.split("#")[1], ext_schema);
+                replacement = resolveRef(ref.split("#")[1], ext_schema);
             }
-            //text value nodes need to only replace the value of the parent of the ref node. same with arrays
-            if(replacement.isValueNode()) {
-                String textVal = replacement.asText();
-                ((ObjectNode) ref).remove(key);
-            } else if (replacement.isArray()){
-                ((ObjectNode) ref).remove(key);
-                ((ObjectNode) ref).setAll((ObjectNode) replacement);
+            if (topNode.isArray() && parentNode.isObject()) {
+                ((ObjectNode) parentNode).removeAll();
+                ((ObjectNode) parentNode).setAll((ObjectNode) replacement); //replace the $ref node with the referenced
             } else {
-                ((ObjectNode) ref).remove(key);
-                ((ObjectNode) ref).setAll((ObjectNode) replacement); //replace the $ref node with the referenced
+                ((ObjectNode) topNode).replace(parentNodeName, replacement);
             }
         }
     }
 
-    private String getPointerToObject(String currentPath, String keyToFind, String valueToFind, JsonNode schema) {
+    private void getRefAndPointerToObject(String currentPath, HashMap<String,String> refs, JsonNode schema) {
+        String newPath = "";
         if (schema.isObject()) {
             ObjectNode objectNode = (ObjectNode) schema;
             Iterator<Map.Entry<String, JsonNode>> iterator = objectNode.fields();
             while (iterator.hasNext()) {
                 Map.Entry<String, JsonNode> entry = iterator.next();
-                String newPath = currentPath.isEmpty() ? entry.getKey() : currentPath + "." + entry.getKey();
-                if (entry.getValue().equals(valueToFind) & entry.getKey().equals(keyToFind)) {
-                    return newPath;
+                newPath = currentPath.isEmpty() ? "/" + entry.getKey() : currentPath + "/" + entry.getKey();
+                String currentValue = entry.getValue().asText();
+                String currentKey = entry.getKey();
+                if (currentKey.equals(keyRef)) {
+                    //put newPath and currentValue in the hashmap
+                    refs.put(newPath, currentValue);
                 }
-                getPointerToObject(newPath, keyToFind, valueToFind, entry.getValue());
+                getRefAndPointerToObject(newPath, refs, entry.getValue());
             }
         }
         if (schema.isArray()) {
             ArrayNode arrayNode = (ArrayNode) schema;
             for (int i = 0; i < arrayNode.size(); i++) {
-                String newPath = currentPath + "[" + i + "]";
-                getPointerToObject(newPath, keyToFind, valueToFind, arrayNode.get(i));
+                //currentPath = currentPath + "[" + i + "]";
+                currentPath = currentPath + "/" + i ;
+                getRefAndPointerToObject(currentPath, refs, arrayNode.get(i));
             }
         }
-        return currentPath;
     }
 
     private void findRefs(JsonNode node, String pointer) {
