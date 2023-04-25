@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.model.Repository;
 import org.junit.jupiter.api.AfterEach;
@@ -113,7 +114,7 @@ class SchemaControllerTest {
     }
 
     @Test
-    void getSchemaTest() throws Exception {
+    void getSchemaMergeTrueTest() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
 
         when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
@@ -138,7 +139,72 @@ class SchemaControllerTest {
                 .getResourceAsStream("/schemas/jhu/example_merged_dereferenced.json");
         ObjectMapper map = new ObjectMapper();
         JsonNode expected = map.readTree(expected_schema_json);
+        ArrayNode expected_array = map.createArrayNode();
+        expected_array.add(expected);
+        JsonNode actual = map.readTree(response.getBody().toString());
+        assertEquals(expected_array, actual);
+    }
+
+    @Test
+    void getSchemaMergeTrueJhuSchemaTest() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
+        when(passClientMock.getObject(Repository.class, 2L)).thenReturn(repositoryMock2);
+
+        List<URI> r1_schemas_list = Arrays.asList(new URI("http://example.org/metadata-schemas/jhu/jscholarship.json"),
+                new URI("http://example.org/metadata-schemas/jhu/common.json"));
+
+        when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
+
+        String repositories = "1";
+
+        ResponseEntity response = schemaServiceController.getSchema(repositories, "true");
+        assertEquals(response.getBody().toString(),response.getBody().toString());
+        InputStream expected_schema_json = SchemaServiceTest.class
+                .getResourceAsStream("/schemas/jhu/expected_jscholarship_common_merge.json");
+        ObjectMapper map = new ObjectMapper();
+        JsonNode expected = map.readTree(expected_schema_json);
+        //ArrayNode expected_array = map.createArrayNode();
+        //expected_array.add(expected);
         JsonNode actual = map.readTree(response.getBody().toString());
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSchemaMergeFalseTest() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
+        when(passClientMock.getObject(Repository.class, 2L)).thenReturn(repositoryMock2);
+
+        List<URI> r1_schemas_list = Arrays.asList(new URI("http://example.org/metadata-schemas/jhu/schema1.json"),
+                new URI("http://example.org/metadata-schemas/jhu/schema2.json"));
+
+        List<URI> r2_schemas_list = Arrays.asList(new URI("http://example.org/metadata-schemas/jhu/schema3.json"));
+
+        when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
+        when(repositoryMock2.getSchemas()).thenReturn(r2_schemas_list);
+
+        String repositories = "1,2";
+
+        ResponseEntity response = schemaServiceController.getSchema(repositories, "false");
+        assertEquals(response.getBody().toString(),response.getBody().toString());
+        InputStream expected_schema_json1 = SchemaServiceTest.class
+                .getResourceAsStream("/schemas/jhu/schema1.json");
+        InputStream expected_schema_json2 = SchemaServiceTest.class
+                .getResourceAsStream("/schemas/jhu/schema2.json");
+        InputStream expected_schema_json3 = SchemaServiceTest.class
+                .getResourceAsStream("/schemas/jhu/schema3.json");
+        ObjectMapper map = new ObjectMapper();
+        JsonNode expected1 = map.readTree(expected_schema_json1);
+        JsonNode expected2 = map.readTree(expected_schema_json2);
+        JsonNode expected3 = map.readTree(expected_schema_json3);
+        ArrayNode expected_array = map.createArrayNode();
+        expected_array.add(expected1);
+        expected_array.add(expected2);
+        expected_array.add(expected3);
+        JsonNode actual = map.readTree(response.getBody().toString());
+        assertEquals(expected_array, actual);
     }
 }
