@@ -17,16 +17,13 @@
 package org.eclipse.pass.metadataschema;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -148,141 +145,12 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
 
     /**
      * Finds references in this schema. Find by going through $ref tags in the
-     * schema
+     * schema and replacing the internal and external references.
      *
      * @param node the node that is being searched for references
-     * @param pointer the pointer to the node
      */
-    public void dereference(JsonNode node, String pointer) {
-        Iterator<String> it = node.fieldNames();
-        it.forEachRemaining(k -> {
-            JsonNode value = node.get(k);
-            String path;
-            String stringval;
-            String propertyToReplace;
-            JsonNode replacement;
-            if (value.isValueNode()) {
-                if (k.equals(keyRef)) {
-                    path = pointer + "/" + k;
-                    stringval = value.asText();
-
-                    // If the reference is pointing to the current schema,
-                    // replace it by the value it is pointing to
-                    if (stringval.charAt(0) == '#') {
-                        propertyToReplace = path.split("/")[1];
-                        replacement = resolveRef(stringval.split("#")[1], schema);
-                        ((ObjectNode) schema).replace(propertyToReplace, replacement);
-                    } else { // referencing another schema
-                        JsonNode ext_schema = null;
-                        try {
-                            ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + stringval.split("#")[0]);
-                        } catch (IllegalArgumentException e) {
-                            logger.log(Level.SEVERE, "Invalid Schema URI", e);
-                        } catch (IOException e) {
-                            logger.log(Level.SEVERE, "Failed to dereference schema", e);
-                        }
-                        propertyToReplace = path.split("/")[1];
-                        replacement = resolveRef(stringval.split("#")[1], ext_schema);
-                        ((ObjectNode) schema).replace(propertyToReplace, replacement);
-                    }
-                }
-            } else if (value.isObject()) {
-                dereference(value, pointer + "/" + k);
-            } else if (value.isArray()){ //need to iterate through array in the JSON node and check for references
-                for (int i = 0; i < value.size(); i++) {
-                    if(value.get(i).isObject()) {
-                        dereference(value.get(i), pointer + "/" + k + "[" + i + "]");
-                    }
-                }
-            }
-        });
-    }
-
-    public void dereference2(JsonNode node, String parentKeyName) {
-        if (node.isArray()) {
-            for (JsonNode element : node) {
-                dereference2(element, "ParentIsArray");
-            }
-        } else if (node.isObject()) {
-            JsonNode replacement;
-            Iterator<String> fieldNames = node.fieldNames();
-            while (fieldNames.hasNext()) {
-                String fieldName = fieldNames.next();
-                JsonNode fieldValue = node.get(fieldName);
-                if (fieldName.equals("$ref")) {
-                    if (fieldValue.asText().charAt(0) == '#') { //internal reference
-                        replacement = resolveRef(fieldValue.asText().split("#")[1], schema);
-                        if(parentKeyName.equals("ParentIsArray")) {
-                            ((ObjectNode) node).remove(fieldName);
-                            ((ObjectNode) node).setAll((ObjectNode) replacement); //replace the $ref node with the referenced
-                        } else {
-                            ((ObjectNode) schema).replace(parentKeyName, replacement);
-                        }
-
-                    } else { //external reference
-                        JsonNode ext_schema = null;
-                        try {
-                            ext_schema = SchemaFetcher.getLocalSchema(
-                                    "/" + schema_dir + "/" + fieldValue.asText().split("#")[0]);
-                        } catch (IllegalArgumentException e) {
-                            logger.log(Level.SEVERE, "Invalid Schema URI", e);
-                        } catch (IOException e) {
-                            logger.log(Level.SEVERE, "Failed to dereference schema", e);
-                        }
-                        replacement = resolveRef(fieldValue.asText().split("#")[1], ext_schema);
-                        if(parentKeyName.equals("ParentIsArray")) {
-                            ((ObjectNode) node).remove(fieldName);
-                            ((ObjectNode) node).setAll((ObjectNode) replacement); //replace the $ref node with the referenced
-                        } else {
-                            ((ObjectNode) schema).replace(parentKeyName, replacement);
-                            //((ObjectNode) schema).put(parentKeyName, replacement.asText()); //replace the $ref node with the referenced
-                        }
-                    }
-                } else {
-                    dereference2(fieldValue, fieldName);
-                }
-            }
-        }
-    }
-
-    public void dereference3(JsonNode node) {
-
-        //collect all $refs in a hashmap in the schema and the JSONpath to the $ref
-        HashMap<String, String> refs = new HashMap<>();
-        List<JsonNode> allRefs = node.findParents("$ref");
-
-        for (JsonNode ref : allRefs) {
-            String key = ref.fieldNames().next();
-            String val = ref.get(key).asText();
-            //String path = getPointerToObject("", key, val, schema); //remove the leading slash (e.g. /definitions/form/properties/firstName
-            //refs.put(path, val);
-        }
-
-        //iterate through all the $refs and replace them with the referenced object
-        for (Map.Entry<String, String> entry : refs.entrySet()) {
-            String path = entry.getKey();
-            String ref = entry.getValue();
-            JsonNode replacement;
-            if (ref.charAt(0) == '#') { //internal reference
-                replacement = resolveRef(ref.split("#")[1], schema);
-                ((ObjectNode) schema).replace(path, replacement);
-            } else { //external reference
-                JsonNode ext_schema = null;
-                try {
-                    ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + ref.split("#")[0]);
-                } catch (IllegalArgumentException e) {
-                    logger.log(Level.SEVERE, "Invalid Schema URI", e);
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE, "Failed to dereference schema", e);
-                }
-                replacement = resolveRef(ref.split("#")[1], ext_schema);
-                ((ObjectNode) schema).replace(path, replacement);
-            }
-        }
-    }
-
-    public void dereference4(JsonNode node) {
-        //collect all $refs in a hashmap in the schema and the JSONpath to the $ref
+    public void dereference(JsonNode node) {
+        //collect all $refs in a hashmap in the schema and the xPath to the $ref
         HashMap<String, String> allRefs = new HashMap<>();
         getRefAndPointerToObject("", allRefs, node);
 
@@ -298,7 +166,6 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
             String topNodePtr = parentNodePtr.substring(0, parentNodePtr.lastIndexOf("/"));
             JsonNode parentNode = node.at(parentNodePtr);
             JsonNode topNode = node.at(topNodePtr);
-
 
             if (ref.charAt(0) == '#') { //internal reference
                 replacement = resolveRef(refParts[1], schema);
@@ -348,7 +215,7 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         if (schema.isArray()) {
             ArrayNode arrayNode = (ArrayNode) schema;
             for (int i = 0; i < arrayNode.size(); i++) {
-                if (i > 0){
+                if (i > 0) {
                     currentPath = currentPath.substring(0, currentPath.lastIndexOf("/")) + "/" + i;
                 } else {
                     currentPath = currentPath + "/" + i;

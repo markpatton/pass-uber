@@ -2,7 +2,7 @@
   {
     "allOf": [
       {
-        "$id": "https://oa-pass.github.io/metadata-schemas/jhu/global.json",
+        "$id": "https://eclipse-pass.github.io/pass-metadata-schemas/schemas/jhu/global.json",
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "dependencies": {
@@ -18,7 +18,7 @@
                 "under-embargo": true
               },
               "fieldClass": "date-time-picker",
-              "helper": "\u003ci\u003eAfter the embargo end date, your submission manuscripts or article can be made public. \u003cb\u003eIf this publication is not under embargo, please leave this field blank.\u003cb\u003e\u003c/i\u003e",
+              "helper": "<i>After the embargo end date, your submission manuscripts or article can be made public. <b>If this publication is not under embargo, please leave this field blank.<b></i>",
               "helpersPosition": "above",
               "inputType": "date",
               "label": "Embargo End Date",
@@ -34,7 +34,7 @@
             "abstract": {
               "fieldClass": "clearfix",
               "hidden": false,
-              "label": "Abstract \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Abstract <small class=\"text-muted\">(optional)</small>",
               "order": 9,
               "placeholder": "Enter abstract",
               "type": "textarea"
@@ -52,9 +52,9 @@
                     "label": "ORCiD"
                   }
                 },
-                "label": "\u003cspan class=\"d-none\"\u003e\u003c/span\u003e"
+                "label": "<span class=\"d-none\"></span>"
               },
-              "label": "\u003cdiv\u003eAuthors\u003c/div\u003e\u003chr/\u003e",
+              "label": "<div>Authors</div><hr/>",
               "order": 10
             },
             "issns": {
@@ -74,40 +74,40 @@
                     "vertical": false
                   }
                 },
-                "label": "\u003cspan class=\"d-none\"\u003e\u003c/span\u003e"
+                "label": "<span class=\"d-none\"></span>"
               },
-              "label": "\u003cdiv\u003eISSN Information\u003c/div\u003e\u003chr/\u003e",
+              "label": "<div>ISSN Information</div><hr/>",
               "order": 6
             },
             "issue": {
               "hidden": false,
-              "label": "Issue  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Issue  <small class=\"text-muted\">(optional)</small>",
               "order": 5,
               "placeholder": "Enter issue",
               "type": "text"
             },
             "journal-NLMTA-ID": {
-              "label": "Journal NLMTA ID \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Journal NLMTA ID <small class=\"text-muted\">(optional)</small>",
               "order": 3,
               "placeholder": "nlmta",
               "type": "text"
             },
             "journal-title": {
               "hidden": false,
-              "label": "Journal Title \u003csmall class=\"text-muted\"\u003e(required)\u003c/small\u003e",
+              "label": "Journal Title <small class=\"text-muted\">(required)</small>",
               "order": 2,
               "placeholder": "Enter the journal title",
               "type": "text"
             },
             "publicationDate": {
               "hidden": false,
-              "label": "Publication Date  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Publication Date  <small class=\"text-muted\">(optional)</small>",
               "order": 8,
               "type": "date"
             },
             "publisher": {
               "hidden": false,
-              "label": "Publisher \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Publisher <small class=\"text-muted\">(optional)</small>",
               "order": 7,
               "placeholder": "Enter the Publisher",
               "type": "text"
@@ -115,7 +115,7 @@
             "title": {
               "cols": 100,
               "hidden": false,
-              "label": "Article / Manuscript Title \u003csmall class=\"text-muted\"\u003e(required)\u003c/small\u003e",
+              "label": "Article / Manuscript Title <small class=\"text-muted\">(required)</small>",
               "order": 1,
               "placeholder": "Enter the manuscript title",
               "rows": 2,
@@ -130,7 +130,7 @@
             },
             "volume": {
               "hidden": false,
-              "label": "Volume  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Volume  <small class=\"text-muted\">(optional)</small>",
               "order": 4,
               "placeholder": "Enter the volume",
               "type": "text"
@@ -333,7 +333,7 @@
         "required": [
           "authors"
         ],
-        "title": "Johns Hopkins - JScholarship \u003cbr\u003e\u003cp class='lead text-muted'\u003eDeposit requirements for JH's institutional repository JScholarship\u003c/p\u003e",
+        "title": "Johns Hopkins - JScholarship <br><p class='lead text-muted'>Deposit requirements for JH's institutional repository JScholarship</p>",
         "type": "object"
       }
     ],
@@ -352,7 +352,7 @@
                 "under-embargo": true
               },
               "fieldClass": "date-time-picker",
-              "helper": "\u003ci\u003eAfter the embargo end date, your submission manuscripts or article can be made public. \u003cb\u003eIf this publication is not under embargo, please leave this field blank.\u003cb\u003e\u003c/i\u003e",
+              "helper": "<i>After the embargo end date, your submission manuscripts or article can be made public. <b>If this publication is not under embargo, please leave this field blank.<b></i>",
               "helpersPosition": "above",
               "inputType": "date",
               "label": "Embargo End Date",
@@ -368,7 +368,7 @@
             "abstract": {
               "fieldClass": "clearfix",
               "hidden": false,
-              "label": "Abstract \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Abstract <small class=\"text-muted\">(optional)</small>",
               "order": 9,
               "placeholder": "Enter abstract",
               "type": "textarea"
@@ -386,9 +386,9 @@
                     "label": "ORCiD"
                   }
                 },
-                "label": "\u003cspan class=\"d-none\"\u003e\u003c/span\u003e"
+                "label": "<span class=\"d-none\"></span>"
               },
-              "label": "\u003cdiv\u003eAuthors\u003c/div\u003e\u003chr/\u003e",
+              "label": "<div>Authors</div><hr/>",
               "order": 10
             },
             "issns": {
@@ -408,40 +408,40 @@
                     "vertical": false
                   }
                 },
-                "label": "\u003cspan class=\"d-none\"\u003e\u003c/span\u003e"
+                "label": "<span class=\"d-none\"></span>"
               },
-              "label": "\u003cdiv\u003eISSN Information\u003c/div\u003e\u003chr/\u003e",
+              "label": "<div>ISSN Information</div><hr/>",
               "order": 6
             },
             "issue": {
               "hidden": false,
-              "label": "Issue  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Issue  <small class=\"text-muted\">(optional)</small>",
               "order": 5,
               "placeholder": "Enter issue",
               "type": "text"
             },
             "journal-NLMTA-ID": {
-              "label": "Journal NLMTA ID \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Journal NLMTA ID <small class=\"text-muted\">(optional)</small>",
               "order": 3,
               "placeholder": "nlmta",
               "type": "text"
             },
             "journal-title": {
               "hidden": false,
-              "label": "Journal Title \u003csmall class=\"text-muted\"\u003e(required)\u003c/small\u003e",
+              "label": "Journal Title <small class=\"text-muted\">(required)</small>",
               "order": 2,
               "placeholder": "Enter the journal title",
               "type": "text"
             },
             "publicationDate": {
               "hidden": false,
-              "label": "Publication Date  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Publication Date  <small class=\"text-muted\">(optional)</small>",
               "order": 8,
               "type": "date"
             },
             "publisher": {
               "hidden": false,
-              "label": "Publisher \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Publisher <small class=\"text-muted\">(optional)</small>",
               "order": 7,
               "placeholder": "Enter the Publisher",
               "type": "text"
@@ -449,7 +449,7 @@
             "title": {
               "cols": 100,
               "hidden": false,
-              "label": "Article / Manuscript Title \u003csmall class=\"text-muted\"\u003e(required)\u003c/small\u003e",
+              "label": "Article / Manuscript Title <small class=\"text-muted\">(required)</small>",
               "order": 1,
               "placeholder": "Enter the manuscript title",
               "rows": 2,
@@ -464,7 +464,7 @@
             },
             "volume": {
               "hidden": false,
-              "label": "Volume  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+              "label": "Volume  <small class=\"text-muted\">(optional)</small>",
               "order": 4,
               "placeholder": "Enter the volume",
               "type": "text"
@@ -569,7 +569,7 @@
         "required": [
           "authors"
         ],
-        "title": "Johns Hopkins - JScholarship \u003cbr\u003e\u003cp class='lead text-muted'\u003eDeposit requirements for JH's institutional repository JScholarship\u003c/p\u003e",
+        "title": "Johns Hopkins - JScholarship <br><p class='lead text-muted'>Deposit requirements for JH's institutional repository JScholarship</p>",
         "type": "object"
       },
       "options": {
@@ -579,7 +579,7 @@
               "under-embargo": true
             },
             "fieldClass": "date-time-picker",
-            "helper": "\u003ci\u003eAfter the embargo end date, your submission manuscripts or article can be made public. \u003cb\u003eIf this publication is not under embargo, please leave this field blank.\u003cb\u003e\u003c/i\u003e",
+            "helper": "<i>After the embargo end date, your submission manuscripts or article can be made public. <b>If this publication is not under embargo, please leave this field blank.<b></i>",
             "helpersPosition": "above",
             "inputType": "date",
             "label": "Embargo End Date",
@@ -595,7 +595,7 @@
           "abstract": {
             "fieldClass": "clearfix",
             "hidden": false,
-            "label": "Abstract \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+            "label": "Abstract <small class=\"text-muted\">(optional)</small>",
             "order": 9,
             "placeholder": "Enter abstract",
             "type": "textarea"
@@ -613,9 +613,9 @@
                   "label": "ORCiD"
                 }
               },
-              "label": "\u003cspan class=\"d-none\"\u003e\u003c/span\u003e"
+              "label": "<span class=\"d-none\"></span>"
             },
-            "label": "\u003cdiv\u003eAuthors\u003c/div\u003e\u003chr/\u003e",
+            "label": "<div>Authors</div><hr/>",
             "order": 10
           },
           "issns": {
@@ -635,40 +635,40 @@
                   "vertical": false
                 }
               },
-              "label": "\u003cspan class=\"d-none\"\u003e\u003c/span\u003e"
+              "label": "<span class=\"d-none\"></span>"
             },
-            "label": "\u003cdiv\u003eISSN Information\u003c/div\u003e\u003chr/\u003e",
+            "label": "<div>ISSN Information</div><hr/>",
             "order": 6
           },
           "issue": {
             "hidden": false,
-            "label": "Issue  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+            "label": "Issue  <small class=\"text-muted\">(optional)</small>",
             "order": 5,
             "placeholder": "Enter issue",
             "type": "text"
           },
           "journal-NLMTA-ID": {
-            "label": "Journal NLMTA ID \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+            "label": "Journal NLMTA ID <small class=\"text-muted\">(optional)</small>",
             "order": 3,
             "placeholder": "nlmta",
             "type": "text"
           },
           "journal-title": {
             "hidden": false,
-            "label": "Journal Title \u003csmall class=\"text-muted\"\u003e(required)\u003c/small\u003e",
+            "label": "Journal Title <small class=\"text-muted\">(required)</small>",
             "order": 2,
             "placeholder": "Enter the journal title",
             "type": "text"
           },
           "publicationDate": {
             "hidden": false,
-            "label": "Publication Date  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+            "label": "Publication Date  <small class=\"text-muted\">(optional)</small>",
             "order": 8,
             "type": "date"
           },
           "publisher": {
             "hidden": false,
-            "label": "Publisher \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+            "label": "Publisher <small class=\"text-muted\">(optional)</small>",
             "order": 7,
             "placeholder": "Enter the Publisher",
             "type": "text"
@@ -676,7 +676,7 @@
           "title": {
             "cols": 100,
             "hidden": false,
-            "label": "Article / Manuscript Title \u003csmall class=\"text-muted\"\u003e(required)\u003c/small\u003e",
+            "label": "Article / Manuscript Title <small class=\"text-muted\">(required)</small>",
             "order": 1,
             "placeholder": "Enter the manuscript title",
             "rows": 2,
@@ -691,7 +691,7 @@
           },
           "volume": {
             "hidden": false,
-            "label": "Volume  \u003csmall class=\"text-muted\"\u003e(optional)\u003c/small\u003e",
+            "label": "Volume  <small class=\"text-muted\">(optional)</small>",
             "order": 4,
             "placeholder": "Enter the volume",
             "type": "text"

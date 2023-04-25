@@ -257,7 +257,7 @@ class SchemaServiceTest {
         when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
 
         InputStream expected_schema_json = SchemaServiceTest.class
-                .getResourceAsStream("/schemas/jhu/jscholarship_deref.json");
+                .getResourceAsStream("/schemas/jhu/jscholarship_merge_deref.json");
         ObjectMapper map = new ObjectMapper();
         JsonNode expected = map.readTree(expected_schema_json);
         JsonNode result = schemaService.getMergedSchema(repositoryIds);

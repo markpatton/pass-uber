@@ -83,9 +83,7 @@ public class SchemaFetcher {
         // dereference each of the schemas - only perform after ordering dependencies
         for (JsonNode schema : schemas) {
             SchemaInstance s = new SchemaInstance(schema);
-            //pass in $ for root JSONpath
-            s.dereference(s.getSchema(), "$");
-            //s.dereference2(s.getSchema());
+            s.dereference(s.getSchema());
             schema_instances.add(s);
         }
 

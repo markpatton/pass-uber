@@ -165,10 +165,10 @@ class SchemaControllerTest {
                 .getResourceAsStream("/schemas/jhu/expected_jscholarship_common_merge.json");
         ObjectMapper map = new ObjectMapper();
         JsonNode expected = map.readTree(expected_schema_json);
-        ArrayNode expected_array = map.createArrayNode();
-        expected_array.add(expected);
+        //ArrayNode expected_array = map.createArrayNode();
+        //expected_array.add(expected);
         JsonNode actual = map.readTree(response.getBody().toString());
-        assertEquals(expected_array, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
