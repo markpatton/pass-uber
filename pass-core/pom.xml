@@ -25,14 +25,14 @@
   <developers>
     <developer>
       <name>Jim Martino</name>
-      <email>jrm.jhu@jhu.edu</email>
+      <email>jrm@jhu.edu</email>
       <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
       <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
     </developer>
     <developer>
       <name>Mark Patton</name>
       <email>mpatton@jhu.edu</email>
-      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organization>The Sheridan Libraries, Johns Hopkins University</organization>
       <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
     </developer>
     <developer>
@@ -56,6 +56,7 @@
     <module>pass-core-user-service</module>
     <module>pass-core-main</module>
     <module>pass-core-metadataschema-service</module>
+    <module>pass-core-policy-service</module>
   </modules>
 
   <scm>

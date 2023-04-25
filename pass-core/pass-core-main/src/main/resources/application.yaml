@@ -79,6 +79,10 @@ pass:
   auth:
     max-cache-size: 100
     cache-duration: 30
+  policy:
+    institution: ${PASS_CORE_POLICY_INSTITUTION:johnshopkins.edu}
+    institutional_policy_title: ${PASS_CORE_POLICY_INSTITUTIONAL_POLICY_TITLE:Johns Hopkins University (JHU) Open Access Policy}
+    institutional_repository_name: ${PASS_CORE_POLICY_INSTITUTIONAL_REPOSITORY_NAME:JScholarship}
 
 ---
 elide:

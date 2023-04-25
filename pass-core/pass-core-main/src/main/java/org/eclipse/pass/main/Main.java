@@ -27,7 +27,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @ComponentScan(basePackages = {"org.eclipse.pass", "org.eclipse.pass.doi.service",
-    "org.eclipse.pass.file.service", "org.eclipse.pass.user", "org.eclipse.pass.metadataschema.service"})
+    "org.eclipse.pass.file.service", "org.eclipse.pass.user", "org.eclipse.pass.metadataschema.service",
+    "org.eclipse.pass.policy.service"})
 @EntityScan(basePackages = { "org.eclipse.pass.object.model" })
 public class Main {
     /**
