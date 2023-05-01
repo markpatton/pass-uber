@@ -236,11 +236,10 @@ public class ElideConnector {
             selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
         foundList.addAll(result.getObjects());
 
-        //commenting this out until we get a search filter that works for finding a string in a list of strings
         //look for journals with any of these issns
-        /* if (!issns.isEmpty()) {
+        if (!issns.isEmpty()) {
             for (String issn : issns) {
-                filter = RSQL.equals("issns", issn); //probably not the right call, not implemented yet
+                filter = RSQL.hasMember("issns", issn);
                 result = passClient.
                     selectObjects(new PassClientSelector<>(Journal.class, 0, 100, filter, null));
                 result.getObjects().forEach(j -> {
@@ -248,7 +247,6 @@ public class ElideConnector {
                 });
             }
         }
-        */
 
         //count the number of hits for each Journal
         if (foundList.size() == 0) {
