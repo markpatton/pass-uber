@@ -22,6 +22,9 @@ import com.yahoo.elide.core.exceptions.InvalidValueException;
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 
+/**
+ * Serializer/Deserializer for URI. Serializes a URI to a String and deserializes a String to a URI.
+ */
 @ElideTypeConverter(type = URI.class, name = "URI")
 public class URISerde implements Serde<String, URI> {
 

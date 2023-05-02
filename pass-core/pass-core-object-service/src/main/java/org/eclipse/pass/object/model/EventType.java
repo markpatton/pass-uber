@@ -66,6 +66,10 @@ public enum EventType {
         this.value = value;
     }
 
+    /**
+     * @param eventType the event type
+     * @return  the value of the enum EventType
+     */
     public static EventType of(String eventType) {
         EventType result = map.get(eventType);
         if (result == null) {
@@ -74,6 +78,9 @@ public enum EventType {
         return result;
     }
 
+    /**
+     * @return the value of the enum EventType
+     */
     public String getValue() {
         return value;
     }

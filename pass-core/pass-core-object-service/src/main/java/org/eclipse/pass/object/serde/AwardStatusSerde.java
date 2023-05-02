@@ -19,6 +19,9 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.AwardStatus;
 
+/**
+ * Serializer/Deserializer class for AwardStatus
+ */
 @ElideTypeConverter(type = AwardStatus.class, name = "AwardStatus")
 public class AwardStatusSerde implements Serde<String, AwardStatus> {
 

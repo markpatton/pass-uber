@@ -19,6 +19,9 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.Source;
 
+/**
+ * Serializer/Deserializer for Source. Serializes a Source to a String and deserializes a String to a Source.
+ */
 @ElideTypeConverter(type = Source.class, name = "SubmissionSource")
 public class SubmissionSourceSerde implements Serde<String, Source> {
 

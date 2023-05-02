@@ -19,6 +19,9 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.DepositStatus;
 
+/**
+ * Converter class for DepositStatus. Converts DepositStatus to database column and to entity attribute.
+ */
 public class DepositStatusToStringConverter implements AttributeConverter<DepositStatus, String> {
     @Override
     public String convertToDatabaseColumn(DepositStatus attribute) {

@@ -32,6 +32,14 @@ public class UserServiceController {
     @Autowired
     private RefreshableElide refreshableElide;
 
+    /**
+     * Handles the request for retrieving information about the currently logged in user. The response is a JSON object
+     * with the following fields: id, type, and uri.
+     *
+     * @param request The HTTP request containing the user Principal.
+     * @param response The HTTP response containing the JSON object with the following fields: id, type, and uri.
+     * @throws IOException if an error occurs while writing the response.
+     */
     @GetMapping("/user/whoami")
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Principal principal = request.getUserPrincipal();

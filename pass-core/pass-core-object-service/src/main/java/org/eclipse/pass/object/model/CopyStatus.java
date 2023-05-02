@@ -72,6 +72,10 @@ public enum CopyStatus {
         return result;
     }
 
+    /**
+     *
+     * @return CopyStatus value
+     */
     public String getValue() {
         return value;
     }

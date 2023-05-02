@@ -66,6 +66,9 @@ public enum AwardStatus {
         return result;
     }
 
+    /**
+     * @return Serialized status of the award/grant
+     */
     public String getValue() {
         return value;
     }

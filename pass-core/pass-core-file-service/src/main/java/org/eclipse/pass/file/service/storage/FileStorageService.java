@@ -366,6 +366,13 @@ public class FileStorageService {
         return fileDetails.get().getStorageRelativePath();
     }
 
+    /**
+     * Gets the content type of the file from the fileID supplied. It will return the most recent version
+     * of the file. When using S3, this will provide the content type of the file in the S3 bucket.
+     *
+     * @param fileId The fileId of the content type of the file to be returned.
+     * @return The content type of the file.
+     */
     public String getFileContentType(String fileId) {
         VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
         FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().get();

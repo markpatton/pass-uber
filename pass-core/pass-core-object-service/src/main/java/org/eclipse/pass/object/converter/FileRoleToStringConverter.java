@@ -19,6 +19,9 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.FileRole;
 
+/**
+ * Converter class for FileRole. Converts FileRole to database column and to entity attribute.
+ */
 public class FileRoleToStringConverter implements AttributeConverter<FileRole, String> {
     @Override
     public String convertToDatabaseColumn(FileRole attribute) {

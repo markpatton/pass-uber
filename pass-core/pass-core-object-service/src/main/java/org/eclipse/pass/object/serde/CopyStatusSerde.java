@@ -19,6 +19,9 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.CopyStatus;
 
+/**
+ * Serializer/Deserializer class for CopyStatus
+ */
 @ElideTypeConverter(type = CopyStatus.class, name = "CopyStatus")
 public class CopyStatusSerde implements Serde<String, CopyStatus> {
 

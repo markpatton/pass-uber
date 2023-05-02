@@ -20,6 +20,9 @@ import javax.persistence.Converter;
 
 import org.eclipse.pass.object.model.EventType;
 
+/**
+ * Converter class for EventType. Converts EventType to database column and to entity attribute.
+ */
 @Converter
 public class EventTypeToStringConverter implements AttributeConverter<EventType, String> {
     @Override

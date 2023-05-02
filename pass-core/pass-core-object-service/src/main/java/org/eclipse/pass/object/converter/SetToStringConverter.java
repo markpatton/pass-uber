@@ -21,6 +21,10 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.AttributeConverter;
 
+/**
+ * Converter class for Set of Strings. Converts Set of Strings to a comma separated String and a comma separated String
+ * to a Set of Strings.
+ */
 public class SetToStringConverter implements AttributeConverter<Set<String>, String> {
     @Override
     public String convertToDatabaseColumn(Set<String> attribute) {

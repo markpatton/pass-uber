@@ -19,6 +19,9 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.Source;
 
+/**
+ * Converter class for Source. Converts Source to String and a String to Source.
+ */
 public class SourceToStringConverter implements AttributeConverter<Source, String> {
     @Override
     public String convertToDatabaseColumn(Source attribute) {

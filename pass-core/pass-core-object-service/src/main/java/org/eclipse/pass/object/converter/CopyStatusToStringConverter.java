@@ -20,6 +20,9 @@ import javax.persistence.Converter;
 
 import org.eclipse.pass.object.model.CopyStatus;
 
+/**
+ * Converter class for CopyStatus. Converts CopyStatus to database column and to entity attribute.
+ */
 @Converter
 public class CopyStatusToStringConverter implements AttributeConverter<CopyStatus, String> {
     @Override

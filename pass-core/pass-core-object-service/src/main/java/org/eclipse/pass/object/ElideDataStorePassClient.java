@@ -50,6 +50,10 @@ public class ElideDataStorePassClient implements PassClient {
     private final ElideSettings settings;
     private final DataStoreTransaction read_tx;
 
+    /**
+     * Constructor for ElideDataStorePassClient.
+     * @param refreshableElide Elide instance
+     */
     public ElideDataStorePassClient(RefreshableElide refreshableElide) {
         this.elide = refreshableElide.getElide();
         this.settings = elide.getElideSettings();

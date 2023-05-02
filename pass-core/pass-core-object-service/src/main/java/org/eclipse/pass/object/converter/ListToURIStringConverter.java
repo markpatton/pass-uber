@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.AttributeConverter;
 
+/**
+ * Converter class for List of URIs. Converts List of URIs to a database value that is a string of comma-separated
+ * values and an Entity attribute back to a list of URIs.
+ */
 public class ListToURIStringConverter implements AttributeConverter<List<URI>, String> {
     @Override
     public String convertToDatabaseColumn(List<URI> attribute) {

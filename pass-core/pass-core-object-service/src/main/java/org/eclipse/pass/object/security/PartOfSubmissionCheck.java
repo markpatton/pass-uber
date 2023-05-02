@@ -17,6 +17,9 @@ import org.eclipse.pass.object.model.User;
  */
 @SecurityCheck(PartOfSubmissionCheck.OBJECT_PART_OF_USER_SUBMISSION)
 public class PartOfSubmissionCheck<T> extends OperationCheck<T> {
+    /**
+     * String value of the check.
+     */
     public static final String OBJECT_PART_OF_USER_SUBMISSION = "Object part of User Submission";
 
     @Override

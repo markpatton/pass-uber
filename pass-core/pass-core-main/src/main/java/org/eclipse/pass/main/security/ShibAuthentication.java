@@ -34,7 +34,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class ShibAuthentication implements Authentication {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The unique username used by the PASS user.
+     */
     private final String user_name;
+
+    /**
+     * Collection of GrantedAuthority objects of the user roles.
+     */
     private final Collection<? extends GrantedAuthority> authorities;
 
     /**

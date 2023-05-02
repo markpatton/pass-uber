@@ -107,6 +107,11 @@ public enum SubmissionStatus {
         return result;
     }
 
+    /**
+     * Get the string value of the submission status.
+     *
+     * @return The string value of the submission status.
+     */
     public String getValue() {
         return value;
     }

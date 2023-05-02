@@ -16,7 +16,14 @@
  */
 package org.eclipse.pass.metadataschema;
 
+/**
+ * Custom class exception thrown when a merge fails.
+ */
 public class MergeFailException extends RuntimeException {
+    /**
+     * Constructor class for MergeFailException.
+     * @param errorMessage The error message.
+     */
     public MergeFailException(String errorMessage) {
         super(errorMessage);
     }

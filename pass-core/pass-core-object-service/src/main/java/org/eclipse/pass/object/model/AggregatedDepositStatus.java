@@ -77,6 +77,9 @@ public enum AggregatedDepositStatus {
         return result;
     }
 
+    /**
+     * @return non-parsed value of the aggregated deposit status
+     */
     public String getValue() {
         return value;
     }

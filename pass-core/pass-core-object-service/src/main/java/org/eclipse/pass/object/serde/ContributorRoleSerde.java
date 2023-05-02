@@ -19,6 +19,11 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.ContributorRole;
 
+/**
+ * Serializer/Deserializer class for ContributorRole
+ *
+ * @see ContributorRole
+ */
 @ElideTypeConverter(type = ContributorRole.class, name = "ContributorRole")
 public class ContributorRoleSerde implements Serde<String, ContributorRole> {
 

@@ -27,6 +27,10 @@ public class PassClientResult<T extends PassEntity> {
     private final List<T> entities;
     private final long total;
 
+    /**
+     * Constructor class for PassClientResult.
+     * @param total The total number of matching objects.
+     */
     public PassClientResult(long total) {
         this.entities = new ArrayList<>();
         this.total = total;

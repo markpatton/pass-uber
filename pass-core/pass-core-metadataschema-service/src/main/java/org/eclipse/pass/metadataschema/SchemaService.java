@@ -46,7 +46,10 @@ public class SchemaService {
     public SchemaService() {
     }
 
-    // Used in unit tests for inserting a mock client
+    /**
+     * SchemaService constructor used in unit tests for inserting a mock client
+     * @param client PassClient for the SchemaService to use
+     */
     public SchemaService(PassClient client) {
         this.passClient = client;
         schemaFetcher = new SchemaFetcher(passClient);

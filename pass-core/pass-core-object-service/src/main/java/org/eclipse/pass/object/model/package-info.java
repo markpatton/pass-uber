@@ -1,4 +1,6 @@
-
+/**
+    Elide permission annotations for the PASS object service.
+ */
 @CreatePermission(expression = "User is Backend")
 @ReadPermission(expression = "Prefab.Role.All")
 @UpdatePermission(expression = "User is Backend")

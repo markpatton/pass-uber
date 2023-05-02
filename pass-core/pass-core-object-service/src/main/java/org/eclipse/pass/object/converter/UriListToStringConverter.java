@@ -22,6 +22,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.AttributeConverter;
 
+/**
+ * Converter class for List of URIs. Converts List of URIs to comma separated String and a comma separated String to
+ * List of URIs.
+ */
 public class UriListToStringConverter implements AttributeConverter<List<URI>, String> {
     @Override
     public String convertToDatabaseColumn(List<URI> attribute) {

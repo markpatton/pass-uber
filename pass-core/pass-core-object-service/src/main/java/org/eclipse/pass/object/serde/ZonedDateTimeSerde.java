@@ -21,6 +21,10 @@ import java.time.format.DateTimeFormatter;
 import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 
+/**
+ * Serializer/Deserializer for ZonedDateTime. Serializes a ZonedDateTime to a String with the pattern
+ * yyyy-MM-dd'T'HH:mm:ss.SSSX and deserializes a String to a ZonedDateTime.
+ */
 @ElideTypeConverter(type = ZonedDateTime.class, name = "ZonedDateTime")
 public class ZonedDateTimeSerde implements Serde<String, ZonedDateTime> {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");

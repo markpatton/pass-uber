@@ -63,6 +63,10 @@ public enum IntegrationType {
         return result;
     }
 
+    /**
+     *
+     * @return the string value of the enum IntegrationType
+     */
     public String getValue() {
         return value;
     }

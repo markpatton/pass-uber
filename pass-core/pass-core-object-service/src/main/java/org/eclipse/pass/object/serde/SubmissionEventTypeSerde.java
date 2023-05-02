@@ -19,6 +19,9 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.EventType;
 
+/**
+ * Serializer/Deserializer for EventType. Serializes an EventType to a String and deserializes a String to an EventType.
+ */
 @ElideTypeConverter(type = EventType.class, name = "EventType")
 public class SubmissionEventTypeSerde implements Serde<String, EventType> {
 

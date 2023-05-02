@@ -19,6 +19,11 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.AggregatedDepositStatus;
 
+/**
+ * String converter for AggregatedDepositStatus
+ *
+ * @see AggregatedDepositStatus
+ */
 public class AggregatedDepositStatusToStringConverter implements
     AttributeConverter<AggregatedDepositStatus, String> {
     @Override

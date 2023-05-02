@@ -16,12 +16,6 @@
 
 package org.eclipse.pass.object.model;
 
-/**
- * Describes a Publisher and its related Journals, also the path of it's participation in PubMedCentral
- *
- * @author Karen Hanson
- */
-
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -30,6 +24,11 @@ import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
 
+/**
+ * Describes a Publisher and its related Journals, also the path of it's participation in PubMedCentral
+ *
+ * @author Karen Hanson
+ */
 @Include
 @Entity
 @Table(name = "pass_publisher")

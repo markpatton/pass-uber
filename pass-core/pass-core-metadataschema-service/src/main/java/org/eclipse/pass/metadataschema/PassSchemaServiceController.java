@@ -53,6 +53,11 @@ public class PassSchemaServiceController {
     private final PassClient passClient;
     private SchemaService schemaService;
 
+    /**
+     * Constructor for PassSchemaServiceController
+     *
+     * @param refreshableElide Elide instance used for interfacing with the PASS data model
+     */
     @Autowired
     public PassSchemaServiceController(RefreshableElide refreshableElide) {
         this.passClient = PassClient.newInstance(refreshableElide);
@@ -69,6 +74,12 @@ public class PassSchemaServiceController {
         schemaService = new SchemaService(passClient);
     }
 
+    /**
+     * Handle GET text requests
+     * @param r BufferedReader to read the request body
+     * @return List of repository schema names
+     * @throws IOException if there is an error reading the request body
+     */
     protected List<String> readText(BufferedReader r) throws IOException {
         String next;
         List<String> repository_list = new ArrayList<>();
@@ -78,6 +89,12 @@ public class PassSchemaServiceController {
         return repository_list;
     }
 
+    /**
+     * Handle GET JSON requests
+     * @param r BufferedReader to read the request body
+     * @return List of repository schema names
+     * @throws Exception if there is an error reading the request body
+     */
     protected List<String> readJson(BufferedReader r) throws Exception {
         String next;
         String json_list = r.readLine();
