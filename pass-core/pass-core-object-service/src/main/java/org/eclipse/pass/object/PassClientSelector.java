@@ -58,42 +58,82 @@ public class PassClientSelector<T extends PassEntity> {
         this.sorting = sorting;
     }
 
+    /**
+     *
+     * @return The offset into the list of total objects to return.
+     */
     public int getOffset() {
         return offset;
     }
 
+    /**
+     * Set the offset into the list of total objects to return.
+     * @param offset The offset into the list of total objects to return.
+     */
     public void setOffset(int offset) {
         this.offset = offset;
     }
 
+    /**
+     *
+     * @return The maximum number of PassEntity objects to return.
+     */
     public int getLimit() {
         return limit;
     }
 
+    /**
+     * Set the maximum number of PassEntity objects to return.
+     * @param limit The maximum number of PassEntity objects to return.
+     */
     public void setLimit(int limit) {
         this.limit = limit;
     }
 
+    /**
+     *
+     * @return The type of PassEntity objects to return.
+     */
     public Class<? extends PassEntity> getType() {
         return type;
     }
 
+    /**
+     * Set the type of PassEntity objects to return.
+     * @param type The type of PassEntity objects to return.
+     */
     public void setType(Class<T> type) {
         this.type = type;
     }
 
+    /**
+     *
+     * @return The sorting used to order the PassEntity objects.
+     */
     public String getSorting() {
         return sorting;
     }
 
+    /**
+     * Set the sorting used to order the PassEntity objects.
+     * @param sorting The sorting used to order the PassEntity objects.
+     */
     public void setSorting(String sorting) {
         this.sorting = sorting;
     }
 
+    /**
+     *
+     * @return The filter used to select the PassEntity objects.
+     */
     public String getFilter() {
         return filter;
     }
 
+    /**
+     * Set the filter used to select the PassEntity objects.
+     * @param filter The filter used to select the PassEntity objects.
+     */
     public void setFilter(String filter) {
         this.filter = filter;
     }
