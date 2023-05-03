@@ -31,9 +31,9 @@ import software.amazon.awssdk.regions.Region;
  */
 @ConfigurationProperties(prefix = "spring.file-service")
 public class StorageProperties {
-    private final String ocflDir = "ocfl";
-    private final String ocflWorkDir = "ocfl-work";
-    private final String tempDir = "temp";
+    private final static String OCFL_DIR = "ocfl";
+    private final static String OCFL_WORK_DIR = "ocfl-work";
+    private final static String TEMP_DIR = "temp";
     private String rootDir;
     private StorageServiceType storageType;
     private String s3BucketName;
@@ -56,7 +56,7 @@ public class StorageProperties {
      * @return The logical path of the OCFL storage directory
      */
     public String getStorageOcflDir() {
-        return ocflDir;
+        return OCFL_DIR;
     }
 
     /**
@@ -66,7 +66,7 @@ public class StorageProperties {
      * @return The logical path of the OCFL working directory
      */
     public String getStorageWorkDir() {
-        return ocflWorkDir;
+        return OCFL_WORK_DIR;
     }
 
     /**
@@ -75,7 +75,7 @@ public class StorageProperties {
      * @return The logical path of the temp directory
      */
     public String getStorageTempDir() {
-        return tempDir;
+        return TEMP_DIR;
     }
 
     /**
