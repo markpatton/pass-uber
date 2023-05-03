@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
  * @see SchemaFetcher
  */
 public class SchemaInstance implements Comparable<SchemaInstance> {
+    private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
 
     private final JsonNode schema;
     private final HashMap<String, String> deps = new HashMap<>();
@@ -42,7 +43,6 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
     private final String keyRef = "$ref";
     private final String schema_name;
     private final String schema_dir;
-    private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
 
     // all dependencies of a schema on other schemas, as well as dependencies of the
     // schemas with "greater" value than the given schema

@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class PassPolicyServiceController {
+    private static final Logger LOG = LoggerFactory.getLogger(PassPolicyServiceController.class);
 
     @Value("${pass.policy.institution}")
     private String institution;
@@ -56,7 +57,6 @@ public class PassPolicyServiceController {
     @Value("${pass.policy.institutional_repository_name}")
     private String institutionalRepositoryName;
 
-    private static final Logger LOG = LoggerFactory.getLogger(PassPolicyServiceController.class);
     private final PolicyService policyService;
 
     /**
