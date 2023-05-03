@@ -31,7 +31,7 @@ import javax.json.JsonObject;
  */
 public class XrefDoiService extends ExternalDoiService {
 
-    String XREF_BASEURI = "https://api.crossref.org/v1/works/";
+    private final static String XREF_BASEURI = "https://api.crossref.org/v1/works/";
 
     @Override
     public String name() {
