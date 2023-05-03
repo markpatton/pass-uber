@@ -37,6 +37,10 @@ public enum Source {
         throw new IllegalArgumentException("Invalid performer role: " + s);
     }
 
+    /**
+     * Get the string value of the Source. Can either be a 'pass' or 'other'.
+     * @return The value of the Source.
+     */
     public String getValue() {
         return value;
     }

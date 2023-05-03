@@ -61,6 +61,10 @@ public enum UserRole {
         return result;
     }
 
+    /**
+     * Get the string value of the UserRole. Can be either an 'admin' or 'submitter'
+     * @return string value of the UserRole.
+     */
     public String getValue() {
         return value;
     }

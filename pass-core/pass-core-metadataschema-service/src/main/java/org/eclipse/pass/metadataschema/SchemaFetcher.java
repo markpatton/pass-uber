@@ -48,6 +48,11 @@ public class SchemaFetcher {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
     private static ConcurrentHashMap<String, JsonNode> localSchemaCache = new ConcurrentHashMap<>();
 
+    /**
+     * Constructor for SchemaFetcher
+     *
+     * @param client PassClient session to use for interfacing with the PASS repository.
+     */
     public SchemaFetcher(PassClient client) {
         this.passClient = client;
     }

@@ -42,6 +42,10 @@ public class SimplePolicyService implements PolicyService {
 
     private final RefreshableElide refreshableElide;
 
+    /**
+     * SimplePolicyService constructor
+     * @param refreshableElide a RefreshableElide instance
+     */
     public SimplePolicyService(RefreshableElide refreshableElide) {
         this.refreshableElide = refreshableElide;
     }

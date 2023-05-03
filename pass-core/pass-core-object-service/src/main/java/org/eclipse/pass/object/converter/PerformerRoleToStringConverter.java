@@ -20,6 +20,9 @@ import javax.persistence.Converter;
 
 import org.eclipse.pass.object.model.PerformerRole;
 
+/**
+ * Converter class for PerformerRole. Converts PerformerRole to String and a String to PerformerRole.
+ */
 @Converter
 public class PerformerRoleToStringConverter implements AttributeConverter<PerformerRole, String> {
     @Override

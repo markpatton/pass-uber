@@ -50,6 +50,13 @@ public class PassDoiServiceController {
         this.unpaywallDoiService = new UnpaywallDoiService();
     }
 
+    /**
+     * This method handles GET requests to resolve a given DOI to a journal metadata
+     *
+     * @param request the HTTP Request with the DOI to resolve for a journal
+     * @param response the HTTP Response with the journal metadata
+     * @throws IOException if there is an error writing the response
+     */
     @GetMapping("/doi/journal")
     protected void getXrefMetadata(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
@@ -157,6 +164,14 @@ public class PassDoiServiceController {
         }
     }
 
+    /**
+     * This method handles GET requests to retrieve a manuscript from Unpaywall REST API for a given DOI. The response
+     * is a JSON object containing the manuscript metadata.
+     *
+     * @param request The HTTP request containing the DOI to be resolved
+     * @param response The HTTP response containing the JSON object of the resolved DOI to manuscript metadata
+     * @throws IOException if there is an error writing the response
+     */
     @GetMapping("/doi/manuscript")
     protected void getUnpaywallMetadata(HttpServletRequest request, HttpServletResponse response)
         throws IOException {

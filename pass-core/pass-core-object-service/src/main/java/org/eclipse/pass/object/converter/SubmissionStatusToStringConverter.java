@@ -19,6 +19,9 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.SubmissionStatus;
 
+/**
+ * Converter class for SubmissionStatus. Converts SubmissionStatus to String and a String to SubmissionStatus.
+ */
 public class SubmissionStatusToStringConverter implements AttributeConverter<SubmissionStatus, String> {
     @Override
     public String convertToDatabaseColumn(SubmissionStatus attribute) {

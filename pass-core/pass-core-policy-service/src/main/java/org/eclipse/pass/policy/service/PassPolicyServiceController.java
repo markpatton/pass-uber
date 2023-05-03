@@ -63,6 +63,11 @@ public class PassPolicyServiceController {
     @Autowired
     private RefreshableElide refreshableElide;
 
+    /**
+     * PassPolicyServiceController Constructor
+     *
+     * @param refreshableElide A refreshable Elide instance
+     */
     public PassPolicyServiceController(RefreshableElide refreshableElide) {
         this.policyService = new SimplePolicyService(refreshableElide);
     }

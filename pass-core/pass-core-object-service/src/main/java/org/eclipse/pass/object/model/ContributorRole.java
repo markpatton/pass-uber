@@ -71,6 +71,9 @@ public enum ContributorRole {
         return result;
     }
 
+    /**
+     * @return Contributor role value
+     */
     public String getValue() {
         return value;
     }

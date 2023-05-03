@@ -23,6 +23,11 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.ContributorRole;
 
+/**
+ * String converter for ContributorRole
+ *
+ * @see ContributorRole
+ */
 public class ContributorRoleListToStringConverter implements AttributeConverter<List<ContributorRole>, String> {
     @Override
     public String convertToDatabaseColumn(List<ContributorRole> attribute) {

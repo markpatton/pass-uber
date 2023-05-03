@@ -19,6 +19,10 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.IntegrationType;
 
+/**
+ * Serializer/Deserializer for IntegrationType. Deserializes a String to a IntegrationType and serializes an
+ * IntegrationType to a String.
+ */
 @ElideTypeConverter(type = IntegrationType.class, name = "IntegrationType")
 public class IntegrationTypeSerde implements Serde<String, IntegrationType> {
 

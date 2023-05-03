@@ -57,10 +57,8 @@ public enum FileRole {
     }
 
     /**
-     * Parse file role.
-     *
-     * @param role Role string
-     * @return parsed file role.
+     * @param role the string value of the enum FileRole to be returned
+     * @return value of the enum FileRole
      */
     public static FileRole of(String role) {
         FileRole result = map.get(role);
@@ -70,6 +68,10 @@ public enum FileRole {
         return result;
     }
 
+    /**
+     *
+     * @return String value of the enum FileRole
+     */
     public String getValue() {
         return value;
     }

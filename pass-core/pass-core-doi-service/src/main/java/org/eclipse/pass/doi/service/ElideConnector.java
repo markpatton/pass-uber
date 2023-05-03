@@ -47,12 +47,25 @@ import org.slf4j.LoggerFactory;
 public class ElideConnector {
     private static final Logger LOG = LoggerFactory.getLogger(ElideConnector.class);
 
+    /**
+     * The Elide instance to use for all Elide operations
+     */
     protected RefreshableElide refreshableElide;
 
+    /**
+     * Constructor for ElideConnector
+     *
+     * @param refreshableElide the Elide instance to use for all Elide operations
+     */
     protected ElideConnector(RefreshableElide refreshableElide) {
         this.refreshableElide = refreshableElide;
     }
 
+    /**
+     * This method gets the PassClient to perform data model operations
+     *
+     * @return a new PassClient
+     */
     protected PassClient getNewClient() {
         return new ElideDataStorePassClient(refreshableElide);
     }
@@ -271,7 +284,13 @@ public class ElideConnector {
      * a convenience enum for translating type strings for issns
      */
     public enum IssnType {
+        /**
+         * Pass Journal object type for print issns
+         */
         PRINT,
+        /**
+         * Pass Journal object type for electronic issns
+         */
         ELECTRONIC;
 
         static {
@@ -289,10 +308,18 @@ public class ElideConnector {
         private String passTypeString;
         private String crossrefTypeString;
 
+        /**
+         *
+         * @return The value of how types are stored in the issn field for the Pass Journal object
+         */
         public String getPassTypeString() {
             return passTypeString;
         }
 
+        /**
+         *
+         * @return The value of how issn types are presented in Crossref metadata
+         */
         public String getCrossrefTypeString() {
             return crossrefTypeString;
         }

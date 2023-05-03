@@ -19,6 +19,10 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.SubmissionStatus;
 
+/**
+ * Serializer/Deserializer for SubmissionStatus. Serializes a SubmissionStatus to a String and deserializes a String to
+ * a SubmissionStatus.
+ */
 @ElideTypeConverter(type = SubmissionStatus.class, name = "SubmissionStatus")
 public class SubmissionStatusSerde implements Serde<String, SubmissionStatus> {
 

@@ -19,6 +19,9 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.IntegrationType;
 
+/**
+ * Converter class for IntegrationType. Converts IntegrationType to database column and to entity attribute.
+ */
 public class IntegrationTypeToStringConverter implements AttributeConverter<IntegrationType, String> {
     @Override
     public String convertToDatabaseColumn(IntegrationType attribute) {

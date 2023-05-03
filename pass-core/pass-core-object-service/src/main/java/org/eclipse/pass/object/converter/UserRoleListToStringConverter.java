@@ -23,6 +23,10 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.UserRole;
 
+/**
+ * Converter class for List of UserRoles. Converts List of UserRoles to comma separated String and a comma separated
+ * String to List of UserRoles.
+ */
 public class UserRoleListToStringConverter implements AttributeConverter<List<UserRole>, String> {
     @Override
     public String convertToDatabaseColumn(List<UserRole> attribute) {

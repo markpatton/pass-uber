@@ -33,8 +33,8 @@ public abstract class PassEntity {
     /**
      * Needed because Hibernate does not correctly implement list equality when ElementCollection annotation is used.
      *
-     * @param list1
-     * @param list2
+     * @param list1 List to compare
+     * @param list2 List to compare
      * @return list equality
      */
     protected static boolean listEquals(List<?> list1, List<?> list2) {

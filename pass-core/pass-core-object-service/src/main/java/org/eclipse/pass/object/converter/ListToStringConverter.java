@@ -20,6 +20,10 @@ import java.util.Collections;
 import java.util.List;
 import javax.persistence.AttributeConverter;
 
+/**
+ * Converter class for converting list of string to a database value that is a string of comma-separated values
+ * and an Entity attribute back to a list of strings.
+ */
 public class ListToStringConverter implements AttributeConverter<List<String>, String> {
     @Override
     public String convertToDatabaseColumn(List<String> attribute) {

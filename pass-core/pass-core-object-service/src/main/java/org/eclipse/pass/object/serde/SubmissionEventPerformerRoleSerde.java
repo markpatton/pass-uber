@@ -19,6 +19,10 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.PerformerRole;
 
+/**
+ * Serializer/Deserializer for PerformerRole. Serializes a PerformerRole to a String and deserializes a String to a
+ * PerformerRole.
+ */
 @ElideTypeConverter(type = PerformerRole.class, name = "PerformerRole")
 public class SubmissionEventPerformerRoleSerde implements Serde<String, PerformerRole> {
 

@@ -19,6 +19,9 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.UserRole;
 
+/**
+ * Serializer/Deserializer for UserRole. Serializes a UserRole to a String and deserializes a String to a UserRole.
+ */
 @ElideTypeConverter(type = UserRole.class, name = "UserRole")
 public class UserRoleSerde implements Serde<String, UserRole> {
 

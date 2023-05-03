@@ -51,6 +51,10 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
     // schemas with "greater" value than the given schema
     private static Map<String, Collection<String>> orderedDeps = new HashMap<String, Collection<String>>();
 
+    /**
+     * Constructor for SchemaInstance
+     * @param schema the JSON schema that represents a PASS metadata requirements
+     */
     public SchemaInstance(JsonNode schema) {
         this.schema = schema;
         String[] schema_tkns = schema.get("$id").asText().split("/");
@@ -256,18 +260,35 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
         orderedDeps.put(schema_name, deps.values());
     }
 
+    /**
+     * Find a dependency in a schema
+     *
+     * @param dep the reference to resolve
+     * @param schema the schema to resolve the reference in
+     * @return the dependency in the schema
+     */
     private JsonNode resolveRef(String dep, JsonNode schema) {
         return schema.at(dep);
     }
 
+    /**
+     *
+     * @return the schema as a JsonNode
+     */
     public JsonNode getSchema() {
         return schema;
     }
 
+    /**
+     * @return the name of the schema
+     */
     public String getName() {
         return schema_name;
     }
 
+    /**
+     * @return the dependencies of the schema
+     */
     public HashMap<String, String> getDeps() {
         return deps;
     }

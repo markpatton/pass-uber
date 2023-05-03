@@ -46,6 +46,7 @@ public class StorageProperties {
 
     /**
      * Get the root directory for the File Service. This is the absolute path of the root directory.
+     *
      * @return The root directory of the File Service storage
      */
     public String getStorageRootDir() {
@@ -54,6 +55,7 @@ public class StorageProperties {
 
     /**
      * Get the relative path of the OCFL storage directory. This directory is a child of the root directory.
+     *
      * @return The logical path of the OCFL storage directory
      */
     public String getStorageOcflDir() {
@@ -63,6 +65,7 @@ public class StorageProperties {
     /**
      * Get the relative path of the OCFL working directory. This directory must be on the same
      * mount as the OCFL root directory. This directory is a child of the root directory.
+     *
      * @return The logical path of the OCFL working directory
      */
     public String getStorageWorkDir() {
@@ -71,6 +74,7 @@ public class StorageProperties {
 
     /**
      * Get the relative path of the temp directory. This directory is a child of the root directory.
+     *
      * @return The logical path of the temp directory
      */
     public String getStorageTempDir() {
@@ -79,6 +83,7 @@ public class StorageProperties {
 
     /**
      * Get the storage type that is configured for the File Service
+     *
      * @return The StorageServiceType of the File Service
      * @see StorageServiceType
      */
@@ -88,6 +93,7 @@ public class StorageProperties {
 
     /**
      * Get the S3 repo prefix that is configured for the File Service
+     *
      * @return The S3 bucket name of the File Service
      */
     public Optional<String> getS3RepoPrefix() {
@@ -96,6 +102,7 @@ public class StorageProperties {
 
     /**
      * Get the S3 bucket name that is configured for the File Service
+     *
      * @return The S3 bucket name of the File Service
      */
     public Optional<String> getBucketName() {
@@ -104,6 +111,7 @@ public class StorageProperties {
 
     /**
      * Get the S3 region that is configured for the File Service
+     *
      * @return The S3 region of the File Service
      */
     public Optional<Region> getRegion() {
@@ -117,32 +125,64 @@ public class StorageProperties {
 
     /**
      * Get the S3 endpoint that is configured for the File Service
+     *
      * @return The S3 endpoint of the File Service
      */
     public Optional<String> getS3Endpoint() {
         return Optional.ofNullable(s3Endpoint);
     }
 
+    /**
+     * Set the root directory for the File Service. This is the absolute path of the root directory.
+     * Important: The OCFL root and working directory must be on the same mount.
+     *
+     * @param rootDir The root directory of the File Service storage
+     */
     public void setRootDir(String rootDir) {
         this.rootDir = rootDir;
     }
 
+    /**
+     * Set the storage type that is configured for the File Service
+     *
+     * @param storageType The StorageServiceType of the File Service
+     */
     public void setStorageType(StorageServiceType storageType) {
         this.storageType = storageType;
     }
 
+    /**
+     * Set the S3 bucket name that is configured for the File Service
+     *
+     * @param bucketName The S3 bucket name of the File Service
+     */
     public void setS3BucketName(String bucketName) {
         this.s3BucketName = bucketName;
     }
 
+    /**
+     * Set the S3 repo prefix that is configured for the File Service
+     *
+     * @param s3RepoPrefix The S3 repo prefix of the File Service.
+     */
     public void setS3RepoPrefix(String s3RepoPrefix) {
         this.s3RepoPrefix = s3RepoPrefix;
     }
 
+    /**
+     * Set the S3 region that is configured for the File Service
+     *
+     * @param region The S3 region of the File Service
+     */
     public void setS3Region(String region) {
         this.s3Region = region;
     }
 
+    /**
+     * Set the S3 endpoint that is configured for the File Service
+     *
+     * @param endpoint The S3 endpoint of the File Service
+     */
     public void setS3Endpoint(String endpoint) {
         this.s3Endpoint = endpoint;
     }

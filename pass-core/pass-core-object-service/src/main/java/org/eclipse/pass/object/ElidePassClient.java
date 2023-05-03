@@ -55,6 +55,13 @@ public class ElidePassClient implements PassClient {
     private final String api_version;
     private final DataStoreTransaction read_tx;
 
+    /**
+     * Constructor for ElidePassClient. Will initialize the Elide instance, User, Elide settings, DataStoreTransaction,
+     * and the API version.
+     *
+     * @param refreshableElide Elide instance to use for the Elide PassClient
+     * @param user User to use for the Elide PassClient
+     */
     public ElidePassClient(RefreshableElide refreshableElide, User user) {
         this.elide = refreshableElide.getElide();
         this.settings = elide.getElideSettings();
@@ -66,7 +73,7 @@ public class ElidePassClient implements PassClient {
     /**
      * Act as a backend user.
      *
-     * @param refreshableElide
+     * @param refreshableElide Elide instance to use for the Elide PassClient
      */
     public ElidePassClient(RefreshableElide refreshableElide) {
         this(refreshableElide, new User(null) {

@@ -19,6 +19,9 @@ import com.yahoo.elide.core.utils.coerce.converters.ElideTypeConverter;
 import com.yahoo.elide.core.utils.coerce.converters.Serde;
 import org.eclipse.pass.object.model.FileRole;
 
+/**
+ * Serializer/Deserializer for FileRole. Deserializes a String to a FileRole and serializes a FileRole to a String.
+ */
 @ElideTypeConverter(type = FileRole.class, name = "FileRole")
 public class FileRoleSerde implements Serde<String, FileRole> {
 

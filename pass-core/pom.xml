@@ -159,6 +159,24 @@
         <configuration>
           <source>11</source>
           <detectJavaApiLink>false</detectJavaApiLink>
+          <tags>
+          <tag>
+            <name>CreatePermission</name>
+            <placement>a</placement>
+          </tag>
+            <tag>
+              <name>ReadPermission</name>
+              <placement>a</placement>
+            </tag>
+            <tag>
+              <name>UpdatePermission</name>
+              <placement>a</placement>
+            </tag>
+            <tag>
+              <name>DeletePermission</name>
+              <placement>a</placement>
+            </tag>
+          </tags>
         </configuration>
       </plugin>
     </plugins>

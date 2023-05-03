@@ -19,6 +19,9 @@ import javax.persistence.AttributeConverter;
 
 import org.eclipse.pass.object.model.AwardStatus;
 
+/**
+ * Converter class for AwardStatus. Converts AwardStatus to database column and to entity attribute.
+ */
 public class AwardStatusToStringConverter implements AttributeConverter<AwardStatus, String> {
     @Override
     public String convertToDatabaseColumn(AwardStatus attribute) {
