@@ -19,7 +19,7 @@ public enum StorageServiceType {
      * Get the string value of the StorageServiceType. Can be either an 'FILE_SYSTEM' or 'S3'
      */
     public final String label;
-    private StorageServiceType(String label) {
+    StorageServiceType(String label) {
         this.label = label;
     }
 }

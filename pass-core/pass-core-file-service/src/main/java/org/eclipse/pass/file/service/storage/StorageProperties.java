@@ -18,8 +18,6 @@ package org.eclipse.pass.file.service.storage;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import software.amazon.awssdk.regions.Region;
 
@@ -33,7 +31,6 @@ import software.amazon.awssdk.regions.Region;
  */
 @ConfigurationProperties(prefix = "spring.file-service")
 public class StorageProperties {
-    private static final Logger LOG = LoggerFactory.getLogger(StorageProperties.class);
     private final String ocflDir = "ocfl";
     private final String ocflWorkDir = "ocfl-work";
     private final String tempDir = "temp";
