@@ -44,7 +44,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -84,22 +83,16 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 @Lazy
 @Service
 public class FileStorageService {
-
     private static final Logger LOG = LoggerFactory.getLogger(FileStorageService.class);
-    private Path rootLoc;
+
+    private final Path tempLoc;
+    private final StorageServiceType storageType;
+    private final OcflRepository ocflRepository;
     private Path ocflLoc;
-    private Path workLoc;
-    private Path tempLoc;
-    private StorageServiceType storageType;
-    private OcflRepository ocflRepository;
     private S3Client cloudS3Client;
-    private StorageProperties storageProperties;
     private String bucketName;
     private String repoPrefix;
     private Region region;
-
-    private FileStorageService(){
-    }
 
     /**
      *  FileStorageService Class constructor.
@@ -108,26 +101,26 @@ public class FileStorageService {
      * @throws FileSystemException If the File Service directories cannot be created and readable/writeble a
      * FileSystemException will be thrown
      */
-    @Autowired
     public FileStorageService(StorageConfiguration storageConfiguration) throws IOException {
-        this.storageProperties = storageConfiguration.getStorageProperties();
-        storageType = this.storageProperties.getStorageType();
+        StorageProperties storageProperties = storageConfiguration.getStorageProperties();
+        storageType = storageProperties.getStorageType();
 
-        if (this.storageProperties.getStorageRootDir() == null
-                || this.storageProperties.getStorageRootDir().isEmpty()) {
+        Path rootLoc;
+        if (storageProperties.getStorageRootDir() == null
+                || storageProperties.getStorageRootDir().isEmpty()) {
             //when a storage root is not specified, then it should be: system_temp/create_temp_dir
-            this.rootLoc = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")),null);
+            rootLoc = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")),null);
         } else {
-            this.rootLoc = Paths.get(this.storageProperties.getStorageRootDir());
+            rootLoc = Paths.get(storageProperties.getStorageRootDir());
         }
 
         // The ocflLoc only needs to be set if the storage type is file system.
         // If the storageType is S3 then workLoc and tempLoc are used because they are used with FILE_SYSTEM AND S3
         if (storageType.equals(StorageServiceType.FILE_SYSTEM)) {
-            ocflLoc = Paths.get(this.rootLoc.toString(),this.storageProperties.getStorageOcflDir());
+            ocflLoc = Paths.get(rootLoc.toString(), storageProperties.getStorageOcflDir());
         }
-        this.workLoc = Paths.get(this.rootLoc.toString(),this.storageProperties.getStorageWorkDir());
-        this.tempLoc = Paths.get(this.rootLoc.toString(),this.storageProperties.getStorageTempDir());
+        Path workLoc = Paths.get(rootLoc.toString(), storageProperties.getStorageWorkDir());
+        this.tempLoc = Paths.get(rootLoc.toString(), storageProperties.getStorageTempDir());
 
         try {
             if (!Files.exists(rootLoc)) {
@@ -158,7 +151,7 @@ public class FileStorageService {
                 ocflRepository = new OcflRepositoryBuilder()
                         .defaultLayoutConfig(new HashedNTupleLayoutConfig())
                         .storage(storage -> storage.fileSystem(this.ocflLoc))
-                        .workDir(this.workLoc)
+                        .workDir(workLoc)
                         .build();
             } catch (IOException e) {
                 throw new IOException("File Service: Unable to setup File Storage directories: " + e);

@@ -36,14 +36,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class PassDoiServiceController {
-
     private static final Logger LOG = LoggerFactory.getLogger(PassDoiServiceController.class);
-    ElideConnector elideConnector;
-    ExternalDoiServiceConnector externalDoiServiceConnector;
-    ExternalDoiService xrefDoiService;
-    ExternalDoiService unpaywallDoiService;
 
-    PassDoiServiceController(RefreshableElide refreshableElide) {
+    private final ElideConnector elideConnector;
+    private final ExternalDoiServiceConnector externalDoiServiceConnector;
+    private final ExternalDoiService xrefDoiService;
+    private final ExternalDoiService unpaywallDoiService;
+
+    public PassDoiServiceController(RefreshableElide refreshableElide) {
         this.elideConnector = new ElideConnector(refreshableElide);
         this.externalDoiServiceConnector = new ExternalDoiServiceConnector();
         this.xrefDoiService = new XrefDoiService();

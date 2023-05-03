@@ -20,7 +20,6 @@ import org.eclipse.pass.usertoken.Token;
 import org.eclipse.pass.usertoken.TokenFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,15 +35,17 @@ public class UserServiceController {
 
     private final TokenFactory token_factory;
 
-    @Autowired
-    private RefreshableElide refreshableElide;
+    private final RefreshableElide refreshableElide;
 
     /**
      * Construct a UserServiceController.
      *
      * @param usertoken_key or null
+     * @param refreshableElide a refreshable elide instance
      */
-    public UserServiceController(@Value("${pass.usertoken.key:#{null}}") String usertoken_key) {
+    public UserServiceController(@Value("${pass.usertoken.key:#{null}}") String usertoken_key,
+                                 RefreshableElide refreshableElide) {
+        this.refreshableElide = refreshableElide;
         this.token_factory = usertoken_key == null || usertoken_key.isEmpty() ? null
                 : new TokenFactory(usertoken_key);
 

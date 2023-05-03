@@ -23,8 +23,6 @@ import org.eclipse.pass.file.service.storage.FileStorageService;
 import org.eclipse.pass.file.service.storage.StorageFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -49,14 +47,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class PassFileServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassFileServiceController.class);
 
-    @Lazy
-    @Autowired
-    private FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
 
     /**
      *   Class constructor.
      */
-    public PassFileServiceController() {
+    public PassFileServiceController(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
 
     /**
