@@ -33,7 +33,6 @@ import org.eclipse.pass.object.model.Policy;
 import org.eclipse.pass.object.model.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -59,9 +58,6 @@ public class PassPolicyServiceController {
 
     private static final Logger LOG = LoggerFactory.getLogger(PassPolicyServiceController.class);
     private final PolicyService policyService;
-
-    @Autowired
-    private RefreshableElide refreshableElide;
 
     /**
      * PassPolicyServiceController Constructor
