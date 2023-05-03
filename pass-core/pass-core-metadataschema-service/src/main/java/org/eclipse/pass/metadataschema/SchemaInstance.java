@@ -174,8 +174,10 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
                 JsonNode ext_schema = null;
                 try {
                     ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + refParts[0]);
-                } catch (IllegalArgumentException | IOException e) {
+                } catch (IllegalArgumentException e) {
                     LOG.error("Invalid Schema URI", e);
+                } catch (IOException e) {
+                    LOG.error("Failed to dereference schema", e);
                 }
                 if (refParts.length == 2) {
                     replacement = resolveRef(refParts[1], ext_schema);
