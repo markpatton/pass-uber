@@ -63,7 +63,6 @@ public class PassPolicyServiceController {
     @Autowired
     private RefreshableElide refreshableElide;
 
-
     /**
      * PassPolicyServiceController Constructor
      *
