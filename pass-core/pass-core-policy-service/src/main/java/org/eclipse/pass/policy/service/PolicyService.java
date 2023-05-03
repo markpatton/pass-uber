@@ -24,7 +24,7 @@ import org.eclipse.pass.object.model.Policy;
 import org.eclipse.pass.object.model.Repository;
 
 /**
- * Interface for Policy Sevice implementations.
+ * Interface for Policy Service implementations.
  *
  * @author jrm
  */
