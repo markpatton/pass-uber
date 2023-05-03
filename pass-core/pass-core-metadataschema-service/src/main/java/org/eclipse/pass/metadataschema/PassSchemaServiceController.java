@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PassSchemaServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
     private final PassClient passClient;
-    private SchemaService schemaService;
+    private final SchemaService schemaService;
 
     /**
      * Constructor for PassSchemaServiceController
@@ -96,12 +96,11 @@ public class PassSchemaServiceController {
      * @throws Exception if there is an error reading the request body
      */
     protected List<String> readJson(BufferedReader r) throws Exception {
-        String next;
         String json_list = r.readLine();
         ObjectMapper o = new ObjectMapper();
         List<String> repository_list = o.readValue(json_list, new TypeReference<ArrayList<String>>() {
         });
-        if ((next = r.readLine()) != null) {
+        if (r.readLine() != null) {
             throw new Exception("Too many lines");
         }
         return repository_list;
@@ -132,7 +131,6 @@ public class PassSchemaServiceController {
 
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode responseArray = objectMapper.createArrayNode();
-        String jsonResponse = "";
 
         //front-end will first attempt to merge schemas, if that fails, it will attempt to retrieve individual schemas
         if (mergeSchemaOpt.equalsIgnoreCase("true")) {
@@ -160,7 +158,7 @@ public class PassSchemaServiceController {
             }
         }
 
-        jsonResponse = objectMapper.writeValueAsString(responseArray);
+        String jsonResponse = objectMapper.writeValueAsString(responseArray);
         HttpHeaders headers = new HttpHeaders();
         //APPLICATION_JSON_UTF8 is deprecated and APPLICATION_JSON is preferred, will be interpreted as UTF-8
         headers.setContentType(MediaType.APPLICATION_JSON);
