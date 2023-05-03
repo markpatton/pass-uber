@@ -43,9 +43,9 @@ public enum IntegrationType {
         }
     }
 
-    private String value;
+    private final String value;
 
-    private IntegrationType(String value) {
+    IntegrationType(String value) {
         this.value = value;
     }
 

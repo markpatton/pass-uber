@@ -60,9 +60,9 @@ public enum EventType {
         }
     }
 
-    String value;
+    private final String value;
 
-    private EventType(String value) {
+    EventType(String value) {
         this.value = value;
     }
 

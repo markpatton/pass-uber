@@ -57,9 +57,9 @@ public enum AggregatedDepositStatus {
         }
     }
 
-    private String value;
+    private final String value;
 
-    private AggregatedDepositStatus(String value) {
+    AggregatedDepositStatus(String value) {
         this.value = value;
     }
 

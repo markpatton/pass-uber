@@ -41,9 +41,9 @@ public enum UserRole {
         }
     }
 
-    private String value;
+    private final String value;
 
-    private UserRole(String value) {
+    UserRole(String value) {
         this.value = value;
     }
 

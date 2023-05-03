@@ -49,9 +49,9 @@ public enum DepositStatus {
         }
     }
 
-    private String value;
+    private final String value;
 
-    private DepositStatus(String value) {
+    DepositStatus(String value) {
         this.value = value;
     }
 
