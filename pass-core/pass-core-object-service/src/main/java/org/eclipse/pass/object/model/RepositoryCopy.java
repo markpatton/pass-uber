@@ -42,7 +42,7 @@ public class RepositoryCopy extends PassEntity {
      * IDs assigned by the repository
      */
     @Convert(converter = ListToStringConverter.class)
-    private List<String> externalIds = new ArrayList<String>();
+    private List<String> externalIds = new ArrayList<>();
 
     /**
      * Status of deposit
@@ -80,7 +80,7 @@ public class RepositoryCopy extends PassEntity {
      */
     public RepositoryCopy(RepositoryCopy repositoryCopy) {
         super(repositoryCopy);
-        this.externalIds = new ArrayList<String>(repositoryCopy.externalIds);
+        this.externalIds = new ArrayList<>(repositoryCopy.externalIds);
         this.copyStatus = repositoryCopy.copyStatus;
         this.accessUrl = repositoryCopy.accessUrl;
         this.publication = repositoryCopy.publication;
