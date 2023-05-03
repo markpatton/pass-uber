@@ -7,7 +7,6 @@ import java.util.UUID;
 import com.yahoo.elide.RefreshableElide;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.eclipse.pass.main.security.ShibConstants;
 import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.model.User;
 import org.eclipse.pass.object.model.UserRole;
@@ -15,10 +14,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.eclipse.pass.main.security.ShibConstants.*;
+
 /**
  * Provide a Shib user to make requests.
  */
-public class ShibIntegrationTest extends IntegrationTest implements ShibConstants {
+public class ShibIntegrationTest extends IntegrationTest {
     protected static String SUBMITTER_NAME = "Sally M. Submitter";
     protected static String SUBMITTER_SUR_NAME = "Submitter";
     protected static String SUBMITTER_GIVEN_NAME = "Sally";
@@ -35,7 +36,7 @@ public class ShibIntegrationTest extends IntegrationTest implements ShibConstant
     protected RefreshableElide refreshableElide;
 
     @BeforeAll
-    private static void setupTests() throws IOException {
+    void setupTests() {
         client = new OkHttpClient.Builder().followRedirects(false).build();
         submitter = new User();
 
@@ -53,7 +54,7 @@ public class ShibIntegrationTest extends IntegrationTest implements ShibConstant
     }
 
     @BeforeEach
-    private void persistSubmitter() throws IOException {
+    void persistSubmitter() throws IOException {
         // Create the submitter once
         if (submitter.getId() == null) {
             try (PassClient pass_client = PassClient.newInstance(refreshableElide)) {

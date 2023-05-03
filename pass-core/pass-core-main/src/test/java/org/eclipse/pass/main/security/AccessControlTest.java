@@ -15,12 +15,6 @@
  */
 package org.eclipse.pass.main.security;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 
 import okhttp3.Credentials;
@@ -39,6 +33,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.BadCredentialsException;
+
+import static org.eclipse.pass.main.security.ShibConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Ensure that HTTP requests are authenticated and authorized appropriately.
@@ -61,7 +58,7 @@ public class AccessControlTest extends ShibIntegrationTest {
             try {
                 return new JSONObject(json);
             } catch (JSONException e) {
-                assertTrue(false, "Expected JSON object, got: " + json);
+                fail("Expected JSON object, got: " + json);
             }
         }
 
@@ -114,9 +111,7 @@ public class AccessControlTest extends ShibIntegrationTest {
 
     private void print(Response response) throws IOException {
         System.err.println(response.code() + " " + response.message());
-        response.headers().names().forEach(h -> {
-            System.err.println("  " + h + ": " + response.header(h));
-        });
+        response.headers().names().forEach(h -> System.err.println("  " + h + ": " + response.header(h)));
         System.err.println(response.body().string());
     }
 
@@ -189,9 +184,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         // No headers
 
         assertFalse(ShibAuthenticationFilter.isShibRequest(req));
-        assertThrows(BadCredentialsException.class, () -> {
-            ShibAuthenticationFilter.parseShibHeaders(req);
-        });
+        assertThrows(BadCredentialsException.class, () -> ShibAuthenticationFilter.parseShibHeaders(req));
 
         // Enough headers to look like a request
 
@@ -199,9 +192,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         req.addHeader(EPPN_HEADER, getSubmitterEppn());
 
         assertTrue(ShibAuthenticationFilter.isShibRequest(req));
-        assertThrows(BadCredentialsException.class, () -> {
-            ShibAuthenticationFilter.parseShibHeaders(req);
-        });
+        assertThrows(BadCredentialsException.class, () -> ShibAuthenticationFilter.parseShibHeaders(req));
     }
 
     @Test

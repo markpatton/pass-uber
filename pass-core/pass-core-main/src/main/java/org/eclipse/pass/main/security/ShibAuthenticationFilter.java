@@ -42,6 +42,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import static org.eclipse.pass.main.security.ShibConstants.*;
+
 /**
  * Filter responsible for mapping a Shib user to a PASS user. The PASS user is
  * created if it does not exist and otherwise updated to reflect the information
@@ -54,7 +56,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * maintained. It is cleared every pass.auth.cache-duration minutes.
  */
 @Component
-public class ShibAuthenticationFilter extends OncePerRequestFilter implements ShibConstants {
+public class ShibAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(ShibAuthenticationFilter.class);
 
     private final ConcurrentHashMap<String, ShibAuthentication> auth_cache;
@@ -78,8 +80,8 @@ public class ShibAuthenticationFilter extends OncePerRequestFilter implements Sh
 
     // Do authentication and return Authentication object representing success.
     // Throw AuthenticationException if there is trouble with the user credentials
-    private Authentication authenticate(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
+    private Authentication authenticate(HttpServletRequest request)
+            throws AuthenticationException, IOException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Request headers:");
             request.getHeaderNames().asIterator().forEachRemaining(s -> {
@@ -294,7 +296,7 @@ public class ShibAuthenticationFilter extends OncePerRequestFilter implements Sh
 
         if (isShibRequest(request)) {
             try {
-                Authentication auth = authenticate(request, response);
+                Authentication auth = authenticate(request);
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
                 LOG.debug("Shib user logged in {}", auth.getName());

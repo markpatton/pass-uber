@@ -18,7 +18,10 @@ package org.eclipse.pass.main.security;
 /**
  * Various constants associated with Shib authentication
  */
-public interface ShibConstants {
+public final class ShibConstants {
+
+    private ShibConstants() {}
+
     /** Display name http header */
     public static final String DISPLAY_NAME_HEADER = "Displayname";
 

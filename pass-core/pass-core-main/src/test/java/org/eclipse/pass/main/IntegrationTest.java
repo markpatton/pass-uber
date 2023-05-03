@@ -44,7 +44,7 @@ public abstract class IntegrationTest {
     }
 
     @BeforeAll
-    public void setup() {
+    void setup() {
         RestAssured.port = port;
     }
 }
