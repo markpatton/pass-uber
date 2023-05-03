@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createFunder;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
 
@@ -40,7 +39,7 @@ public class FunderModelTests {
         assertEquals(funder1.hashCode(), funder2.hashCode());
 
         funder1.setName("different");
-        assertTrue(!funder1.equals(funder2));
+        assertNotEquals(funder1, funder2);
     }
 
     /**

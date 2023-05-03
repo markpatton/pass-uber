@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createPublisher;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,7 @@ public class PublisherModelTests {
         assertEquals(publisher1.hashCode(), publisher2.hashCode());
 
         publisher1.setName("different");
-        assertTrue(!publisher1.equals(publisher2));
+        assertNotEquals(publisher1, publisher2);
     }
 
     /**

@@ -18,8 +18,7 @@ package org.eclipse.pass.object.model;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createPublication;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createRepository;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createRepositoryCopy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +43,7 @@ public class RepositoryCopyModelTests {
         assertEquals(repoCopy1.hashCode(), repoCopy2.hashCode());
 
         repoCopy1.setRepository(createRepository(TestValues.REPOSITORY_ID_2));
-        assertTrue(!repoCopy1.equals(repoCopy2));
+        assertNotEquals(repoCopy1, repoCopy2);
     }
 
     /**
@@ -53,7 +52,7 @@ public class RepositoryCopyModelTests {
     @Test
     public void testRepositoryCopyCopyConstructor()  {
         RepositoryCopy repositoryCopy = createRepositoryCopy(TestValues.REPOSITORYCOPY_ID_1);
-        List<String> externalIds = new ArrayList<String>(
+        List<String> externalIds = new ArrayList<>(
             Arrays.asList(TestValues.REPOSITORYCOPY_EXTERNALID_1, TestValues.REPOSITORYCOPY_EXTERNALID_2));
         repositoryCopy.setExternalIds(externalIds);
         RepositoryCopy repositoryCopyCopy = new RepositoryCopy(repositoryCopy);
@@ -64,7 +63,7 @@ public class RepositoryCopyModelTests {
         assertEquals(createPublication(TestValues.PUBLICATION_ID_1), repositoryCopy.getPublication());
         assertEquals(newPublication, repositoryCopyCopy.getPublication());
 
-        List<String> externalIdsNew = new ArrayList<String>(Arrays.asList(TestValues.REPOSITORYCOPY_EXTERNALID_2));
+        List<String> externalIdsNew = List.of(TestValues.REPOSITORYCOPY_EXTERNALID_2);
         repositoryCopyCopy.setExternalIds(externalIdsNew);
         assertEquals(externalIds, repositoryCopy.getExternalIds());
         assertEquals(externalIdsNew, repositoryCopyCopy.getExternalIds());

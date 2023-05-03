@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createSubmission;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
 
@@ -41,7 +40,7 @@ public class FileModelTests {
         assertEquals(file1.hashCode(), file2.hashCode());
 
         file1.setDescription("different");
-        assertTrue(!file1.equals(file2));
+        assertNotEquals(file1, file2);
     }
 
     /**

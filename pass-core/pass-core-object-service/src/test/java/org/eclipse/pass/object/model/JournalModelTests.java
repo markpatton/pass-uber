@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createJournal;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +41,7 @@ public class JournalModelTests {
         assertEquals(journal1.hashCode(), journal2.hashCode());
 
         journal1.setJournalName("different");
-        assertTrue(!journal1.equals(journal2));
+        assertNotEquals(journal1, journal2);
     }
 
     /**
@@ -51,7 +50,7 @@ public class JournalModelTests {
     @Test
     public void testJournalCopyConstructor()  {
         Journal journal = createJournal(TestValues.JOURNAL_ID_1);
-        List<String> issnsOrig = new ArrayList<String>(
+        List<String> issnsOrig = new ArrayList<>(
             Arrays.asList(TestValues.JOURNAL_ISSN_1, TestValues.JOURNAL_ISSN_2));
         journal.setIssns(issnsOrig);
         Journal journalCopy = new Journal(journal);
@@ -62,7 +61,7 @@ public class JournalModelTests {
         assertEquals(PmcParticipation.valueOf(TestValues.JOURNAL_PMCPARTICIPATION), journal.getPmcParticipation());
         assertEquals(PmcParticipation.A, journalCopy.getPmcParticipation());
 
-        List<String> issnsNew = new ArrayList<String>(Arrays.asList("9876-1234"));
+        List<String> issnsNew = List.of("9876-1234");
         journalCopy.setIssns(issnsNew);
         assertEquals(issnsOrig, journal.getIssns());
         assertEquals(issnsNew, journalCopy.getIssns());

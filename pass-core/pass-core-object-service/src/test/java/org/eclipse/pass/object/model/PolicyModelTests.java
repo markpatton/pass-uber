@@ -17,8 +17,7 @@ package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createPolicy;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createRepository;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class PolicyModelTests {
         assertEquals(policy1.hashCode(), policy2.hashCode());
 
         policy1.setPolicyUrl(URI.create("https://somethingdifferent.test"));
-        assertTrue(!policy1.equals(policy2));
+        assertNotEquals(policy1, policy2);
     }
 
     /**
@@ -54,7 +53,7 @@ public class PolicyModelTests {
     public void testPolicyCopyConstructor()  {
         Policy policy = createPolicy(TestValues.POLICY_ID_1);
         List<Repository> repositoriesOrig =
-            new ArrayList<Repository>(Arrays.asList(createRepository(TestValues.REPOSITORY_ID_1),
+            new ArrayList<>(Arrays.asList(createRepository(TestValues.REPOSITORY_ID_1),
                                              createRepository(TestValues.REPOSITORY_ID_2)));
         policy.setRepositories(repositoriesOrig);
 
@@ -66,8 +65,7 @@ public class PolicyModelTests {
         assertEquals(URI.create(TestValues.INSTITUTION_ID_1), policy.getInstitution());
         assertEquals(newInstitution, policyCopy.getInstitution());
 
-        List<Repository> repositoriesNew =
-            new ArrayList<Repository>(Arrays.asList(createRepository(TestValues.REPOSITORY_ID_2)));
+        List<Repository> repositoriesNew = List.of(createRepository(TestValues.REPOSITORY_ID_2));
         policyCopy.setRepositories(repositoriesNew);
         assertEquals(repositoriesOrig, policy.getRepositories());
         assertEquals(repositoriesNew, policyCopy.getRepositories());

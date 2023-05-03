@@ -17,9 +17,7 @@ package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createSubmission;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +44,7 @@ public class SubmissionModelTests {
         assertEquals(submission1.hashCode(), submission2.hashCode());
 
         submission1.setSubmissionStatus(SubmissionStatus.CANCELLED);
-        assertTrue(!submission1.equals(submission2));
+        assertNotEquals(submission1, submission2);
     }
 
     /**
@@ -68,7 +66,7 @@ public class SubmissionModelTests {
     @Test
     public void testSubmissionCopyConstructor()  {
         Submission submission = createSubmission(TestValues.SUBMISSION_ID_1);
-        List<User> preparersOrig = new ArrayList<>(Arrays.asList(createUser(TestValues.USER_ID_1)));
+        List<User> preparersOrig = List.of(createUser(TestValues.USER_ID_1));
         submission.setPreparers(preparersOrig);
         Submission submissionCopy = new Submission(submission);
         assertEquals(submission, submissionCopy);

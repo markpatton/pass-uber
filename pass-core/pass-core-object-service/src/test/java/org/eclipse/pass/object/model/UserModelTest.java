@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +42,7 @@ public class UserModelTest {
         assertEquals(user1.hashCode(), user2.hashCode());
 
         user1.setUsername("different");
-        assertTrue(!user1.equals(user2));
+        assertNotEquals(user1, user2);
     }
 
     /**
@@ -52,7 +51,7 @@ public class UserModelTest {
     @Test
     public void testUserCopyConstructor()  {
         User user = createUser(TestValues.USER_ID_1);
-        List<UserRole> rolesOrig = new ArrayList<UserRole>(Arrays.asList(UserRole.ADMIN));
+        List<UserRole> rolesOrig = List.of(UserRole.ADMIN);
         user.setRoles(rolesOrig);
 
         User userCopy = new User(user);

@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createDeposit;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,7 @@ public class DepositModelTests {
         assertEquals(deposit1.hashCode(), deposit2.hashCode());
 
         deposit1.setDepositStatusRef("different");
-        assertTrue(!deposit1.equals(deposit2));
+        assertNotEquals(deposit1, deposit2);
     }
 
     /**

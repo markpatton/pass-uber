@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createContributor;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,7 @@ public class ContributorModelTests {
         assertEquals(contributor1.hashCode(), contributor2.hashCode());
 
         contributor1.setFirstName("different");
-        assertTrue(!contributor1.equals(contributor2));
+        assertNotEquals(contributor1, contributor2);
     }
 
     /**
@@ -55,14 +54,14 @@ public class ContributorModelTests {
         assertEquals(TestValues.USER_EMAIL, contributor.getEmail());
         assertEquals(newEmail, contributorCopy.getEmail());
 
-        contributorCopy.setUser(createUser(TestValues.USER_ID_2));
+        contributorCopy.setUser(createUser());
         assertEquals(TestValues.USER_ID_1, contributor.getUser().getId());
         assertEquals(TestValues.USER_ID_2, contributorCopy.getUser().getId());
     }
 
-    private User createUser(Long id) {
+    private User createUser() {
         User user = new User();
-        user.setId(id);
+        user.setId(TestValues.USER_ID_2);
         user.setFirstName(TestValues.USER_FIRST_NAME);
         user.setMiddleName(TestValues.USER_MIDDLE_NAME);
         user.setLastName(TestValues.USER_LAST_NAME);

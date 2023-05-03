@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createGrant;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.ZonedDateTime;
 
@@ -41,7 +40,7 @@ public class GrantModelTests {
         assertEquals(grant1.hashCode(), grant2.hashCode());
 
         grant1.setAwardNumber("different");
-        assertTrue(!grant1.equals(grant2));
+        assertNotEquals(grant1, grant2);
     }
 
     /**

@@ -16,8 +16,7 @@
 package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createPublication;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.pass.object.model.support.TestValues;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,7 @@ public class PublicationModelTests {
         assertEquals(publication1.hashCode(), publication2.hashCode());
 
         publication1.setIssue("different");
-        assertTrue(!publication1.equals(publication2));
+        assertNotEquals(publication1, publication2);
     }
 
     /**
