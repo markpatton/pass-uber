@@ -38,10 +38,11 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ExternalDoiService {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalDoiService.class);
+
     private final Set<String> activeJobSet = new HashSet<>();
     private final Set<String> syncActiveJobSet = Collections.synchronizedSet(activeJobSet);
 
-    String MAILTO = "pass@jhu.edu";
+    final static String MAILTO = "pass@jhu.edu";
 
     /**
      * The name of the external service
