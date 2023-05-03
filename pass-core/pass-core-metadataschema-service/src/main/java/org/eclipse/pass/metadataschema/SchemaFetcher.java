@@ -46,7 +46,7 @@ public class SchemaFetcher {
 
     private final PassClient passClient;
     private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
-    private static ConcurrentHashMap<String, JsonNode> localSchemaCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, JsonNode> localSchemaCache = new ConcurrentHashMap<>();
 
     /**
      * Constructor for SchemaFetcher

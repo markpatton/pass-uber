@@ -21,13 +21,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The SchemaInstance class represents a schema map, read from a schema URI that is fetched by the
@@ -37,19 +36,17 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SchemaInstance implements Comparable<SchemaInstance> {
 
-    private JsonNode schema;
-    private HashMap<String, String> deps = new HashMap<String, String>();
-    private HashMap<String, String> refs = new HashMap<String, String>();
-    private String keyRef = "$ref";
-    private String schema_name;
-    private String schema_dir;
-    private static final Logger logger = Logger.getLogger(SchemaInstance.class.getName());
-    @Autowired
-    private SchemaFetcher schemaFetcher;
+    private final JsonNode schema;
+    private final HashMap<String, String> deps = new HashMap<>();
+    private final HashMap<String, String> refs = new HashMap<>();
+    private final String keyRef = "$ref";
+    private final String schema_name;
+    private final String schema_dir;
+    private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
 
     // all dependencies of a schema on other schemas, as well as dependencies of the
     // schemas with "greater" value than the given schema
-    private static Map<String, Collection<String>> orderedDeps = new HashMap<String, Collection<String>>();
+    private static final Map<String, Collection<String>> orderedDeps = new HashMap<>();
 
     /**
      * Constructor for SchemaInstance
@@ -177,10 +174,8 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
                 JsonNode ext_schema = null;
                 try {
                     ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + refParts[0]);
-                } catch (IllegalArgumentException e) {
-                    logger.log(Level.SEVERE, "Invalid Schema URI", e);
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE, "Failed to dereference schema", e);
+                } catch (IllegalArgumentException | IOException e) {
+                    LOG.error("Invalid Schema URI", e);
                 }
                 if (refParts.length == 2) {
                     replacement = resolveRef(refParts[1], ext_schema);
