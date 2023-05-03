@@ -26,14 +26,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.FileSystemUtils;
 
 class FileStorageServiceS3Test {
-    StorageConfiguration storageConfiguration;
+    private final static String ROOT_DIR = System.getProperty("java.io.tmpdir") + "/pass-s3-test";
+
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
-    private final String rootDir = System.getProperty("java.io.tmpdir") + "/pass-s3-test";
-    private final String s3Endpoint = "http://localhost:8001";
-    private final String s3Bucket = "bucket-test-name";
-    private final String s3Region = "us-east-1";
-    private final String s3Prefix = "s3-repo-prefix";
     private S3Mock s3MockApi;
 
     /**
@@ -44,12 +40,12 @@ class FileStorageServiceS3Test {
         s3MockApi = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
         s3MockApi.start();
         properties.setStorageType(StorageServiceType.S3);
-        properties.setRootDir(rootDir);
-        properties.setS3Endpoint(s3Endpoint);
-        properties.setS3BucketName(s3Bucket);
-        properties.setS3Region(s3Region);
-        properties.setS3RepoPrefix(s3Prefix);
-        storageConfiguration =  new StorageConfiguration(properties);
+        properties.setRootDir(ROOT_DIR);
+        properties.setS3Endpoint("http://localhost:8001");
+        properties.setS3BucketName("bucket-test-name");
+        properties.setS3Region("us-east-1");
+        properties.setS3RepoPrefix("s3-repo-prefix");
+        StorageConfiguration storageConfiguration = new StorageConfiguration(properties);
         try {
             fileStorageService = new FileStorageService(storageConfiguration);
         } catch (IOException e) {
@@ -63,7 +59,7 @@ class FileStorageServiceS3Test {
     @AfterEach
     void tearDown() {
         s3MockApi.stop();
-        FileSystemUtils.deleteRecursively(Paths.get(rootDir).toFile());
+        FileSystemUtils.deleteRecursively(Paths.get(ROOT_DIR).toFile());
     }
 
     /**
@@ -101,9 +97,7 @@ class FileStorageServiceS3Test {
     @Test
     void getFileShouldThrowException() {
         Exception exception = assertThrows(IOException.class,
-                () -> {
-                    ByteArrayResource file = fileStorageService.getFile("12345");
-                }
+                () -> fileStorageService.getFile("12345")
         );
         String expectedExceptionText = "File Service: The file could not be loaded";
         String actualExceptionText = exception.getMessage();
@@ -155,9 +149,7 @@ class FileStorageServiceS3Test {
                     MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
             fileStorageService.deleteFile(storageFile.getId());
             Exception exception = assertThrows(NotFoundException.class,
-                    () -> {
-                        fileStorageService.getResourceFileRelativePath(storageFile.getId());
-                    });
+                    () -> fileStorageService.getResourceFileRelativePath(storageFile.getId()));
             String exceptionText = exception.getMessage();
             assertTrue(exceptionText.matches("(.)+(was not found){1}(.)+"));
         } catch (IOException e) {
