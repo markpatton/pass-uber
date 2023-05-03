@@ -48,9 +48,6 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
 
     @Test
     public void testSchemaControllerOneRepoWithMergeTrue() throws Exception {
-        List<URI> r1_schemas_list = Arrays.asList(new URI("https://example.com/metadata-schemas/jhu/schema1.json"),
-                new URI("https://example.com/metadata-schemas/jhu/schema2.json"));
-
         String url = getBaseUrl() + "schema?entityIds=" + repo1Id.toString() + "&merge=true";
         Request okHttpRequest = new Request.Builder()
                 .url(url).header("Authorization", credentials)
