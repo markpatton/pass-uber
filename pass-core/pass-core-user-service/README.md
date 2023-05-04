@@ -14,4 +14,13 @@ Example result:
 }
 ```
 
+The parameter `userToken` can be used to provide a user token. The user token must be associated with
+a submission and an email address. (A user token is an encrypted tuple consisting of a PASS resource
+URI and a reference URI.) A request with a user token will return as normal, but have
+the side effect of setting the submitter of the submission to the current user. In order for
+that to happen the submitterEmail address field on the submission must match the email address of the token.
 
+Then environment variable PASS_CORE_USERTOKEN_KEY provides the key used to encrypt and decrypt user tokens.
+If it is not provided or empty, user token support is disabled. To generate a key run the class,
+`org.eclipse.pass.usertoken.KeyGenerator`. One way to do that is from `pass-core-usertoken` to do
+`mvn compile exec:java -Dexec.mainClass="org.eclipse.pass.usertoken.KeyGenerator"`.
