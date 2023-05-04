@@ -18,7 +18,9 @@ package org.eclipse.pass.metadataschema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.eclipse.pass.metadataschema.SchemaTestUtils.RefreshableElideMocked;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -28,7 +30,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.model.Repository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ import org.mockito.Mockito;
 
 class SchemaFetcherTest {
 
-    private PassClient passClientMock;
+    private RefreshableElideMocked refreshableElideMocked;
     private Repository repositoryMock1;
     private Repository repositoryMock2;
     private SchemaFetcher schemaFetcher;
@@ -44,10 +45,10 @@ class SchemaFetcherTest {
 
     @BeforeEach
     void setup() {
-        passClientMock = Mockito.mock(PassClient.class);
-        repositoryMock1 = Mockito.mock(Repository.class);
-        repositoryMock2 = Mockito.mock(Repository.class);
-        schemaFetcher = new SchemaFetcher(passClientMock);
+        repositoryMock1 = mock(Repository.class);
+        repositoryMock2 = mock(Repository.class);
+        refreshableElideMocked = SchemaTestUtils.getMockedRefreshableElide();
+        schemaFetcher = new SchemaFetcher(refreshableElideMocked.getRefreshableElideMock());
         map = new ObjectMapper();
     }
 
@@ -67,7 +68,8 @@ class SchemaFetcherTest {
 
     @Test
     void getRepositorySchemasTest() throws Exception {
-        when(passClientMock.getObject(Mockito.any(), Mockito.anyLong())).thenReturn(repositoryMock1);
+        when(refreshableElideMocked.getDataStoreTransactionMock().loadObject(any(), anyLong(), any()))
+                .thenReturn(repositoryMock1);
 
         List<URI> r1_schemas_list = Arrays.asList(new URI("https://example.com/metadata-schemas/jhu/schema1.json"),
                 new URI("https://example.com/metadata-schemas/jhu/schema2.json"));
@@ -103,8 +105,10 @@ class SchemaFetcherTest {
     void getSchemasTest() throws Exception {
         List<String> repositoryIds = new ArrayList<>(Arrays.asList("1", "2"));
 
-        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
-        when(passClientMock.getObject(Repository.class, 2L)).thenReturn(repositoryMock2);
+        when(refreshableElideMocked.getDataStoreTransactionMock().loadObject(any(), eq(1L), any()))
+                .thenReturn(repositoryMock1);
+        when(refreshableElideMocked.getDataStoreTransactionMock().loadObject(any(), eq(2L), any()))
+                .thenReturn(repositoryMock2);
 
         List<URI> r1_schemas_list = Arrays.asList(new URI("https://example.com/metadata-schemas/jhu/schema1.json"),
                 new URI("https://example.com/metadata-schemas/jhu/schema2.json"));
@@ -141,11 +145,12 @@ class SchemaFetcherTest {
 
     @Test
     void invalidSchemaUriTest() throws Exception {
-        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
+        when(refreshableElideMocked.getDataStoreTransactionMock().loadObject(any(), eq(1L), Mockito.any()))
+                .thenReturn(repositoryMock1);
         List<URI> r1_schemas_list = Arrays.asList(new URI("https://example.com/metadata-schemas/jhu/invalidschema.json"),
                 new URI("https://example.com/metadata-schemas/jhu/schema2.json"));
         when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
-        Exception ex = assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(IllegalArgumentException.class, () ->
                 schemaFetcher.getRepositorySchemas("repository1"));
     }
 

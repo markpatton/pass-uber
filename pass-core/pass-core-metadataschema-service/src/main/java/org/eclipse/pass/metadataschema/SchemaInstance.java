@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @see SchemaFetcher
  */
 public class SchemaInstance implements Comparable<SchemaInstance> {
-    private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SchemaInstance.class);
 
     private final JsonNode schema;
     private final HashMap<String, String> deps = new HashMap<>();
@@ -150,7 +150,7 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
      *
      * @param node the node that is being searched for references
      */
-    public void dereference(JsonNode node) {
+    public void dereference(JsonNode node, SchemaFetcher schemaFetcher) {
         //collect all $refs in a hashmap in the schema and the xPath to the $ref
         HashMap<String, String> allRefs = new HashMap<>();
         getRefAndPointerToObject("", allRefs, node);
@@ -173,7 +173,7 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
             } else { //external reference
                 JsonNode ext_schema = null;
                 try {
-                    ext_schema = SchemaFetcher.getLocalSchema("/" + schema_dir + "/" + refParts[0]);
+                    ext_schema = schemaFetcher.getLocalSchema("/" + schema_dir + "/" + refParts[0]);
                 } catch (IllegalArgumentException e) {
                     LOG.error("Invalid Schema URI", e);
                 } catch (IOException e) {

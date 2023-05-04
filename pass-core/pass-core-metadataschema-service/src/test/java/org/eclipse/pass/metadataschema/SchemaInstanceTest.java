@@ -24,8 +24,10 @@ import java.util.Collections;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yahoo.elide.RefreshableElide;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class SchemaInstanceTest {
 
@@ -131,7 +133,8 @@ class SchemaInstanceTest {
 
         SchemaInstance testSchema = new SchemaInstance(map.readTree(example_schema_json));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expected));
-        testSchema.dereference(testSchema.getSchema());
+        SchemaFetcher schemaFetcher = new SchemaFetcher(Mockito.mock(RefreshableElide.class));
+        testSchema.dereference(testSchema.getSchema(), schemaFetcher);
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
@@ -145,7 +148,8 @@ class SchemaInstanceTest {
 
         SchemaInstance testSchema = new SchemaInstance(map.readTree(schemaDerefTest));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expectedDeref));
-        testSchema.dereference(testSchema.getSchema());
+        SchemaFetcher schemaFetcher = new SchemaFetcher(Mockito.mock(RefreshableElide.class));
+        testSchema.dereference(testSchema.getSchema(), schemaFetcher);
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
@@ -159,7 +163,8 @@ class SchemaInstanceTest {
 
         SchemaInstance testSchema = new SchemaInstance(map.readTree(schemaDerefTest));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(expectedDeref));
-        testSchema.dereference(testSchema.getSchema());
+        SchemaFetcher schemaFetcher = new SchemaFetcher(Mockito.mock(RefreshableElide.class));
+        testSchema.dereference(testSchema.getSchema(), schemaFetcher);
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
@@ -173,7 +178,8 @@ class SchemaInstanceTest {
 
         SchemaInstance testSchema = new SchemaInstance(map.readTree(jscholarSchemaJson));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(jscholarExpected));
-        testSchema.dereference(testSchema.getSchema());
+        SchemaFetcher schemaFetcher = new SchemaFetcher(Mockito.mock(RefreshableElide.class));
+        testSchema.dereference(testSchema.getSchema(), schemaFetcher);
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 
@@ -187,7 +193,8 @@ class SchemaInstanceTest {
 
         SchemaInstance testSchema = new SchemaInstance(map.readTree(jscholarSchemaJson));
         SchemaInstance expectedSchema = new SchemaInstance(map.readTree(jscholarExpected));
-        testSchema.dereference(testSchema.getSchema());
+        SchemaFetcher schemaFetcher = new SchemaFetcher(Mockito.mock(RefreshableElide.class));
+        testSchema.dereference(testSchema.getSchema(), schemaFetcher);
         assertEquals(expectedSchema.getSchema(), testSchema.getSchema());
     }
 

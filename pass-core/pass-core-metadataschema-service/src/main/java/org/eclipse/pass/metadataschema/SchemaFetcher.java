@@ -23,14 +23,17 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yahoo.elide.RefreshableElide;
 import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.model.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Fetches the schemas from a list of repository URIs and creates a corresponding list of SchemaInstance objects.
@@ -42,19 +45,19 @@ import org.slf4j.LoggerFactory;
  *
  * @see SchemaInstance
  */
+@Component
 public class SchemaFetcher {
-
-    private final PassClient passClient;
     private static final Logger LOG = LoggerFactory.getLogger(SchemaFetcher.class);
-    private static final ConcurrentHashMap<String, JsonNode> localSchemaCache = new ConcurrentHashMap<>();
+
+    private final RefreshableElide refreshableElide;
+    private final ConcurrentHashMap<String, JsonNode> localSchemaCache = new ConcurrentHashMap<>();
 
     /**
      * Constructor for SchemaFetcher
-     *
-     * @param client PassClient session to use for interfacing with the PASS repository.
+     * @param refreshableElide A refreshable Elide instance
      */
-    public SchemaFetcher(PassClient client) {
-        this.passClient = client;
+    public SchemaFetcher(RefreshableElide refreshableElide) {
+        this.refreshableElide = refreshableElide;
     }
 
     /**
@@ -88,7 +91,7 @@ public class SchemaFetcher {
         // dereference each of the schemas - only perform after ordering dependencies
         for (JsonNode schema : schemas) {
             SchemaInstance s = new SchemaInstance(schema);
-            s.dereference(s.getSchema());
+            s.dereference(s.getSchema(), this);
             schema_instances.add(s);
         }
 
@@ -112,18 +115,16 @@ public class SchemaFetcher {
      * @throws IOException if the repository cannot be found.
      */
     public List<JsonNode> getRepositorySchemas(String entityId) throws IOException {
-        Repository repo;
         List<JsonNode> repository_schemas = new ArrayList<>();
-        try {
-            repo = passClient.getObject(Repository.class, Long.parseLong(entityId));
-
+        try (PassClient passClient = PassClient.newInstance(refreshableElide)) {
+            Repository repo = passClient.getObject(Repository.class, Long.parseLong(entityId));
+            if (Objects.isNull(repo)) {
+                throw new IOException("Repository not found at ID: " + entityId);
+            }
             List<URI> schema_uris = repo.getSchemas();
             for (URI schema_uri : schema_uris) {
                 repository_schemas.add(getSchemaFromUri(schema_uri));
             }
-        } catch (NullPointerException e) {
-            LOG.error("Repository not found at ID: " + entityId, e);
-            throw new IOException("Repository not found at ID: " + entityId);
         }
         return repository_schemas;
     }
@@ -135,7 +136,7 @@ public class SchemaFetcher {
      * @return SchemaInstance schema at URI
      * @throws IOException if the schema cannot be fetched
      */
-    public static JsonNode getSchemaFromUri(URI schemaUri) throws IOException {
+    public JsonNode getSchemaFromUri(URI schemaUri) throws IOException {
         // Given the schema's $id url, go to the corresponding local json file
         // by loading it as a resource stream based on the last 2 parts of the $id
         // Create a SchemaInstance object from the json file and return it
@@ -153,7 +154,7 @@ public class SchemaFetcher {
      * @return the local schema
      * @throws IOException if the schema cannot be found or is corrupted
      */
-    public static JsonNode getLocalSchema(String path) throws IOException {
+    public JsonNode getLocalSchema(String path) throws IOException {
         ObjectMapper objmapper = new ObjectMapper();
         if (localSchemaCache.containsKey(path)) {
             JsonNode cacheSchema = localSchemaCache.get(path);

@@ -18,7 +18,9 @@ package org.eclipse.pass.metadataschema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.eclipse.pass.metadataschema.SchemaTestUtils.RefreshableElideMocked;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -27,7 +29,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.model.Repository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ import org.mockito.Mockito;
 
 class SchemaServiceTest {
 
-    private PassClient passClientMock;
+    private RefreshableElideMocked refreshableElideMocked;
     private Repository repositoryMock1;
     private Repository repositoryMock2;
     private SchemaService schemaService;
@@ -43,10 +44,11 @@ class SchemaServiceTest {
 
     @BeforeEach
     void setup() {
-        passClientMock = Mockito.mock(PassClient.class);
         repositoryMock1 = Mockito.mock(Repository.class);
         repositoryMock2 = Mockito.mock(Repository.class);
-        schemaService = new SchemaService(passClientMock);
+        refreshableElideMocked = SchemaTestUtils.getMockedRefreshableElide();
+        SchemaFetcher schemaFetcher = new SchemaFetcher(refreshableElideMocked.getRefreshableElideMock());
+        schemaService = new SchemaService(schemaFetcher);
         map = new ObjectMapper();
     }
 
@@ -225,8 +227,10 @@ class SchemaServiceTest {
     @Test
     void getMergedSchemaTest() throws Exception {
         List<String> repositoryIds = Arrays.asList("1", "2");
-        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
-        when(passClientMock.getObject(Repository.class, 2L)).thenReturn(repositoryMock2);
+        when(refreshableElideMocked.getDataStoreTransactionMock().loadObject(any(), eq(1L), any()))
+                .thenReturn(repositoryMock1);
+        when(refreshableElideMocked.getDataStoreTransactionMock().loadObject(any(), eq(2L), any()))
+                .thenReturn(repositoryMock2);
 
         List<URI> r1_schemas_list = Arrays.asList(new URI("https://example.com/metadata-schemas/jhu/schema1.json"),
                 new URI("https://example.com/metadata-schemas/jhu/schema2.json"),
@@ -249,10 +253,11 @@ class SchemaServiceTest {
 
     @Test
     void getMergeJscholarSchemaTest() throws Exception {
-        List<String> repositoryIds = Arrays.asList("1");
-        when(passClientMock.getObject(Repository.class, 1L)).thenReturn(repositoryMock1);
+        List<String> repositoryIds = List.of("1");
+        when(refreshableElideMocked.getDataStoreTransactionMock().loadObject(any(), eq(1L), any()))
+                .thenReturn(repositoryMock1);
 
-        List<URI> r1_schemas_list = Arrays.asList(new URI("https://example.com/metadata-schemas/jhu/jscholarship.json"));
+        List<URI> r1_schemas_list = List.of(new URI("https://example.com/metadata-schemas/jhu/jscholarship.json"));
 
         when(repositoryMock1.getSchemas()).thenReturn(r1_schemas_list);
 

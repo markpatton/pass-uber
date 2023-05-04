@@ -28,32 +28,24 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.eclipse.pass.object.PassClient;
+import org.springframework.stereotype.Service;
 
 /**
  * The SchemaService class handles the business logic of the metadata schema
  * service. It can be used to get a merged schema composed of all the schemas
  * relevant to the repositories that a PASS submission must be published to.
  */
+@Service
 public class SchemaService {
 
-    private PassClient passClient;
-    private SchemaFetcher schemaFetcher;
+    private final SchemaFetcher schemaFetcher;
 
     /**
-     * SchemaService constructor
+     * Constructor for SchemaService
+     * @param schemaFetcher the component responsible for reading schemas
      */
-    public SchemaService() {
-    }
-
-    /**
-     * SchemaService constructor used in unit tests for inserting a mock client
-     * @param client PassClient for the SchemaService to use
-     */
-    public SchemaService(PassClient client) {
-        this.passClient = client;
-        schemaFetcher = new SchemaFetcher(passClient);
-
+    public SchemaService(SchemaFetcher schemaFetcher) {
+        this.schemaFetcher = schemaFetcher;
     }
 
     /**
@@ -67,22 +59,13 @@ public class SchemaService {
      * @throws IOException, if the schemas cannot be fetched
      */
     JsonNode getMergedSchema(List<String> repository_list) throws MergeFailException, IOException {
-
-        // Create a SchemaFetcher instance to get the schemas from the repository URIs
-        List<JsonNode> repository_schemas;
-        repository_schemas = schemaFetcher.getSchemas(repository_list);
-        JsonNode mergedSchema;
-        mergedSchema = mergeSchemas(repository_schemas);
-
-        return mergedSchema;
+        List<JsonNode> repository_schemas = schemaFetcher.getSchemas(repository_list);
+        return mergeSchemas(repository_schemas);
     }
 
     List<JsonNode> getIndividualSchemas(List<String> repository_list)
             throws IllegalArgumentException, URISyntaxException, IOException {
-        SchemaFetcher f = new SchemaFetcher(passClient);
-        List<JsonNode> repository_schemas;
-        repository_schemas = f.getSchemas(repository_list);
-        return repository_schemas;
+        return schemaFetcher.getSchemas(repository_list);
     }
 
     /**

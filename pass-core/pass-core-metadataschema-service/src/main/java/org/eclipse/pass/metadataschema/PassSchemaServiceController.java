@@ -27,11 +27,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.yahoo.elide.RefreshableElide;
-import org.eclipse.pass.object.PassClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,28 +47,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PassSchemaServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassSchemaServiceController.class);
-    private final PassClient passClient;
+
     private final SchemaService schemaService;
 
     /**
      * Constructor for PassSchemaServiceController
-     *
-     * @param refreshableElide Elide instance used for interfacing with the PASS data model
+     * @param schemaService the service responsible for managing schemas
      */
-    @Autowired
-    public PassSchemaServiceController(RefreshableElide refreshableElide) {
-        this.passClient = PassClient.newInstance(refreshableElide);
-        schemaService = new SchemaService(passClient);
-    }
-
-    /**
-     * This constructor is used for unit testing to inject a mock client
-     *
-     * @param passClient PassClient to use for unit testing
-     */
-    protected PassSchemaServiceController(PassClient passClient) {
-        this.passClient = passClient;
-        schemaService = new SchemaService(passClient);
+    public PassSchemaServiceController(SchemaService schemaService) {
+        this.schemaService = schemaService;
     }
 
     /**
