@@ -34,7 +34,6 @@ public class UserServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceController.class);
 
     private final TokenFactory token_factory;
-
     private final RefreshableElide refreshableElide;
 
     /**
