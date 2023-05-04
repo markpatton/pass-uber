@@ -57,6 +57,7 @@
     <module>pass-core-main</module>
     <module>pass-core-metadataschema-service</module>
     <module>pass-core-policy-service</module>
+    <module>pass-core-usertoken</module>
   </modules>
 
   <scm>
@@ -81,6 +82,7 @@
     <s3mock.version>0.2.6</s3mock.version>
     <jsoup.version>1.15.3</jsoup.version>
     <mockito.core.version>4.8.1</mockito.core.version>
+    <commons.codec.version>1.13</commons.codec.version>
   </properties>
 
   <dependencyManagement>
