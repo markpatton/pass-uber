@@ -16,7 +16,8 @@
 package org.eclipse.pass.object.model;
 
 /**
- * PMC route options. Full documentation here: https://publicaccess.nih.gov/submit_process.htm
+ * PMC route options. Full documentation here:
+ * <a href="https://publicaccess.nih.gov/submit_process.htm">Submit Process</a>
  *
  * @author Karen Hanson
  */

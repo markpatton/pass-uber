@@ -19,7 +19,7 @@ import org.eclipse.pass.object.model.PassEntity;
 
 /**
  * PassClientSelector is used to select objects in the repository.
- * See https://elide.io/pages/guide/v6/10-jsonapi.html for information on the
+ * See <a href="https://elide.io/pages/guide/v6/10-jsonapi.html">Elide JSON-API</a> for information on the
  * sort and filter syntax.
  */
 public class PassClientSelector<T extends PassEntity> {

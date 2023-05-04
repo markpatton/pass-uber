@@ -22,9 +22,9 @@ import javax.json.JsonObject;
 /**
  * The XrefDoiService class is an implementation of the ExternalDoiService abstract class to interface with the Crossref
  * API. The Crossref API is a RESTful API that returns JSON metadata for a given DOI.
- *
- * The Crossref API is documented here: https://api.crossref.org/
- *
+ * <p>
+ * The Crossref API is documented here: <a href="https://api.crossref.org/">Crossref API</a>
+ * <p>
  * The Crossref API requires a User-Agent header to be set on the request. The value of this header must be an email
  * address. The default email address used by is pass@jhu.edu and can be overridden by setting the environment variable
  * PASS_DOI_SERVICE_MAILTO

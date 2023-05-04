@@ -44,7 +44,7 @@ import org.eclipse.pass.object.security.WebSecurityRole;
 /**
  * PASS client which uses the HTTP verb methods of the main Elide class.
  * Hooks should be triggered and permissions will be checked.
- *
+ * <p>
  * Objects retrieved using this client may not work after the client has been closed.
  * This is because relationships are loaded lazily.
  */

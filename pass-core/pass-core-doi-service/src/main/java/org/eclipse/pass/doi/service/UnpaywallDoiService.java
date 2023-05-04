@@ -26,7 +26,7 @@ import javax.json.JsonValue;
 /**
  * The UnpaywallDoiService class is an implementation of the ExternalDoiService abstract class to interface with
  * the Unpaywall API. The Unpaywall API is a RESTful API that returns JSON metadata for a given DOI. More information
- * about the Unpaywall API can be found here: https://unpaywall.org/products/api
+ * about the Unpaywall API can be found here: <a href="https://unpaywall.org/products/api">Unpaywall API</a>
  */
 public class UnpaywallDoiService extends ExternalDoiService {
 

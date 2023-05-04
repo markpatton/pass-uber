@@ -48,10 +48,10 @@ import static org.eclipse.pass.main.security.ShibConstants.*;
  * Filter responsible for mapping a Shib user to a PASS user. The PASS user is
  * created if it does not exist and otherwise updated to reflect the information
  * provided by Shib. The PASS user name becomes the name of the Principal.
- *
+ * <p>
  * If the request does not look like it came from Shib, the mapping step is skipped.
  * In any case, the request is passed down the chain.
- *
+ * <p>
  * A cache of maximum size pass.auth.max-cache-size of recent authentications is
  * maintained. It is cleared every pass.auth.cache-duration minutes.
  */
