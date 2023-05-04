@@ -41,7 +41,7 @@ import org.eclipse.pass.object.model.PassEntity;
  * interplay between the RequestScope, PersistentResource, and
  * DataStoreTransaction. This approach means that life cycle hooks wills not be
  * called because they can only be added in PersistentResource.
- *
+ * <p>
  * Objects retrieved using this client may not work after the client has been closed.
  * This is because relationships are loaded lazily.
  */
