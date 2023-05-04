@@ -92,7 +92,6 @@ public class FileStorageService {
     private S3Client cloudS3Client;
     private String bucketName;
     private String repoPrefix;
-    private Region region;
 
     /**
      *  FileStorageService Class constructor.
@@ -164,6 +163,7 @@ public class FileStorageService {
                 throw new IOException("File Service: S3 bucket name is not set");
             }
 
+            Region region;
             if (storageProperties.getRegion().isPresent()) {
                 region = storageProperties.getRegion().get();
             } else {
