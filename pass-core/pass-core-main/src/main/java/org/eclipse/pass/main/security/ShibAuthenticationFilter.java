@@ -42,8 +42,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import static org.eclipse.pass.main.security.ShibConstants.*;
-
 /**
  * Filter responsible for mapping a Shib user to a PASS user. The PASS user is
  * created if it does not exist and otherwise updated to reflect the information
@@ -192,38 +190,38 @@ public class ShibAuthenticationFilter extends OncePerRequestFilter {
     protected static User parseShibHeaders(HttpServletRequest request) {
         User user = new User();
 
-        String display_name = get_shib_attr(request, DISPLAY_NAME_HEADER, true);
-        String given_name = get_shib_attr(request, GIVENNAME_HEADER, true);
-        String surname = get_shib_attr(request, SN_HEADER, true);
-        String email = get_shib_attr(request, EMAIL_HEADER, true);
-        String eppn = get_shib_attr(request, EPPN_HEADER, true);
-        String employee_id = get_shib_attr(request, EMPLOYEE_ID_HEADER, false);
-        String unique_id = get_shib_attr(request, UNIQUE_ID_HEADER, true);
-        String affiliation = get_shib_attr(request, SCOPED_AFFILIATION_HEADER, false);
+        String display_name = get_shib_attr(request, ShibConstants.DISPLAY_NAME_HEADER, true);
+        String given_name = get_shib_attr(request, ShibConstants.GIVENNAME_HEADER, true);
+        String surname = get_shib_attr(request, ShibConstants.SN_HEADER, true);
+        String email = get_shib_attr(request, ShibConstants.EMAIL_HEADER, true);
+        String eppn = get_shib_attr(request, ShibConstants.EPPN_HEADER, true);
+        String employee_id = get_shib_attr(request, ShibConstants.EMPLOYEE_ID_HEADER, false);
+        String unique_id = get_shib_attr(request, ShibConstants.UNIQUE_ID_HEADER, true);
+        String affiliation = get_shib_attr(request, ShibConstants.SCOPED_AFFILIATION_HEADER, false);
 
         String[] eppn_parts = eppn.split("@");
 
         if (eppn_parts.length != 2) {
-            throw new BadCredentialsException("Shib header malformed: " + EPPN_HEADER);
+            throw new BadCredentialsException("Shib header malformed: " + ShibConstants.EPPN_HEADER);
         }
 
         String domain = eppn_parts[1];
         String institutional_id = eppn_parts[0].toLowerCase();
 
         if (domain.isEmpty() || institutional_id.isEmpty()) {
-            throw new BadCredentialsException("Shib header malformed: " + EPPN_HEADER);
+            throw new BadCredentialsException("Shib header malformed: " + ShibConstants.EPPN_HEADER);
         }
 
-        unique_id = String.join(":", domain, UNIQUE_ID_TYPE, unique_id.split("@")[0]);
+        unique_id = String.join(":", domain, ShibConstants.UNIQUE_ID_TYPE, unique_id.split("@")[0]);
 
         // The locator id list has durable ids first.
         user.getLocatorIds().add(unique_id);
 
-        institutional_id = String.join(":", domain, JHED_ID_TYPE, institutional_id);
+        institutional_id = String.join(":", domain, ShibConstants.JHED_ID_TYPE, institutional_id);
         user.getLocatorIds().add(institutional_id);
 
         if (employee_id != null && !employee_id.isEmpty()) {
-            employee_id = String.join(":", domain, EMPLOYEE_ID_TYPE, employee_id);
+            employee_id = String.join(":", domain, ShibConstants.EMPLOYEE_ID_TYPE, employee_id);
             user.getLocatorIds().add(employee_id);
         }
 
@@ -250,7 +248,7 @@ public class ShibAuthenticationFilter extends OncePerRequestFilter {
      * @return whether or not this looks like a Shib request
      */
     protected static boolean isShibRequest(HttpServletRequest request) {
-        return has_all_headers(request, EPPN_HEADER, UNIQUE_ID_HEADER);
+        return has_all_headers(request, ShibConstants.EPPN_HEADER, ShibConstants.UNIQUE_ID_HEADER);
     }
 
     private static boolean has_all_headers(HttpServletRequest request, String... names) {

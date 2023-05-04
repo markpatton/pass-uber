@@ -7,14 +7,13 @@ import java.util.UUID;
 import com.yahoo.elide.RefreshableElide;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.eclipse.pass.main.security.ShibConstants;
 import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.model.User;
 import org.eclipse.pass.object.model.UserRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.eclipse.pass.main.security.ShibConstants.*;
 
 /**
  * Provide a Shib user to make requests.
@@ -84,13 +83,13 @@ public class ShibIntegrationTest extends IntegrationTest {
     }
 
     protected void setShibHeaders(Request.Builder builder) {
-        builder.addHeader(SCOPED_AFFILIATION_HEADER, SUBMITTER_SCOPED_AFFILIATION);
-        builder.addHeader(SN_HEADER, SUBMITTER_SUR_NAME);
-        builder.addHeader(GIVENNAME_HEADER, SUBMITTER_GIVEN_NAME);
-        builder.addHeader(UNIQUE_ID_HEADER, getSubmitterUniqueId());
-        builder.addHeader(EMAIL_HEADER, SUBMITTER_EMAIL);
-        builder.addHeader(EMPLOYEE_ID_HEADER, getSubmitterEmployeeId());
-        builder.addHeader(DISPLAY_NAME_HEADER, SUBMITTER_NAME);
-        builder.addHeader(EPPN_HEADER, getSubmitterEppn());
+        builder.addHeader(ShibConstants.SCOPED_AFFILIATION_HEADER, SUBMITTER_SCOPED_AFFILIATION);
+        builder.addHeader(ShibConstants.SN_HEADER, SUBMITTER_SUR_NAME);
+        builder.addHeader(ShibConstants.GIVENNAME_HEADER, SUBMITTER_GIVEN_NAME);
+        builder.addHeader(ShibConstants.UNIQUE_ID_HEADER, getSubmitterUniqueId());
+        builder.addHeader(ShibConstants.EMAIL_HEADER, SUBMITTER_EMAIL);
+        builder.addHeader(ShibConstants.EMPLOYEE_ID_HEADER, getSubmitterEmployeeId());
+        builder.addHeader(ShibConstants.DISPLAY_NAME_HEADER, SUBMITTER_NAME);
+        builder.addHeader(ShibConstants.EPPN_HEADER, getSubmitterEppn());
     }
 }

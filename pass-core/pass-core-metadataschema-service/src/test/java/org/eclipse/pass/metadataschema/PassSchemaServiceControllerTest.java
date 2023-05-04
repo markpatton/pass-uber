@@ -16,10 +16,12 @@
  */
 package org.eclipse.pass.metadataschema;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.eclipse.pass.metadataschema.SchemaTestUtils.RefreshableElideMocked;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -38,7 +40,6 @@ import org.eclipse.pass.object.model.Repository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 
 class PassSchemaServiceControllerTest {
@@ -51,8 +52,8 @@ class PassSchemaServiceControllerTest {
 
     @BeforeEach
     void setup() {
-        repositoryMock1 = Mockito.mock(Repository.class);
-        repositoryMock2 = Mockito.mock(Repository.class);
+        repositoryMock1 = mock(Repository.class);
+        repositoryMock2 = mock(Repository.class);
         refreshableElideMocked = SchemaTestUtils.getMockedRefreshableElide();
         SchemaFetcher schemaFetcher = new SchemaFetcher(refreshableElideMocked.getRefreshableElideMock());
         SchemaService schemaService = new SchemaService(schemaFetcher);

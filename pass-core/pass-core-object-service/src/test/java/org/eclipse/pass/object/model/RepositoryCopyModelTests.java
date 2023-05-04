@@ -18,7 +18,8 @@ package org.eclipse.pass.object.model;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createPublication;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createRepository;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createRepositoryCopy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;

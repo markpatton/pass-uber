@@ -15,6 +15,13 @@
  */
 package org.eclipse.pass.main.security;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.IOException;
 
 import okhttp3.Credentials;
@@ -33,9 +40,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.BadCredentialsException;
-
-import static org.eclipse.pass.main.security.ShibConstants.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Ensure that HTTP requests are authenticated and authorized appropriately.
@@ -159,14 +163,14 @@ public class AccessControlTest extends ShibIntegrationTest {
     public void testParseShibHeaders() {
         MockHttpServletRequest req = new MockHttpServletRequest();
 
-        req.addHeader(SCOPED_AFFILIATION_HEADER, SUBMITTER_SCOPED_AFFILIATION);
-        req.addHeader(SN_HEADER, SUBMITTER_SUR_NAME);
-        req.addHeader(GIVENNAME_HEADER, SUBMITTER_GIVEN_NAME);
-        req.addHeader(UNIQUE_ID_HEADER, getSubmitterUniqueId());
-        req.addHeader(EMAIL_HEADER, SUBMITTER_EMAIL);
-        req.addHeader(EMPLOYEE_ID_HEADER, getSubmitterEmployeeId());
-        req.addHeader(DISPLAY_NAME_HEADER, SUBMITTER_NAME);
-        req.addHeader(EPPN_HEADER, getSubmitterEppn());
+        req.addHeader(ShibConstants.SCOPED_AFFILIATION_HEADER, SUBMITTER_SCOPED_AFFILIATION);
+        req.addHeader(ShibConstants.SN_HEADER, SUBMITTER_SUR_NAME);
+        req.addHeader(ShibConstants.GIVENNAME_HEADER, SUBMITTER_GIVEN_NAME);
+        req.addHeader(ShibConstants.UNIQUE_ID_HEADER, getSubmitterUniqueId());
+        req.addHeader(ShibConstants.EMAIL_HEADER, SUBMITTER_EMAIL);
+        req.addHeader(ShibConstants.EMPLOYEE_ID_HEADER, getSubmitterEmployeeId());
+        req.addHeader(ShibConstants.DISPLAY_NAME_HEADER, SUBMITTER_NAME);
+        req.addHeader(ShibConstants.EPPN_HEADER, getSubmitterEppn());
 
         assertTrue(ShibAuthenticationFilter.isShibRequest(req));
 
@@ -188,8 +192,8 @@ public class AccessControlTest extends ShibIntegrationTest {
 
         // Enough headers to look like a request
 
-        req.addHeader(UNIQUE_ID_HEADER, getSubmitterUniqueId());
-        req.addHeader(EPPN_HEADER, getSubmitterEppn());
+        req.addHeader(ShibConstants.UNIQUE_ID_HEADER, getSubmitterUniqueId());
+        req.addHeader(ShibConstants.EPPN_HEADER, getSubmitterEppn());
 
         assertTrue(ShibAuthenticationFilter.isShibRequest(req));
         assertThrows(BadCredentialsException.class, () -> ShibAuthenticationFilter.parseShibHeaders(req));

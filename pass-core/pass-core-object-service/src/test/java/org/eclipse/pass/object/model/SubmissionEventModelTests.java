@@ -17,7 +17,8 @@ package org.eclipse.pass.object.model;
 
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createSubmission;
 import static org.eclipse.pass.object.model.support.TestObjectCreator.createUser;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.net.URI;
 import java.time.ZonedDateTime;

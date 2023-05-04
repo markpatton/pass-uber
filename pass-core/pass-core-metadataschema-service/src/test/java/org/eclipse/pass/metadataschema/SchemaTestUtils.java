@@ -1,5 +1,10 @@
 package org.eclipse.pass.metadataschema;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Set;
+
 import com.yahoo.elide.Elide;
 import com.yahoo.elide.ElideSettings;
 import com.yahoo.elide.RefreshableElide;
@@ -7,12 +12,9 @@ import com.yahoo.elide.core.datastore.DataStore;
 import com.yahoo.elide.core.datastore.DataStoreTransaction;
 import com.yahoo.elide.core.dictionary.EntityDictionary;
 
-import java.util.Set;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public final class SchemaTestUtils {
+
+    private SchemaTestUtils() {}
 
     /**
      * Returns a RefreshableElideMocked object. The RefreshableElideMocked object contains
