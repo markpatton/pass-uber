@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Johns Hopkins University
+ * Copyright 2023 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.eclipse.pass.support.grant.data;
 
 import static org.eclipse.pass.support.grant.data.DirectoryServiceUtil.DIRECTORY_SERVICE_BASE_URL;
@@ -32,15 +31,15 @@ import org.junit.Test;
 /**
  * This is a test class for a simple directory lookup service running at the endpoint specified by "serviceUrl" below
  * the service type completes the URL, and the client id and client secret are supplied as headers.
- *
+ * <p>
  * values for serviceUrl, clientId and clientSecret, must be supplied below.
- *
+ * <p>
  * This test has been run against the running service with valid parameters and arguments supplied to the methods -
  * this class has been
  * cleaned up after successful testing. because of the simplicity and isolation of this class, it does not need to be
  * tested
  * every build - just when something about the service changes. so we ignore it for now.
- *
+ * <p>
  * To test, provide real connection parameter values, and a real kopkins id / employee id pair
  *
  * @author jrm

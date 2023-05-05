@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Johns Hopkins University
+ * Copyright 2023 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.eclipse.pass.support.client.model.User;
  * A utility class for handling Grants, Users or Funders. One function performed is comparison of two instances of
  * these PASS entity classes. These comparisons are reduced to only those fields which are updatable by
  * data from COEUS, so that two objects are considered "COEUS equal" iff they agree on these fields.
- *
+ * <p>
  * Another function performed by this utility class is to construct an updated version of an instance of one of these
  * classes
  * by merging a (possibly) existing Pass object with new information obtained from a COEUS data pull.

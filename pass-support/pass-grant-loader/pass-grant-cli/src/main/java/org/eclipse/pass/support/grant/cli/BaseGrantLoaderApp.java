@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Johns Hopkins University
+ * Copyright 2023 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.eclipse.pass.support.grant.cli;
 
 import static java.lang.String.format;
@@ -65,8 +64,7 @@ import org.slf4j.LoggerFactory;
  * of the grants or users updated since the timestamp at the end of the updated timestamps file;
  * use the PassLoader to take {@code List} representing the {@code ResultSet} to push this data into our PASS instance
  * via the java pass client.
- *
- *
+ * <p>
  * A large percentage of the code here is handling exceptional paths, as this is intended to be run in an automated
  * fashion, so care must be taken to log errors, report them to STDOUT, and also send email notifications.
  *
