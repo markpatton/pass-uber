@@ -15,9 +15,10 @@
  */
 package org.eclipse.pass.support.grant.data;
 
-import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.time.ZonedDateTime;
 
 /**
  * Test class for static utility methods
@@ -86,32 +87,32 @@ public class DateTimeUtilTest {
      * correct output
      */
     @Test
-    public void testCreateJodaDateTime() {
+    public void testCreateZonedDateTime() {
         String timestamp = "2018-01-30 23:59:58.0";
-        DateTime dateTime = DateTimeUtil.createJodaDateTime(timestamp);
+        ZonedDateTime dateTime = DateTimeUtil.createZonedDateTime(timestamp);
         Assert.assertNotNull(dateTime);
 
         Assert.assertEquals(2018, dateTime.getYear());
-        Assert.assertEquals(1, dateTime.getMonthOfYear());
+        Assert.assertEquals(1, dateTime.getMonthValue());
         Assert.assertEquals(30, dateTime.getDayOfMonth());
 
-        Assert.assertEquals(23, dateTime.getHourOfDay());
-        Assert.assertEquals(59, dateTime.getMinuteOfHour());
-        Assert.assertEquals(58, dateTime.getSecondOfMinute());
+        Assert.assertEquals(23, dateTime.getHour());
+        Assert.assertEquals(59, dateTime.getMinute());
+        Assert.assertEquals(58, dateTime.getSecond());
 
-        Assert.assertEquals(0, dateTime.getMillisOfSecond());
+        Assert.assertEquals(0, dateTime.getNano());
 
         String date = "01/30/2018";
-        dateTime = DateTimeUtil.createJodaDateTime(date);
+        dateTime = DateTimeUtil.createZonedDateTime(date);
         Assert.assertEquals(2018, dateTime.getYear());
-        Assert.assertEquals(1, dateTime.getMonthOfYear());
+        Assert.assertEquals(1, dateTime.getMonthValue());
         Assert.assertEquals(30, dateTime.getDayOfMonth());
 
-        Assert.assertEquals(0, dateTime.getHourOfDay());
-        Assert.assertEquals(0, dateTime.getMinuteOfHour());
-        Assert.assertEquals(0, dateTime.getSecondOfMinute());
+        Assert.assertEquals(0, dateTime.getHour());
+        Assert.assertEquals(0, dateTime.getMinute());
+        Assert.assertEquals(0, dateTime.getSecond());
 
-        Assert.assertEquals(0, dateTime.getMillisOfSecond());
+        Assert.assertEquals(0, dateTime.getNano());
     }
 
     /**

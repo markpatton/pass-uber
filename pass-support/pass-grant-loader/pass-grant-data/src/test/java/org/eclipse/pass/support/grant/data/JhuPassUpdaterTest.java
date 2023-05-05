@@ -180,9 +180,9 @@ public class JhuPassUpdaterTest {
         assertEquals(awardNumber, grant.getAwardNumber());
         assertEquals(Grant.AwardStatus.ACTIVE, grant.getAwardStatus());
         assertEquals("johnshopkins.edu:grant:8675309", grant.getLocalKey());
-        assertEquals(DateTimeUtil.createJodaDateTime(awardDate), grant.getAwardDate());
-        assertEquals(DateTimeUtil.createJodaDateTime(startDate), grant.getStartDate());
-        assertEquals(DateTimeUtil.createJodaDateTime(endDate), grant.getEndDate());
+        assertEquals(DateTimeUtil.createZonedDateTime(awardDate), grant.getAwardDate());
+        assertEquals(DateTimeUtil.createZonedDateTime(startDate), grant.getStartDate());
+        assertEquals(DateTimeUtil.createZonedDateTime(endDate), grant.getEndDate());
         assertEquals(projectName, grant.getProjectName());
 
         assertEquals("johnshopkins.edu:grant:8675309", grant.getLocalKey());

@@ -18,14 +18,13 @@ package org.eclipse.pass.support.grant.data;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 /**
- * This utility class provides static methods for intermunging Joda DateTime objects and timestamp strings
+ * This utility class provides static methods for intermunging ZonedDateTime objects and timestamp strings
  */
 public class DateTimeUtil {
     private DateTimeUtil () {
@@ -33,15 +32,15 @@ public class DateTimeUtil {
     }
 
     /**
-     * A method to convert a timestamp string from our database to a Joda DateTime object
+     * A method to convert a timestamp string from our database to a ZonedDateTime object
      *
      * @param dateString the timestamp string
      * @return the corresponding DataTime object
      */
-    public static DateTime createJodaDateTime(String dateString) {
+    public static ZonedDateTime createZonedDateTime(String dateString) {
 
         if (dateString != null) {
-            DateTime dateTime = null;
+            ZonedDateTime dateTime = null;
 
             String[] parts = dateString.split(" ");
 
@@ -60,14 +59,14 @@ public class DateTimeUtil {
                     String[] secondParts = timeParts[2].split("\\.");
                     int second = Integer.parseInt(secondParts[0]);
                     int millisecond = Integer.parseInt(secondParts[1]);//seems to be always 0 in our data
-                    dateTime = new DateTime(year, month, day, hour, minute, second, millisecond, DateTimeZone.UTC);
+                    dateTime = ZonedDateTime.of(year, month, day, hour, minute, second, millisecond, ZoneId.of("UTC"));
                 }
             } else if (verifyDate(dateString)) { //we may have just a date - date format is mm/day/year
                 parts = dateString.split("/");
                 int month = Integer.parseInt(parts[0]);
                 int day = Integer.parseInt(parts[1]);
                 int year = Integer.parseInt(parts[2]);
-                dateTime = new DateTime(year, month, day, 0, 0, DateTimeZone.UTC);
+                dateTime = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, ZoneId.of("UTC"));;
             }
             return dateTime;
         } else {

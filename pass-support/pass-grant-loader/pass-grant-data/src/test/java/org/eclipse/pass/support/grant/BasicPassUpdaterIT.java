@@ -36,7 +36,7 @@ import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_EMPLOYE
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_FIRST_NAME;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_LAST_NAME;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_MIDDLE_NAME;
-import static org.eclipse.pass.support.grant.data.DateTimeUtil.createJodaDateTime;
+import static org.eclipse.pass.support.grant.data.DateTimeUtil.createZonedDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -247,9 +247,9 @@ public class BasicPassUpdaterIT {
             String grantIdPrefix = DOMAIN + ":grant:";
             grant.setLocalKey(grantIdPrefix + C_GRANT_LOCAL_KEY + i);
             grant.setProjectName(C_GRANT_PROJECT_NAME + i);
-            grant.setAwardDate(createJodaDateTime("01/01/2000"));
-            grant.setStartDate(createJodaDateTime("01/01/2001"));
-            grant.setEndDate(createJodaDateTime("01/01/2002"));
+            grant.setAwardDate(createZonedDateTime("01/01/2000"));
+            grant.setStartDate(createZonedDateTime("01/01/2001"));
+            grant.setEndDate(createZonedDateTime("01/01/2002"));
 
             URI passGrantUri = passClient.findByAttribute(Grant.class, "localKey", grant.getLocalKey());
             Grant passGrant = passClient.readResource(passGrantUri, Grant.class);
@@ -259,8 +259,8 @@ public class BasicPassUpdaterIT {
             assertEquals(grant.getLocalKey(), passGrant.getLocalKey());
             if (i == 1) {
                 assertEquals(grant.getProjectName() + "MOO", passGrant.getProjectName());
-                assertEquals(createJodaDateTime("01/01/1999"), passGrant.getStartDate());
-                assertEquals(createJodaDateTime("01/01/1999"), passGrant.getStartDate());
+                assertEquals(createZonedDateTime("01/01/1999"), passGrant.getStartDate());
+                assertEquals(createZonedDateTime("01/01/1999"), passGrant.getStartDate());
             } else {
                 assertEquals(grant.getProjectName(), passGrant.getProjectName());
                 assertEquals(grant.getAwardDate(), passGrant.getAwardDate());

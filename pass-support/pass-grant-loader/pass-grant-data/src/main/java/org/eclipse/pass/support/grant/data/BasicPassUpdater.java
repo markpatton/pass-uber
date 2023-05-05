@@ -16,6 +16,7 @@
 package org.eclipse.pass.support.grant.data;
 
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,7 +29,6 @@ import org.eclipse.pass.support.client.model.Funder;
 import org.eclipse.pass.support.client.model.Grant;
 import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.support.client.model.UserRole;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,11 +147,11 @@ public class BasicPassUpdater implements PassUpdater {
 
                 grant.setLocalKey(grantLocalKey);
                 grant.setProjectName(rowMap.get(CoeusFieldNames.C_GRANT_PROJECT_NAME));
-                grant.setAwardDate(DateTimeUtil.createJodaDateTime(
+                grant.setAwardDate(DateTimeUtil.createZonedDateTime(
                         rowMap.getOrDefault(CoeusFieldNames.C_GRANT_AWARD_DATE, null)));
-                grant.setStartDate(DateTimeUtil.createJodaDateTime(
+                grant.setStartDate(DateTimeUtil.createZonedDateTime(
                         rowMap.getOrDefault(CoeusFieldNames.C_GRANT_START_DATE, null)));
-                grant.setEndDate(DateTimeUtil.createJodaDateTime(
+                grant.setEndDate(DateTimeUtil.createZonedDateTime(
                         rowMap.getOrDefault(CoeusFieldNames.C_GRANT_END_DATE, null)));
 
                 //process direct funder, and primary funder if we have one
@@ -475,8 +475,8 @@ public class BasicPassUpdater implements PassUpdater {
      * @return the later of the two parameters
      */
     static String returnLaterUpdate(String currentUpdateString, String latestUpdateString) {
-        DateTime grantUpdateTime = DateTimeUtil.createJodaDateTime(currentUpdateString);
-        DateTime previousLatestUpdateTime = DateTimeUtil.createJodaDateTime(latestUpdateString);
+        ZonedDateTime grantUpdateTime = DateTimeUtil.createZonedDateTime(currentUpdateString);
+        ZonedDateTime previousLatestUpdateTime = DateTimeUtil.createZonedDateTime(latestUpdateString);
         return grantUpdateTime.isAfter(previousLatestUpdateTime) ? currentUpdateString : latestUpdateString;
     }
 

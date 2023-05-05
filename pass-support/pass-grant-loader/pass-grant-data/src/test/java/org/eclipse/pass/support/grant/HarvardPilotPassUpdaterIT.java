@@ -33,7 +33,7 @@ import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_EMAIL;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_EMPLOYEE_ID;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_FIRST_NAME;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_LAST_NAME;
-import static org.eclipse.pass.support.grant.data.DateTimeUtil.createJodaDateTime;
+import static org.eclipse.pass.support.grant.data.DateTimeUtil.createZonedDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -147,8 +147,8 @@ public class HarvardPilotPassUpdaterIT {
         assertEquals(Grant.AwardStatus.ACTIVE, passGrant.getAwardStatus());
         assertEquals(grantIdPrefix + grantLocalKey[0], passGrant.getLocalKey());
         assertEquals(grantProjectName[0], passGrant.getProjectName());
-        assertEquals(createJodaDateTime(grantStartDate[0]), passGrant.getStartDate());
-        assertEquals(createJodaDateTime(grantEndDate[0]), passGrant.getEndDate());
+        assertEquals(createZonedDateTime(grantStartDate[0]), passGrant.getStartDate());
+        assertEquals(createZonedDateTime(grantEndDate[0]), passGrant.getEndDate());
         assertEquals(passUser0Uri, passGrant.getPi()); //Pblic
         assertEquals(1, passGrant.getCoPis().size());
         assertEquals(passUser1Uri, passGrant.getCoPis().get(0));
@@ -188,8 +188,8 @@ public class HarvardPilotPassUpdaterIT {
         assertEquals(Grant.AwardStatus.ACTIVE, passGrant.getAwardStatus());
         assertEquals(grantIdPrefix + grantLocalKey[1], passGrant.getLocalKey());//earliest of the additions
         assertEquals(grantProjectName[1], passGrant.getProjectName());//earliest of the additions
-        assertEquals(createJodaDateTime(grantStartDate[1]), passGrant.getStartDate());//earliest of the additions
-        assertEquals(createJodaDateTime(grantEndDate[1]), passGrant.getEndDate());//earliest of the additions
+        assertEquals(createZonedDateTime(grantStartDate[1]), passGrant.getStartDate());//earliest of the additions
+        assertEquals(createZonedDateTime(grantEndDate[1]), passGrant.getEndDate());//earliest of the additions
         assertEquals(passUser0Uri, passGrant.getPi());//first one in the pull
         assertEquals(2, passGrant.getCoPis().size());
         assertTrue(passGrant.getCoPis().contains(passUser1Uri));//Public

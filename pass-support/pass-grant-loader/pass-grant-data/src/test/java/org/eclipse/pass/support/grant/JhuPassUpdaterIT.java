@@ -38,7 +38,7 @@ import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_HOPKINS
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_INSTITUTIONAL_ID;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_LAST_NAME;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_MIDDLE_NAME;
-import static org.eclipse.pass.support.grant.data.DateTimeUtil.createJodaDateTime;
+import static org.eclipse.pass.support.grant.data.DateTimeUtil.createZonedDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -118,7 +118,7 @@ public class JhuPassUpdaterIT {
      * interesting fields are the investigator fields: all CO-PIs ever on the grant should stay on the
      * co-pi field throughout iterations. If a PI is changed, they should appear on the CO-PI field
      *
-     * @throws InterruptedException from joda date time creation
+     * @throws InterruptedException from date time creation
      */
     @Test
     public void processGrantIT() throws InterruptedException {
@@ -146,9 +146,9 @@ public class JhuPassUpdaterIT {
         assertEquals(Grant.AwardStatus.ACTIVE, passGrant.getAwardStatus());
         assertEquals(grantIdPrefix + grantLocalKey[0], passGrant.getLocalKey());
         assertEquals(grantProjectName[0], passGrant.getProjectName());
-        assertEquals(createJodaDateTime(grantAwardDate[0]), passGrant.getAwardDate());
-        assertEquals(createJodaDateTime(grantStartDate[0]), passGrant.getStartDate());
-        assertEquals(createJodaDateTime(grantEndDate[0]), passGrant.getEndDate());
+        assertEquals(createZonedDateTime(grantAwardDate[0]), passGrant.getAwardDate());
+        assertEquals(createZonedDateTime(grantStartDate[0]), passGrant.getStartDate());
+        assertEquals(createZonedDateTime(grantEndDate[0]), passGrant.getEndDate());
         assertEquals(passUser0Uri, passGrant.getPi()); //Reckondwith
         assertEquals(1, passGrant.getCoPis().size());
         assertEquals(passUser1Uri, passGrant.getCoPis().get(0));
@@ -187,9 +187,9 @@ public class JhuPassUpdaterIT {
         assertEquals(Grant.AwardStatus.ACTIVE, passGrant.getAwardStatus());
         assertEquals(grantIdPrefix + grantLocalKey[0], passGrant.getLocalKey());
         assertEquals(grantProjectName[0], passGrant.getProjectName());//initial
-        assertEquals(createJodaDateTime(grantAwardDate[0]), passGrant.getAwardDate());//initial
-        assertEquals(createJodaDateTime(grantStartDate[0]), passGrant.getStartDate());//initial
-        assertEquals(createJodaDateTime(grantEndDate[2]), passGrant.getEndDate());//latest
+        assertEquals(createZonedDateTime(grantAwardDate[0]), passGrant.getAwardDate());//initial
+        assertEquals(createZonedDateTime(grantStartDate[0]), passGrant.getStartDate());//initial
+        assertEquals(createZonedDateTime(grantEndDate[2]), passGrant.getEndDate());//latest
         assertEquals(passUser1Uri, passGrant.getPi());//Class
         assertEquals(2, passGrant.getCoPis().size());
         assertTrue(passGrant.getCoPis().contains(passUser0Uri));//Reckondwith

@@ -35,9 +35,10 @@ import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_EMPLOYE
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_FIRST_NAME;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_LAST_NAME;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_MIDDLE_NAME;
-import static org.eclipse.pass.support.grant.data.DateTimeUtil.createJodaDateTime;
+import static org.eclipse.pass.support.grant.data.DateTimeUtil.createZonedDateTime;
 
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -49,7 +50,6 @@ import org.eclipse.pass.support.client.model.Funder;
 import org.eclipse.pass.support.client.model.Grant;
 import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.support.client.model.UserRole;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,9 +191,9 @@ public class DefaultPassUpdater implements PassUpdater {
             }
 
             //now do things which may depend on the date - award date is the only one that changes
-            DateTime awardDate = createJodaDateTime(rowMap.getOrDefault(C_GRANT_AWARD_DATE, null));
-            DateTime startDate = createJodaDateTime(rowMap.getOrDefault(C_GRANT_START_DATE, null));
-            DateTime endDate = createJodaDateTime(rowMap.getOrDefault(C_GRANT_END_DATE, null));
+            ZonedDateTime awardDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_AWARD_DATE, null));
+            ZonedDateTime startDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_START_DATE, null));
+            ZonedDateTime endDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_END_DATE, null));
 
             //set values that should match earliest iteration of the grant. we wet these on the system record
             //in case they are needed to update a stored grant record.
@@ -506,8 +506,8 @@ public class DefaultPassUpdater implements PassUpdater {
      * @return the later of the two parameters
      */
     static String returnLaterUpdate(String currentUpdateString, String latestUpdateString) {
-        DateTime grantUpdateTime = createJodaDateTime(currentUpdateString);
-        DateTime previousLatestUpdateTime = createJodaDateTime(latestUpdateString);
+        ZonedDateTime grantUpdateTime = createZonedDateTime(currentUpdateString);
+        ZonedDateTime previousLatestUpdateTime = createZonedDateTime(latestUpdateString);
         return grantUpdateTime.isAfter(previousLatestUpdateTime) ? currentUpdateString : latestUpdateString;
     }
 
