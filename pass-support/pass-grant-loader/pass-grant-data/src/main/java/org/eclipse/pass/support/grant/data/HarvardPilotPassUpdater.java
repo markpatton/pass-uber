@@ -43,7 +43,8 @@ public class HarvardPilotPassUpdater extends BasicPassUpdater {
         user.setFirstName(rowMap.get(CoeusFieldNames.C_USER_FIRST_NAME));
         //user.setMiddleName(rowMap.getOrDefault(C_USER_MIDDLE_NAME, null));
         user.setLastName(rowMap.get(CoeusFieldNames.C_USER_LAST_NAME));
-        user.setDisplayName(rowMap.get(CoeusFieldNames.C_USER_FIRST_NAME) + " " + rowMap.get(CoeusFieldNames.C_USER_LAST_NAME));
+        user.setDisplayName(rowMap.get(CoeusFieldNames.C_USER_FIRST_NAME) + " " +
+                rowMap.get(CoeusFieldNames.C_USER_LAST_NAME));
         String email = rowMap.get(CoeusFieldNames.C_USER_EMAIL);
         user.setEmail(email);
         //

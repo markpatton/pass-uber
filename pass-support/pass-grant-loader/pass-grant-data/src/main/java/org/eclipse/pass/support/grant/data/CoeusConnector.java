@@ -118,27 +118,31 @@ public class CoeusConnector implements GrantConnector {
                 rowMap.put(CoeusFieldNames.C_USER_LAST_NAME, rs.getString(CoeusFieldNames.C_USER_LAST_NAME));
                 rowMap.put(CoeusFieldNames.C_USER_EMAIL, rs.getString(CoeusFieldNames.C_USER_EMAIL));
                 rowMap.put(CoeusFieldNames.C_USER_EMPLOYEE_ID, rs.getString(CoeusFieldNames.C_USER_EMPLOYEE_ID));
-                rowMap.put(CoeusFieldNames.C_USER_INSTITUTIONAL_ID, rs.getString(CoeusFieldNames.C_USER_INSTITUTIONAL_ID));
+                rowMap.put(CoeusFieldNames.C_USER_INSTITUTIONAL_ID,
+                        rs.getString(CoeusFieldNames.C_USER_INSTITUTIONAL_ID));
                 rowMap.put(CoeusFieldNames.C_UPDATE_TIMESTAMP, rs.getString(CoeusFieldNames.C_UPDATE_TIMESTAMP));
                 rowMap.put(CoeusFieldNames.C_ABBREVIATED_ROLE, rs.getString(CoeusFieldNames.C_ABBREVIATED_ROLE));
 
                 String employeeId = rs.getString(CoeusFieldNames.C_USER_EMPLOYEE_ID);
                 if (employeeId != null) {
-                    rowMap.put(CoeusFieldNames.C_USER_HOPKINS_ID, directoryServiceUtil.getHopkinsIdForEmployeeId(employeeId));
+                    rowMap.put(CoeusFieldNames.C_USER_HOPKINS_ID,
+                            directoryServiceUtil.getHopkinsIdForEmployeeId(employeeId));
                 }
 
                 String primaryFunderLocalKey = rs.getString(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY);
                 rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY, primaryFunderLocalKey);
                 if (primaryFunderLocalKey != null &&
                     funderPolicyProperties.stringPropertyNames().contains(primaryFunderLocalKey)) {
-                    rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_POLICY, funderPolicyProperties.getProperty(primaryFunderLocalKey));
+                    rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_POLICY,
+                            funderPolicyProperties.getProperty(primaryFunderLocalKey));
                 }
 
                 String directFunderLocalKey = rs.getString(CoeusFieldNames.C_DIRECT_FUNDER_LOCAL_KEY);
                 rowMap.put(CoeusFieldNames.C_DIRECT_FUNDER_LOCAL_KEY, directFunderLocalKey);
                 if (directFunderLocalKey != null &&
                     funderPolicyProperties.stringPropertyNames().contains(directFunderLocalKey)) {
-                    rowMap.put(CoeusFieldNames.C_DIRECT_FUNDER_POLICY, funderPolicyProperties.getProperty(directFunderLocalKey));
+                    rowMap.put(CoeusFieldNames.C_DIRECT_FUNDER_POLICY,
+                            funderPolicyProperties.getProperty(directFunderLocalKey));
                 }
                 LOG.debug("Record processed: {}", rowMap);
                 if (!mapList.contains(rowMap)) {
@@ -166,10 +170,13 @@ public class CoeusConnector implements GrantConnector {
             ) {
                 while (rs.next()) { //these are the field names in the swift sponsor view
                     Map<String, String> rowMap = new HashMap<>();
-                    rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY, rs.getString(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY));
-                    rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_NAME, rs.getString(CoeusFieldNames.C_PRIMARY_FUNDER_NAME));
+                    rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY,
+                            rs.getString(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY));
+                    rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_NAME,
+                            rs.getString(CoeusFieldNames.C_PRIMARY_FUNDER_NAME));
                     rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_POLICY,
-                               funderPolicyProperties.getProperty(rs.getString(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY)));
+                               funderPolicyProperties.getProperty(
+                                       rs.getString(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY)));
                     mapList.add(rowMap);
                 }
 
@@ -180,7 +187,8 @@ public class CoeusConnector implements GrantConnector {
             for (Object localKey : funderPolicyProperties.keySet()) {
                 Map<String, String> rowMap = new HashMap<>();
                 rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY, localKey.toString());
-                rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_POLICY, funderPolicyProperties.getProperty(localKey.toString()));
+                rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_POLICY,
+                        funderPolicyProperties.getProperty(localKey.toString()));
                 mapList.add(rowMap);
             }
         }
@@ -206,12 +214,14 @@ public class CoeusConnector implements GrantConnector {
                 rowMap.put(CoeusFieldNames.C_USER_MIDDLE_NAME, rs.getString(CoeusFieldNames.C_USER_MIDDLE_NAME));
                 rowMap.put(CoeusFieldNames.C_USER_LAST_NAME, rs.getString(CoeusFieldNames.C_USER_LAST_NAME));
                 rowMap.put(CoeusFieldNames.C_USER_EMAIL, rs.getString(CoeusFieldNames.C_USER_EMAIL));
-                rowMap.put(CoeusFieldNames.C_USER_INSTITUTIONAL_ID, rs.getString(CoeusFieldNames.C_USER_INSTITUTIONAL_ID));
+                rowMap.put(CoeusFieldNames.C_USER_INSTITUTIONAL_ID,
+                        rs.getString(CoeusFieldNames.C_USER_INSTITUTIONAL_ID));
                 rowMap.put(CoeusFieldNames.C_USER_EMPLOYEE_ID, rs.getString(CoeusFieldNames.C_USER_EMPLOYEE_ID));
                 rowMap.put(CoeusFieldNames.C_UPDATE_TIMESTAMP, rs.getString(CoeusFieldNames.C_UPDATE_TIMESTAMP));
                 String employeeId = rs.getString(CoeusFieldNames.C_USER_EMPLOYEE_ID);
                 if (employeeId != null) {
-                    rowMap.put(CoeusFieldNames.C_USER_HOPKINS_ID, directoryServiceUtil.getHopkinsIdForEmployeeId(employeeId));
+                    rowMap.put(CoeusFieldNames.C_USER_HOPKINS_ID,
+                            directoryServiceUtil.getHopkinsIdForEmployeeId(employeeId));
                 }
                 LOG.debug("Record processed: {}", rowMap);
                 if (!mapList.contains(rowMap)) {

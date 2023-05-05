@@ -157,9 +157,12 @@ public class BasicPassUpdater implements PassUpdater {
 
                 grant.setLocalKey(grantLocalKey);
                 grant.setProjectName(rowMap.get(CoeusFieldNames.C_GRANT_PROJECT_NAME));
-                grant.setAwardDate(DateTimeUtil.createJodaDateTime(rowMap.getOrDefault(CoeusFieldNames.C_GRANT_AWARD_DATE, null)));
-                grant.setStartDate(DateTimeUtil.createJodaDateTime(rowMap.getOrDefault(CoeusFieldNames.C_GRANT_START_DATE, null)));
-                grant.setEndDate(DateTimeUtil.createJodaDateTime(rowMap.getOrDefault(CoeusFieldNames.C_GRANT_END_DATE, null)));
+                grant.setAwardDate(DateTimeUtil.createJodaDateTime(
+                        rowMap.getOrDefault(CoeusFieldNames.C_GRANT_AWARD_DATE, null)));
+                grant.setStartDate(DateTimeUtil.createJodaDateTime(
+                        rowMap.getOrDefault(CoeusFieldNames.C_GRANT_START_DATE, null)));
+                grant.setEndDate(DateTimeUtil.createJodaDateTime(
+                        rowMap.getOrDefault(CoeusFieldNames.C_GRANT_END_DATE, null)));
 
                 //process direct funder, and primary funder if we have one
                 //update funder(s) in Pass as needed
@@ -281,7 +284,8 @@ public class BasicPassUpdater implements PassUpdater {
         for (Map<String, String> rowMap : results) {
 
             if (!modeChecked) {
-                if (!rowMap.containsKey(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY) && !rowMap.containsKey(CoeusFieldNames.C_PRIMARY_FUNDER_NAME)) {
+                if (!rowMap.containsKey(CoeusFieldNames.C_PRIMARY_FUNDER_LOCAL_KEY)
+                        && !rowMap.containsKey(CoeusFieldNames.C_PRIMARY_FUNDER_NAME)) {
                     throw new RuntimeException("Mode of funder was supplied, but data does not seem to match.");
                 } else {
                     modeChecked = true;
@@ -300,7 +304,8 @@ public class BasicPassUpdater implements PassUpdater {
         user.setFirstName(rowMap.get(CoeusFieldNames.C_USER_FIRST_NAME));
         user.setMiddleName(rowMap.getOrDefault(CoeusFieldNames.C_USER_MIDDLE_NAME, null));
         user.setLastName(rowMap.get(CoeusFieldNames.C_USER_LAST_NAME));
-        user.setDisplayName(rowMap.get(CoeusFieldNames.C_USER_FIRST_NAME) + " " + rowMap.get(CoeusFieldNames.C_USER_LAST_NAME));
+        user.setDisplayName(rowMap.get(CoeusFieldNames.C_USER_FIRST_NAME) + " " +
+                rowMap.get(CoeusFieldNames.C_USER_LAST_NAME));
         user.setEmail(rowMap.get(CoeusFieldNames.C_USER_EMAIL));
         String employeeId = rowMap.get(CoeusFieldNames.C_USER_EMPLOYEE_ID);
         //Build the List of locatorIds - put the most reliable ids first
