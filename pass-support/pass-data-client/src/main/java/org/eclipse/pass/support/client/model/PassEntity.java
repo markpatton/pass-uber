@@ -28,7 +28,7 @@ public interface PassEntity {
      *
      * @return the id
      */
-    public String getId();
+    String getId();
 
     /**
      * Sets the unique ID for an object. Note that when creating a new resource, this should be left
@@ -37,5 +37,5 @@ public interface PassEntity {
      *
      * @param id the id to set
      */
-    public void setId(String id);
+    void setId(String id);
 }
