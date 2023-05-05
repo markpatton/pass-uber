@@ -23,7 +23,6 @@ import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -73,18 +72,8 @@ class EmailService {
             msg.setSubject(subject);
             msg.setText(message);
             Transport.send(msg);
-        } catch (AddressException e) {
-            e.printStackTrace();
-            String ERR_ADDRESS = "Could not send email: an addressing exception occurred";
-            LOG.error(ERR_ADDRESS, e);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            String ERR_MESSAGING = "Could not send email: a messaging exception occurred";
-            LOG.error(ERR_MESSAGING, e);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            String ERR_ENCODING = "Could not send email; an encoding exception occurred";
-            LOG.error(ERR_ENCODING, e);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            LOG.error("Error sending email", e);
         }
 
     }

@@ -15,9 +15,9 @@
  */
 package org.eclipse.pass.support.grant.data;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.pass.support.client.model.Funder;
 import org.eclipse.pass.support.client.model.Grant;
@@ -174,7 +174,7 @@ public class BasicPassEntityUtil implements PassEntityUtil {
         Set<String> idSet = new HashSet<>();
         idSet.addAll(stored.getLocatorIds());
         idSet.addAll(system.getLocatorIds());
-        stored.setLocatorIds(idSet.stream().collect(Collectors.toList()));
+        stored.setLocatorIds(new ArrayList<>(idSet));
         stored.setDisplayName(system.getDisplayName());
         return stored;
     }

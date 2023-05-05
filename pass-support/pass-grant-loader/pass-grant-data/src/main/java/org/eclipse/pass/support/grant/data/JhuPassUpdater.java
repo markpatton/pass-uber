@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.User;
+import org.eclipse.pass.support.client.model.UserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class JhuPassUpdater extends DefaultPassUpdater {
         if (jhedId != null) {
             user.getLocatorIds().add(new Identifier(DOMAIN, JHED_ID_TYPE, jhedId).serialize());
         }
-        user.getRoles().add(User.Role.SUBMITTER);
+        user.getRoles().add(UserRole.SUBMITTER);
         LOG.debug("Built user with employee ID {}", employeeId);
         return user;
     }

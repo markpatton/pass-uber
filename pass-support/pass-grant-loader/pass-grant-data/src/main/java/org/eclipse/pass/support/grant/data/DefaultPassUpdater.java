@@ -44,9 +44,11 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.AwardStatus;
 import org.eclipse.pass.support.client.model.Funder;
 import org.eclipse.pass.support.client.model.Grant;
 import org.eclipse.pass.support.client.model.User;
+import org.eclipse.pass.support.client.model.UserRole;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,21 +220,10 @@ public class DefaultPassUpdater implements PassUpdater {
                 grant.setEndDate(endDate);
                 //status should be the latest one
                 String status = rowMap.getOrDefault(C_GRANT_AWARD_STATUS, null);
-                if (status != null) {
-                    switch (status) {
-                        case "Active":
-                            grant.setAwardStatus(Grant.AwardStatus.ACTIVE);
-                            break;
-                        case "Pre-Award":
-                            grant.setAwardStatus(Grant.AwardStatus.PRE_AWARD);
-                            break;
-                        case "Terminated":
-                            grant.setAwardStatus(Grant.AwardStatus.TERMINATED);
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
+                try {
+                    AwardStatus awardStatus = AwardStatus.of(status);
+                    grant.setAwardStatus(awardStatus);
+                } catch (IllegalArgumentException e) {
                     grant.setAwardStatus(null);
                 }
 
@@ -351,7 +342,7 @@ public class DefaultPassUpdater implements PassUpdater {
             String EMPLOYEE_ID_TYPE = "employeeid";
             user.getLocatorIds().add(new Identifier(DOMAIN, EMPLOYEE_ID_TYPE, employeeId).serialize());
         }
-        user.getRoles().add(User.Role.SUBMITTER);
+        user.getRoles().add(UserRole.SUBMITTER);
         LOG.debug("Built user with employee ID {}", employeeId);
         return user;
     }
@@ -458,8 +449,8 @@ public class DefaultPassUpdater implements PassUpdater {
             User updatedUser;
             if ((updatedUser = passEntityUtil.update(systemUser, storedUser)) != null) { //need to update
                 //post COEUS processing goes here
-                if (!storedUser.getRoles().contains(User.Role.SUBMITTER)) {
-                    storedUser.getRoles().add(User.Role.SUBMITTER);
+                if (!storedUser.getRoles().contains(UserRole.SUBMITTER)) {
+                    storedUser.getRoles().add(UserRole.SUBMITTER);
                 }
                 passClient.updateResource(updatedUser);
                 statistics.addUsersUpdated();

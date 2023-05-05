@@ -32,10 +32,6 @@ import org.kohsuke.args4j.Option;
  */
 public class JhuGrantLoaderCLI {
 
-    /*
-     * General Options
-     */
-
     /**
      * Request for help/usage documentation
      */

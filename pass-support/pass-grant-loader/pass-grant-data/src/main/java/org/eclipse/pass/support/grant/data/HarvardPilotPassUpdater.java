@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.User;
+import org.eclipse.pass.support.client.model.UserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class HarvardPilotPassUpdater extends BasicPassUpdater {
             String INSTITUTIONAL_ID_TYPE = "jhed";
             user.getLocatorIds().add(new Identifier(DOMAIN, INSTITUTIONAL_ID_TYPE, eppn).serialize());
         }
-        user.getRoles().add(User.Role.SUBMITTER);
+        user.getRoles().add(UserRole.SUBMITTER);
         LOG.debug("Built user with institutional ID " + eppn);
         return user;
     }

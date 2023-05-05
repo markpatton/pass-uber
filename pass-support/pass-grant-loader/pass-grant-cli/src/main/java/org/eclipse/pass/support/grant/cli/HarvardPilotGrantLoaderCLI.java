@@ -27,11 +27,6 @@ import org.kohsuke.args4j.Option;
 
 public class HarvardPilotGrantLoaderCLI {
 
-
-    /*
-     * General Options
-     */
-
     /**
      * Request for help/usage documentation
      */
