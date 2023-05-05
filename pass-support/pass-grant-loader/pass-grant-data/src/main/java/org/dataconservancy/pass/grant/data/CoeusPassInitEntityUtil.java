@@ -1,9 +1,9 @@
 package org.dataconservancy.pass.grant.data;
 
-import org.eclipse.pass.support.client.model.Grant;
-
 import java.net.URI;
 import java.util.HashSet;
+
+import org.eclipse.pass.support.client.model.Grant;
 
 /**
  * This subclass is for the special case where we need to correct information on existing PASS objects for which we

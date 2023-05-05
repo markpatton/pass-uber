@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.dataconservancy.pass.grant.data;
-
-import org.eclipse.pass.support.client.model.Funder;
-import org.eclipse.pass.support.client.model.Grant;
-import org.eclipse.pass.support.client.model.User;
 
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.eclipse.pass.support.client.model.Funder;
+import org.eclipse.pass.support.client.model.Grant;
+import org.eclipse.pass.support.client.model.User;
 
 /**
  * A utility class for handling Grants, Users or Funders. One function performed is comparison of two instances of

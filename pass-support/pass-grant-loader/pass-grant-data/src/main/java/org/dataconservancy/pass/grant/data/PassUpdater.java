@@ -15,12 +15,12 @@
  */
 package org.dataconservancy.pass.grant.data;
 
-import org.eclipse.pass.support.client.PassClient;
-import org.eclipse.pass.support.client.model.Grant;
-
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
+
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.Grant;
 
 public interface PassUpdater {
     void updatePass(Collection<Map<String, String>> results, String mode);

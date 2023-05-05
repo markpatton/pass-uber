@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
 
-
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.Funder;
 import org.eclipse.pass.support.client.model.Grant;
