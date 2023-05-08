@@ -41,8 +41,6 @@ public class CoeusConnectorTest {
     @Before
     public void setup() throws Exception {
 
-        System.setProperty("pass.fedora.baseurl", "https://localhost:8080/fcrepo/rest");
-
         try (InputStream resourceStream = new FileInputStream(policyPropertiesFile)) {
             policyProperties.load(resourceStream);
         }
