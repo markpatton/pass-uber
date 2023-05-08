@@ -15,22 +15,12 @@
  */
 package org.eclipse.pass.support.grant.data;
 
-import java.util.Collection;
-import java.util.Map;
+final class GrantDataUtils {
+    private GrantDataUtils() {}
 
-import org.eclipse.pass.support.client.PassClient;
-import org.eclipse.pass.support.client.model.Grant;
-
-public interface PassUpdater {
-    void updatePass(Collection<Map<String, String>> results, String mode);
-
-    String getLatestUpdate();
-
-    String getReport();
-
-    PassUpdateStatistics getStatistics();
-
-    Map<String, Grant> getGrantUriMap();
-
-    PassClient getPassClient();
+    static String buildLocalKey(String domain, String type, String value) {
+        return domain != null && type != null && value != null
+                ? String.format("%s:%s:%s", domain, type, value)
+                : null;
+    }
 }

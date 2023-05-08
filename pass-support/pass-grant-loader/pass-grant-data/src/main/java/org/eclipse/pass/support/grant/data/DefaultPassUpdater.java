@@ -37,17 +37,23 @@ import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_LAST_NA
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_MIDDLE_NAME;
 import static org.eclipse.pass.support.grant.data.DateTimeUtil.createZonedDateTime;
 
-import java.net.URI;
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.PassClientResult;
+import org.eclipse.pass.support.client.PassClientSelector;
+import org.eclipse.pass.support.client.RSQL;
 import org.eclipse.pass.support.client.model.AwardStatus;
 import org.eclipse.pass.support.client.model.Funder;
 import org.eclipse.pass.support.client.model.Grant;
+import org.eclipse.pass.support.client.model.Policy;
 import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.support.client.model.UserRole;
 import org.slf4j.Logger;
@@ -61,23 +67,26 @@ import org.slf4j.LoggerFactory;
  */
 
 public class DefaultPassUpdater implements PassUpdater {
-
-    private String DOMAIN = "default.domain";
-
     private static final Logger LOG = LoggerFactory.getLogger(DefaultPassUpdater.class);
+
+    private static final String GRANT_ID_TYPE = "grant";
+    private static final String EMPLOYEE_ID_TYPE = "employeeid";
+    private static final String FUNDER_ID_TYPE = "funder";
+
+    private String domain = "default.domain";
     private String latestUpdateString = "";
 
     private final PassClient passClient;
     private final PassUpdateStatistics statistics = new PassUpdateStatistics();
     private final PassEntityUtil passEntityUtil;
 
-    private final Map<URI, Grant> grantUriMap = new HashMap<>();
+    private final Map<String, Grant> grantMap = new HashMap<>();
 
     //some entities may be referenced many times during an update, but just need to be updated the first time
     //they are encountered. these include Users and Funders. we save the overhead of redundant updates
     //of these by looking them up here; if they are on the Map, they have already been processed
-    private final Map<String, URI> funderMap = new HashMap<>();
-    private final Map<String, URI> userMap = new HashMap<>();
+    private final Map<String, Funder> funderMap = new HashMap<>();
+    private final Map<String, User> userMap = new HashMap<>();
 
     private String mode;
 
@@ -139,126 +148,126 @@ public class DefaultPassUpdater implements PassUpdater {
 
             String grantLocalKey = rowMap.get(C_GRANT_LOCAL_KEY);
 
-            //get funder local keys. if a primary funder is not specified, we set it to the direct funder
-            String directFunderLocalKey = rowMap.get(C_DIRECT_FUNDER_LOCAL_KEY);
-            String primaryFunderLocalKey = rowMap.get(C_PRIMARY_FUNDER_LOCAL_KEY);
-            primaryFunderLocalKey = (primaryFunderLocalKey == null ? directFunderLocalKey : primaryFunderLocalKey);
+            try {
+                //get funder local keys. if a primary funder is not specified, we set it to the direct funder
+                String directFunderLocalKey = rowMap.get(C_DIRECT_FUNDER_LOCAL_KEY);
+                String primaryFunderLocalKey = rowMap.get(C_PRIMARY_FUNDER_LOCAL_KEY);
+                primaryFunderLocalKey = (primaryFunderLocalKey == null ? directFunderLocalKey : primaryFunderLocalKey);
 
-            //we will need funder PASS URIs - retrieve or create them,
-            //updating the info on them if necessary
-            if (!funderMap.containsKey(directFunderLocalKey)) {
-                Funder updatedFunder = buildDirectFunder(rowMap);
-                URI passFunderURI = updateFunderInPass(updatedFunder);
-                funderMap.put(directFunderLocalKey, passFunderURI);
-            }
-
-            if (!funderMap.containsKey(primaryFunderLocalKey)) {
-                Funder updatedFunder = buildPrimaryFunder(rowMap);
-                URI passFunderURI = updateFunderInPass(updatedFunder);
-                funderMap.put(primaryFunderLocalKey, passFunderURI);
-            }
-
-            //same for any users
-            String employeeId = rowMap.get(C_USER_EMPLOYEE_ID);
-            String abbreviatedRole = rowMap.get(C_ABBREVIATED_ROLE);
-            if (!userMap.containsKey(employeeId)) {
-                User updatedUser = buildUser(rowMap);
-                URI passUserURI = updateUserInPass(updatedUser);
-                userMap.put(employeeId, passUserURI);
-            }
-
-            //now we know all about our user and funders for this record
-            // let's get to the grant proper
-            LOG.debug("Processing grant with localKey {}", grantLocalKey);
-
-            //if this is the first record for this Grant, it will not be on the Map
-            Grant grant;
-            if (!grantMap.containsKey(grantLocalKey)) {
-                grant = new Grant();
-                grant.setLocalKey(grantLocalKey);
-                grantMap.put(grantLocalKey, grant);
-            }
-
-            grant = grantMap.get(grantLocalKey);
-
-            //anybody who was ever a co-pi in an iteration will be in this list
-            if (abbreviatedRole.equals("C") || abbreviatedRole.equals("K")) {
-                URI userId = userMap.get(employeeId);
-                if (!grant.getCoPis().contains(userId)) {
-                    grant.getCoPis().add(userId);
-                    statistics.addCoPi();
-                }
-            }
-
-            //now do things which may depend on the date - award date is the only one that changes
-            ZonedDateTime awardDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_AWARD_DATE, null));
-            ZonedDateTime startDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_START_DATE, null));
-            ZonedDateTime endDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_END_DATE, null));
-
-            //set values that should match earliest iteration of the grant. we wet these on the system record
-            //in case they are needed to update a stored grant record.
-            //these values will not override existing stored values unless the PassEntityUtil implementation
-            //allows it.
-            //we mostly have awardDate, but will use start date as a fallback if not
-            if ((awardDate != null && (grant.getAwardDate() == null || awardDate.isBefore(grant.getAwardDate()))) ||
-                awardDate == null && (startDate != null && (grant.getStartDate() == null || startDate.isBefore(
-                    grant.getStartDate())))) {
-                grant.setProjectName(rowMap.get(C_GRANT_PROJECT_NAME));
-                grant.setAwardNumber(rowMap.get(C_GRANT_AWARD_NUMBER));
-                grant.setDirectFunder(funderMap.get(directFunderLocalKey));
-                grant.setPrimaryFunder(funderMap.get(primaryFunderLocalKey));
-                grant.setStartDate(startDate);
-                grant.setAwardDate(awardDate);
-            }
-
-            //set values that should match the latest iteration of the grant
-            //use !isBefore in case more than one PI is specified, need to process more than one
-            //we mostly have awardDate, but will use end date as a fallback if not
-            if ((awardDate != null && (grant.getAwardDate() == null || !awardDate.isBefore(grant.getAwardDate()))) ||
-                awardDate == null && (endDate != null && (grant.getEndDate() == null || !endDate.isBefore(
-                    grant.getEndDate())))) {
-                grant.setEndDate(endDate);
-                //status should be the latest one
-                String status = rowMap.getOrDefault(C_GRANT_AWARD_STATUS, null);
-                try {
-                    AwardStatus awardStatus = AwardStatus.of(status);
-                    grant.setAwardStatus(awardStatus);
-                } catch (IllegalArgumentException e) {
-                    grant.setAwardStatus(null);
+                //we will need funder PASS URIs - retrieve or create them,
+                //updating the info on them if necessary
+                if (!funderMap.containsKey(directFunderLocalKey)) {
+                    Funder directFunder = buildDirectFunder(rowMap);
+                    Funder updatedFunder = updateFunderInPass(directFunder);
+                    funderMap.put(directFunderLocalKey, updatedFunder);
                 }
 
-                //we want the PI to be the one listed on the most recent grant iteration
-                if (abbreviatedRole.equals("P")) {
-                    URI userId = userMap.get(employeeId);
-                    URI oldPiId = grant.getPi();
-                    grant.setPi(userId);
-                    grant.getCoPis().remove(userId);
-                    if (oldPiId == null) {
-                        statistics.addPi();
-                    } else {
-                        if (!oldPiId.equals(userId)) {
-                            if (!grant.getCoPis().contains(oldPiId)) {
-                                grant.getCoPis().add(oldPiId);
-                                statistics.addCoPi();
+                if (!funderMap.containsKey(primaryFunderLocalKey)) {
+                    Funder primaryFunder = buildPrimaryFunder(rowMap);
+                    Funder updatedFunder = updateFunderInPass(primaryFunder);
+                    funderMap.put(primaryFunderLocalKey, updatedFunder);
+                }
+
+                //same for any users
+                String employeeId = rowMap.get(C_USER_EMPLOYEE_ID);
+                if (!userMap.containsKey(employeeId)) {
+                    User rowUser = buildUser(rowMap);
+                    User updateUser = updateUserInPass(rowUser);
+                    userMap.put(employeeId, updateUser);
+                }
+
+                //now we know all about our user and funders for this record
+                // let's get to the grant proper
+                LOG.debug("Processing grant with localKey {}", grantLocalKey);
+
+                //if this is the first record for this Grant, it will not be on the Map
+                Grant grant;
+                if (!grantMap.containsKey(grantLocalKey)) {
+                    grant = new Grant();
+                    grant.setLocalKey(grantLocalKey);
+                    grantMap.put(grantLocalKey, grant);
+                }
+
+                grant = grantMap.get(grantLocalKey);
+
+                String abbreviatedRole = rowMap.get(C_ABBREVIATED_ROLE);
+                //anybody who was ever a co-pi in an iteration will be in this list
+                if (abbreviatedRole.equals("C") || abbreviatedRole.equals("K")) {
+                    User user = userMap.get(employeeId);
+                    if (!grant.getCoPis().contains(user)) {
+                        grant.getCoPis().add(user);
+                        statistics.addCoPi();
+                    }
+                }
+
+                //now do things which may depend on the date - award date is the only one that changes
+                ZonedDateTime awardDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_AWARD_DATE, null));
+                ZonedDateTime startDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_START_DATE, null));
+                ZonedDateTime endDate = createZonedDateTime(rowMap.getOrDefault(C_GRANT_END_DATE, null));
+
+                //set values that should match earliest iteration of the grant. we wet these on the system record
+                //in case they are needed to update a stored grant record.
+                //these values will not override existing stored values unless the PassEntityUtil implementation
+                //allows it.
+                //we mostly have awardDate, but will use start date as a fallback if not
+                if ((awardDate != null && (grant.getAwardDate() == null || awardDate.isBefore(grant.getAwardDate()))) ||
+                    awardDate == null && (startDate != null && (grant.getStartDate() == null || startDate.isBefore(
+                        grant.getStartDate())))) {
+                    grant.setProjectName(rowMap.get(C_GRANT_PROJECT_NAME));
+                    grant.setAwardNumber(rowMap.get(C_GRANT_AWARD_NUMBER));
+                    grant.setDirectFunder(funderMap.get(directFunderLocalKey));
+                    grant.setPrimaryFunder(funderMap.get(primaryFunderLocalKey));
+                    grant.setStartDate(startDate);
+                    grant.setAwardDate(awardDate);
+                }
+
+                //set values that should match the latest iteration of the grant
+                //use !isBefore in case more than one PI is specified, need to process more than one
+                //we mostly have awardDate, but will use end date as a fallback if not
+                if ((awardDate != null && (grant.getAwardDate() == null || !awardDate.isBefore(grant.getAwardDate()))) ||
+                    awardDate == null && (endDate != null && (grant.getEndDate() == null || !endDate.isBefore(
+                        grant.getEndDate())))) {
+                    grant.setEndDate(endDate);
+                    //status should be the latest one
+                    String status = rowMap.getOrDefault(C_GRANT_AWARD_STATUS, null);
+                    try {
+                        AwardStatus awardStatus = AwardStatus.of(status);
+                        grant.setAwardStatus(awardStatus);
+                    } catch (IllegalArgumentException e) {
+                        grant.setAwardStatus(null);
+                    }
+
+                    //we want the PI to be the one listed on the most recent grant iteration
+                    if (abbreviatedRole.equals("P")) {
+                        User user = userMap.get(employeeId);
+                        User oldPiId = grant.getPi();
+                        grant.setPi(user);
+                        grant.getCoPis().remove(user);
+                        if (oldPiId == null) {
+                            statistics.addPi();
+                        } else {
+                            if (!oldPiId.equals(user)) {
+                                if (!grant.getCoPis().contains(oldPiId)) {
+                                    grant.getCoPis().add(oldPiId);
+                                    statistics.addCoPi();
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            //we are done with this record, let's save the state of this Grant
-            grantMap.put(grantLocalKey, grant);
-            //see if this is the latest grant updated
-            if (rowMap.containsKey(C_UPDATE_TIMESTAMP)) {
-                String grantUpdateString = rowMap.get(C_UPDATE_TIMESTAMP);
-                latestUpdateString = latestUpdateString.length() == 0 ? grantUpdateString : returnLaterUpdate(
-                    grantUpdateString, latestUpdateString);
+                //we are done with this record, let's save the state of this Grant
+                Grant updateGrant = updateGrantInPass(grant);
+                grantMap.put(grantLocalKey, updateGrant);
+                //see if this is the latest grant updated
+                if (rowMap.containsKey(C_UPDATE_TIMESTAMP)) {
+                    String grantUpdateString = rowMap.get(C_UPDATE_TIMESTAMP);
+                    latestUpdateString = latestUpdateString.length() == 0 ? grantUpdateString : returnLaterUpdate(
+                        grantUpdateString, latestUpdateString);
+                }
+            } catch (IOException e) {
+                LOG.error("Error processing Grant localKey: " + grantLocalKey, e);
             }
-        }
-
-        //now put updated grant objects in pass
-        for (Grant grant : grantMap.values()) {
-            grantUriMap.put(updateGrantInPass(grant), grant);
         }
 
         //success - we capture some information to report
@@ -274,6 +283,8 @@ public class DefaultPassUpdater implements PassUpdater {
 
         boolean modeChecked = false;
 
+        LOG.info("Processing result set with {} rows", results.size());
+        int userProcessedCounter = 0;
         for (Map<String, String> rowMap : results) {
 
             if (!modeChecked) {
@@ -284,19 +295,23 @@ public class DefaultPassUpdater implements PassUpdater {
                 }
             }
 
-            LOG.info("Processing result set with {} rows", results.size());
-            User updatedUser = buildUser(rowMap);
-            updateUserInPass(updatedUser);
-            if (rowMap.containsKey(C_UPDATE_TIMESTAMP)) {
-                String userUpdateString = rowMap.get(C_UPDATE_TIMESTAMP);
-                latestUpdateString = latestUpdateString.length() == 0 ? userUpdateString : returnLaterUpdate(
-                    userUpdateString, latestUpdateString);
+            User rowUser = buildUser(rowMap);
+            try {
+                updateUserInPass(rowUser);
+                userProcessedCounter++;
+                if (rowMap.containsKey(C_UPDATE_TIMESTAMP)) {
+                    String userUpdateString = rowMap.get(C_UPDATE_TIMESTAMP);
+                    latestUpdateString = latestUpdateString.length() == 0 ? userUpdateString : returnLaterUpdate(
+                        userUpdateString, latestUpdateString);
+                }
+            } catch (IOException e) {
+                LOG.error("Error processing User: " + rowUser, e);
             }
         }
 
         if (results.size() > 0) {
             statistics.setLatestUpdateString(latestUpdateString);
-            statistics.setReport(results.size(), results.size());
+            statistics.setReport(results.size(), userProcessedCounter);
         } else {
             System.out.println("No records were processed in this update");
         }
@@ -312,6 +327,7 @@ public class DefaultPassUpdater implements PassUpdater {
 
         boolean modeChecked = false;
         LOG.info("Processing result set with {} rows", results.size());
+        int funderProcessedCounter = 0;
         for (Map<String, String> rowMap : results) {
 
             if (!modeChecked) {
@@ -322,11 +338,15 @@ public class DefaultPassUpdater implements PassUpdater {
                 }
             }
 
-            Funder updatedFunder = buildPrimaryFunder(rowMap);
-            updateFunderInPass(updatedFunder);
-
+            Funder rowFunder = buildPrimaryFunder(rowMap);
+            try {
+                updateFunderInPass(rowFunder);
+                funderProcessedCounter++;
+            } catch (IOException e) {
+                LOG.error("Error processing Funder localKey: " + rowFunder.getLocalKey(), e);
+            }
         }
-        statistics.setReport(results.size(), results.size());
+        statistics.setReport(results.size(), funderProcessedCounter);
     }
 
     User buildUser(Map<String, String> rowMap) {
@@ -339,8 +359,8 @@ public class DefaultPassUpdater implements PassUpdater {
         String employeeId = rowMap.get(C_USER_EMPLOYEE_ID);
         //Build the List of locatorIds - put the most reliable ids first
         if (employeeId != null) {
-            String EMPLOYEE_ID_TYPE = "employeeid";
-            user.getLocatorIds().add(new Identifier(DOMAIN, EMPLOYEE_ID_TYPE, employeeId).serialize());
+            String localKey = GrantDataUtils.buildLocalKey(domain, EMPLOYEE_ID_TYPE, employeeId);
+            user.getLocatorIds().add(localKey);
         }
         user.getRoles().add(UserRole.SUBMITTER);
         LOG.debug("Built user with employee ID {}", employeeId);
@@ -358,12 +378,10 @@ public class DefaultPassUpdater implements PassUpdater {
         Funder funder = new Funder();
         funder.setName(rowMap.getOrDefault(C_PRIMARY_FUNDER_NAME, null));
         funder.setLocalKey(rowMap.get(C_PRIMARY_FUNDER_LOCAL_KEY));
-        String policy = rowMap.get(C_PRIMARY_FUNDER_POLICY);
-        if (policy != null && policy.length() > 0) {
-            String fedoraBaseUrl = System.getProperty("pass.fedora.baseurl");
-            fedoraBaseUrl = fedoraBaseUrl.endsWith("/") ? fedoraBaseUrl : fedoraBaseUrl + "/";
-            funder.setPolicy(URI.create(fedoraBaseUrl + policy));
-            LOG.debug("Processing Funder with localKey {} and policy {}", funder.getLocalKey(), policy);
+        String policyId = rowMap.get(C_PRIMARY_FUNDER_POLICY);
+        if (StringUtils.isNotEmpty(policyId)) {
+            funder.setPolicy(new Policy(policyId));
+            LOG.debug("Processing Funder with localKey {} and policy {}", funder.getLocalKey(), policyId);
         }
         LOG.debug("Built Funder with localKey {}", funder.getLocalKey());
 
@@ -376,12 +394,10 @@ public class DefaultPassUpdater implements PassUpdater {
             funder.setName(rowMap.get(C_DIRECT_FUNDER_NAME));
         }
         funder.setLocalKey(rowMap.get(C_DIRECT_FUNDER_LOCAL_KEY));
-        String policy = rowMap.get(C_DIRECT_FUNDER_POLICY);
-        if (policy != null) {
-            String fedoraBaseUrl = System.getProperty("pass.fedora.baseurl");
-            fedoraBaseUrl = fedoraBaseUrl.endsWith("/") ? fedoraBaseUrl : fedoraBaseUrl + "/";
-            funder.setPolicy(URI.create(fedoraBaseUrl + policy));
-            LOG.debug("Processing Funder with localKey {} and policy {}", funder.getLocalKey(), policy);
+        String policyId = rowMap.get(C_DIRECT_FUNDER_POLICY);
+        if (StringUtils.isNotEmpty(policyId)) {
+            funder.setPolicy(new Policy(policyId));
+            LOG.debug("Processing Funder with localKey {} and policy {}", funder.getLocalKey(), policyId);
         }
         LOG.debug("Built Funder with localKey {}", funder.getLocalKey());
 
@@ -393,32 +409,33 @@ public class DefaultPassUpdater implements PassUpdater {
      * new information to update an object for the same Funder in Pass (if it exists)
      *
      * @param systemFunder the new Funder object populated from COEUS
-     * @return the URI for the resource representing the updated Funder in Pass
+     * @return the localKey for the resource representing the updated Funder in Pass
      */
-    private URI updateFunderInPass(Funder systemFunder) {
+    private Funder updateFunderInPass(Funder systemFunder) throws IOException {
         String baseLocalKey = systemFunder.getLocalKey();
-        String FUNDER_ID_TYPE = "funder";
-        String fullLocalKey = new Identifier(DOMAIN, FUNDER_ID_TYPE, baseLocalKey).serialize();
+        String fullLocalKey = GrantDataUtils.buildLocalKey(domain, FUNDER_ID_TYPE, baseLocalKey);
         systemFunder.setLocalKey(fullLocalKey);
 
-        URI passFunderURI = passClient.findByAttribute(Funder.class, "localKey", fullLocalKey);
-        if (passFunderURI != null) {
-            Funder storedFunder = passClient.readResource(passFunderURI, Funder.class);
-            if (storedFunder == null) {
-                throw new RuntimeException("Could not read Funder object with URI " + passFunderURI);
-            }
-            Funder updatedFunder;
-            if ((updatedFunder = passEntityUtil.update(systemFunder, storedFunder)) != null) { //need to update
-                passClient.updateResource(updatedFunder);
+        PassClientSelector<Funder> selector = new PassClientSelector<>(Funder.class);
+        selector.setFilter(RSQL.equals("localKey", fullLocalKey));
+        PassClientResult<Funder> result = passClient.selectObjects(selector);
+
+        if (!result.getObjects().isEmpty()) {
+            // TODO Is the localKey unique, should I handle more than one match?
+            Funder storedFunder = result.getObjects().get(0);
+            Funder updatedFunder = passEntityUtil.update(systemFunder, storedFunder);
+            if (Objects.nonNull(updatedFunder)) { //need to update
+                passClient.updateObject(updatedFunder);
                 statistics.addFundersUpdated();
+                return updatedFunder;
             }
         } else { //don't have a stored Funder for this URI - this one is new to Pass
             if (systemFunder.getName() != null) { //only add if we have a name
-                passFunderURI = passClient.createResource(systemFunder);
+                passClient.createObject(systemFunder);
                 statistics.addFundersCreated();
             }
         }
-        return passFunderURI;
+        return systemFunder;
     }
 
     /**
@@ -428,39 +445,40 @@ public class DefaultPassUpdater implements PassUpdater {
      * @param systemUser the new User object populated from COEUS
      * @return the URI for the resource representing the updated User in Pass
      */
-    private URI updateUserInPass(User systemUser) {
+    private User updateUserInPass(User systemUser) throws IOException {
         //we first check to see if the user is known by the Hopkins ID. If not, we check the employee ID.
         //last attempt is the JHED ID. this order is specified by the order of the List as constructed on updatedUser
-        URI passUserUri = null;
+        User passUser = null;
         ListIterator<String> idIterator = systemUser.getLocatorIds().listIterator();
 
-        while (passUserUri == null && idIterator.hasNext()) {
+        while (passUser == null && idIterator.hasNext()) {
             String id = String.valueOf(idIterator.next());
             if (id != null) {
-                passUserUri = passClient.findByAttribute(User.class, "locatorIds", id);
+                PassClientSelector<User> selector = new PassClientSelector<>(User.class);
+                selector.setFilter(RSQL.in("locatorIds", id));
+                PassClientResult<User> result = passClient.selectObjects(selector);
+                passUser = result.getObjects().get(0);
             }
         }
 
-        if (passUserUri != null) {
-            User storedUser = passClient.readResource(passUserUri, User.class);
-            if (storedUser == null) {
-                throw new RuntimeException("Could not read User object with URI " + passUserUri);
-            }
-            User updatedUser;
-            if ((updatedUser = passEntityUtil.update(systemUser, storedUser)) != null) { //need to update
+        if (Objects.nonNull(passUser)) {
+            User updatedUser = passEntityUtil.update(systemUser, passUser);
+            if (Objects.nonNull(updatedUser)) { //need to update
                 //post COEUS processing goes here
-                if (!storedUser.getRoles().contains(UserRole.SUBMITTER)) {
-                    storedUser.getRoles().add(UserRole.SUBMITTER);
+                if (!updatedUser.getRoles().contains(UserRole.SUBMITTER)) {
+                    updatedUser.getRoles().add(UserRole.SUBMITTER);
                 }
-                passClient.updateResource(updatedUser);
+                passClient.updateObject(updatedUser);
                 statistics.addUsersUpdated();
+                return updatedUser;
             }
         } else if (!mode.equals("user")) { //don't have a stored User for this URI - this one is new to Pass
             //but don't update if we are in user mode - just update existing users
-            passUserUri = passClient.createResource(systemUser);
+            passClient.createObject(systemUser);
             statistics.addUsersCreated();
+            return systemUser;
         }
-        return passUserUri;
+        return passUser;
     }
 
     /**
@@ -470,32 +488,33 @@ public class DefaultPassUpdater implements PassUpdater {
      * @param systemGrant the new Grant object populated from COEUS
      * @return the PASS identifier for the Grant object
      */
-    private URI updateGrantInPass(Grant systemGrant) {
+    private Grant updateGrantInPass(Grant systemGrant) throws IOException {
         String baseLocalKey = systemGrant.getLocalKey();
-        String GRANT_ID_TYPE = "grant";
-        String fullLocalKey = new Identifier(DOMAIN, GRANT_ID_TYPE, baseLocalKey).serialize();
+        String fullLocalKey = GrantDataUtils.buildLocalKey(domain, GRANT_ID_TYPE, baseLocalKey);
         systemGrant.setLocalKey(fullLocalKey);
 
         LOG.debug("Looking for grant with localKey {}", fullLocalKey);
-        URI passGrantURI = passClient.findByAttribute(Grant.class, "localKey", fullLocalKey);
-        if (passGrantURI != null) {
+        PassClientSelector<Grant> selector = new PassClientSelector<>(Grant.class);
+        selector.setFilter(RSQL.equals("localKey", fullLocalKey));
+        PassClientResult<Grant> result = passClient.selectObjects(selector);
+
+        if (!result.getObjects().isEmpty()) {
             LOG.debug("Found grant with localKey {}", fullLocalKey);
-            Grant storedGrant = passClient.readResource(passGrantURI, Grant.class);
-            if (storedGrant == null) {
-                throw new RuntimeException("Could not read Funder object with URI " + passGrantURI);
-            }
-            Grant updatedGrant;
-            if ((updatedGrant = passEntityUtil.update(systemGrant, storedGrant)) != null) { //need to update
-                passClient.updateResource(updatedGrant);
+            // TODO Is the localKey unique, should I handle more than one match?
+            Grant storedGrant = result.getObjects().get(0);
+            Grant updatedGrant = passEntityUtil.update(systemGrant, storedGrant);
+            if (Objects.nonNull(updatedGrant)) { //need to update
+                passClient.updateObject(updatedGrant);
                 statistics.addGrantsUpdated();
                 LOG.debug("Updating grant with local key {}", systemGrant.getLocalKey());
+                return updatedGrant;
             }
         } else { //don't have a stored Grant for this URI - this one is new to Pass
-            passGrantURI = passClient.createResource(systemGrant);
+            passClient.createObject(systemGrant);
             statistics.addGrantsCreated();
             LOG.debug("Creating grant with local key {}", systemGrant.getLocalKey());
         }
-        return passGrantURI;
+        return systemGrant;
     }
 
     /**
@@ -539,8 +558,8 @@ public class DefaultPassUpdater implements PassUpdater {
         return statistics;
     }
 
-    public Map<URI, Grant> getGrantUriMap() {
-        return grantUriMap;
+    public Map<String, Grant> getGrantUriMap() {
+        return grantMap;
     }
 
     //this is used by an integration test
@@ -549,17 +568,17 @@ public class DefaultPassUpdater implements PassUpdater {
     }
 
     //used in unit test
-    Map<String, URI> getFunderMap() {
+    Map<String, Funder> getFunderMap() {
         return funderMap;
     }
 
     //used in unit test
-    Map<String, URI> getUserMap() {
+    Map<String, User> getUserMap() {
         return userMap;
     }
 
     void setDomain(String domain) {
-        this.DOMAIN = domain;
+        this.domain = domain;
     }
 
 }
