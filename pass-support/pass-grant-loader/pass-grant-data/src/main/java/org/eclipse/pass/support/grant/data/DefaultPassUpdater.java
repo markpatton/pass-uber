@@ -558,7 +558,7 @@ public class DefaultPassUpdater implements PassUpdater {
         return statistics;
     }
 
-    public Map<String, Grant> getGrantUriMap() {
+    public Map<String, Grant> getGrantMap() {
         return grantMap;
     }
 
