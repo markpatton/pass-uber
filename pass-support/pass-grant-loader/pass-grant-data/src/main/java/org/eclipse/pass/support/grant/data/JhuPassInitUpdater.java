@@ -25,9 +25,9 @@ import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_MIDDLE_
 
 import java.util.Map;
 
+import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.support.client.model.UserRole;
-import org.intellij.lang.annotations.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class JhuPassInitUpdater extends DefaultPassUpdater {
     private static final String HOPKINS_ID_TYPE = "hopkinsid";
     private static final String JHED_ID_TYPE = "jhed";
 
-    public JhuPassInitUpdater(PassUpdater passClient) {
+    public JhuPassInitUpdater(PassClient passClient) {
         super(new CoeusPassInitEntityUtil(), passClient);
         super.setDomain(DOMAIN);
     }
@@ -70,13 +70,13 @@ public class JhuPassInitUpdater extends DefaultPassUpdater {
         }
         //Build the List of locatorIds - put the most reliable ids first
         if (employeeId != null) {
-            user.getLocatorIds().add(new Identifier(DOMAIN, EMPLOYEE_ID_TYPE, employeeId).serialize());
+            user.getLocatorIds().add(GrantDataUtils.buildLocalKey(DOMAIN, EMPLOYEE_ID_TYPE, employeeId));
         }
         if (hopkinsId != null) {
-            user.getLocatorIds().add(new Identifier(DOMAIN, HOPKINS_ID_TYPE, hopkinsId).serialize());
+            user.getLocatorIds().add(GrantDataUtils.buildLocalKey(DOMAIN, HOPKINS_ID_TYPE, hopkinsId));
         }
         if (jhedId != null) {
-            user.getLocatorIds().add(new Identifier(DOMAIN, JHED_ID_TYPE, jhedId).serialize());
+            user.getLocatorIds().add(GrantDataUtils.buildLocalKey(DOMAIN, JHED_ID_TYPE, jhedId));
         }
         user.getRoles().add(UserRole.SUBMITTER);
         LOG.debug("Built user with employee ID {}", employeeId);

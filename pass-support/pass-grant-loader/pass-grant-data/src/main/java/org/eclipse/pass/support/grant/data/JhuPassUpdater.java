@@ -77,13 +77,13 @@ public class JhuPassUpdater extends DefaultPassUpdater {
         }
         //Build the List of locatorIds - put the most reliable ids first
         if (employeeId != null) {
-            user.getLocatorIds().add(new Identifier(DOMAIN, EMPLOYEE_ID_TYPE, employeeId).serialize());
+            user.getLocatorIds().add(GrantDataUtils.buildLocalKey(DOMAIN, EMPLOYEE_ID_TYPE, employeeId));
         }
         if (hopkinsId != null) {
-            user.getLocatorIds().add(new Identifier(DOMAIN, HOPKINS_ID_TYPE, hopkinsId).serialize());
+            user.getLocatorIds().add(GrantDataUtils.buildLocalKey(DOMAIN, HOPKINS_ID_TYPE, hopkinsId));
         }
         if (jhedId != null) {
-            user.getLocatorIds().add(new Identifier(DOMAIN, JHED_ID_TYPE, jhedId).serialize());
+            user.getLocatorIds().add(GrantDataUtils.buildLocalKey(DOMAIN, JHED_ID_TYPE, jhedId));
         }
         user.getRoles().add(UserRole.SUBMITTER);
         LOG.debug("Built user with employee ID {}", employeeId);
