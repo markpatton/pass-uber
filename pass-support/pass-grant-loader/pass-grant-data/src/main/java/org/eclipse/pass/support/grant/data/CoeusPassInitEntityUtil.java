@@ -15,10 +15,10 @@
  */
 package org.eclipse.pass.support.grant.data;
 
-import java.net.URI;
 import java.util.HashSet;
 
 import org.eclipse.pass.support.client.model.Grant;
+import org.eclipse.pass.support.client.model.User;
 
 /**
  * This subclass is for the special case where we need to correct information on existing PASS objects for which we
@@ -29,16 +29,16 @@ public class CoeusPassInitEntityUtil extends CoeusPassEntityUtil {
     @Override
     public Grant update(Grant system, Grant stored) {
         //adjust the system view of co-pis  by merging in the stored view of pi and co-pis
-        for (URI uri : stored.getCoPis()) {
-            if (!system.getCoPis().contains(uri)) {
-                system.getCoPis().add(uri);
+        for (User coPiUser : stored.getCoPis()) {
+            if (!system.getCoPis().contains(coPiUser)) {
+                system.getCoPis().add(coPiUser);
             }
         }
 
         //need to be careful, system pi might be null if there is no record for it
         //this is to finalize the version of the co-pi list we want to compare between
         //system and stored
-        URI storedPi = stored.getPi();
+        User storedPi = stored.getPi();
         if (system.getPi() != null) {
             if (!system.getPi().equals(storedPi)) {
                 // stored.setPi( system.getPi() );
