@@ -52,9 +52,9 @@ public enum CopyStatus {
         }
     }
 
-    private String value;
+    private final String value;
 
-    private CopyStatus(String value) {
+    CopyStatus(String value) {
         this.value = value;
     }
 

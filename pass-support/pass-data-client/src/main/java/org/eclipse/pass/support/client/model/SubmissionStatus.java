@@ -86,9 +86,9 @@ public enum SubmissionStatus {
 
     private String value;
 
-    private boolean submitted;
+    private final boolean submitted;
 
-    private SubmissionStatus(String value, boolean submitted) {
+    SubmissionStatus(String value, boolean submitted) {
         this.value = value;
         this.submitted = submitted;
     }

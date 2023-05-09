@@ -51,9 +51,9 @@ public enum ContributorRole {
         }
     }
 
-    private String value;
+    private final String value;
 
-    private ContributorRole(String value) {
+    ContributorRole(String value) {
         this.value = value;
     }
 

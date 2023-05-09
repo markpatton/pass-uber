@@ -46,9 +46,9 @@ public enum AwardStatus {
         }
     }
 
-    private String value;
+    private final String value;
 
-    private AwardStatus(String value) {
+    AwardStatus(String value) {
         this.value = value;
     }
 

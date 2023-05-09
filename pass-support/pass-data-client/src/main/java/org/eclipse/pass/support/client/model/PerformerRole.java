@@ -29,9 +29,9 @@ public enum PerformerRole {
      */
     SUBMITTER("submitter");
 
-    private String value;
+    private final String value;
 
-    private PerformerRole(String value) {
+    PerformerRole(String value) {
         this.value = value;
     }
 

@@ -15,9 +15,9 @@ public enum Source {
      */
     OTHER("other");
 
-    private String value;
+    private final String value;
 
-    private Source(String value) {
+    Source(String value) {
         this.value = value;
     }
 

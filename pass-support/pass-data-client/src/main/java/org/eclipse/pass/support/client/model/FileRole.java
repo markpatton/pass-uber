@@ -50,9 +50,9 @@ public enum FileRole {
         }
     }
 
-    private String value;
+    private final String value;
 
-    private FileRole(String value) {
+    FileRole(String value) {
         this.value = value;
     }
 
