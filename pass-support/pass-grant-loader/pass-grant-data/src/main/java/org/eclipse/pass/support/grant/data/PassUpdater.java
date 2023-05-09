@@ -30,7 +30,7 @@ public interface PassUpdater {
 
     PassUpdateStatistics getStatistics();
 
-    Map<String, Grant> getGrantMap();
+    Map<String, Grant> getGrantResultMap();
 
     PassClient getPassClient();
 }

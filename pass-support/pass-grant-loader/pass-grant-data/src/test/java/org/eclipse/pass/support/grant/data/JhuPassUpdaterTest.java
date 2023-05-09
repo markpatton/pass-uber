@@ -16,22 +16,24 @@
 package org.eclipse.pass.support.grant.data;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doReturn;
 
-import java.net.URI;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dataconservancy.pass.client.PassClient;
-import org.dataconservancy.pass.client.PassClientFactory;
-import org.dataconservancy.pass.model.Funder;
-import org.dataconservancy.pass.model.Grant;
-import org.dataconservancy.pass.model.User;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.PassClientResult;
+import org.eclipse.pass.support.client.model.AwardStatus;
+import org.eclipse.pass.support.client.model.Funder;
+import org.eclipse.pass.support.client.model.Grant;
+import org.eclipse.pass.support.client.model.PassEntity;
+import org.eclipse.pass.support.client.model.User;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -47,29 +49,6 @@ public class JhuPassUpdaterTest {
 
     @Mock
     private PassClient passClientMock;
-
-    // private PassEntityUtil passEntityUtil = new CoeusPassEntityUtil();
-    // private String domain = "johnshopkins.edu";
-
-    private URI grantUri;
-
-    @Before
-    public void setup() {
-        System.setProperty("pass.fedora.baseurl", "https://localhost:8080/fcrepo/rest/");
-
-        grantUri = URI.create("grantUri");
-        URI userUri1 = URI.create("piUri");
-        URI useruri2 = URI.create("coPiUri");
-        URI funderUri1 = URI.create("funderuri1");
-        URI funderUri2 = URI.create("funderuri2");
-
-        when(passClientMock.createResource(any(Grant.class))).thenReturn(grantUri);
-        when(passClientMock.createResource(any(Funder.class))).thenReturn(funderUri1, funderUri2);
-        when(passClientMock.createResource(any(User.class))).thenReturn(userUri1, useruri2);
-
-        // when(directoryServiceUtilMock.getHopkinsIdForEmployeeId("0000222")).thenReturn("A1A1A1");
-        // when(directoryServiceUtilMock.getHopkinsIdForEmployeeId("0000333")).thenReturn("B2B2B2");
-    }
 
     /**
      * Test static timestamp utility method to verify it returns the later of two supplied timestamps
@@ -89,8 +68,36 @@ public class JhuPassUpdaterTest {
     }
 
     @Test
-    public void testGrantBuilding() {
+    public void testUpdatePassGrant_Success_NewGrant() throws IOException {
 
+        List<Map<String, String>> resultSet = buildTestInputResultSet();
+        preparePassClientMockCalls();
+
+        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
+        passUpdater.updatePass(resultSet, "grant");
+
+        Map<String, Grant> grantMap = passUpdater.getGrantResultMap();
+        assertEquals(1, grantMap.size());
+        Grant grant = grantMap.get("8675309");
+        assertEquals(1, grant.getCoPis().size());
+        assertEquals(2, passUpdater.getFunderMap().size());
+        assertEquals(grant.getDirectFunder(), passUpdater.getFunderMap().get("000029282"));
+        assertEquals(grant.getPrimaryFunder(), passUpdater.getFunderMap().get("8675309"));
+        assertEquals(grant.getPi(), passUpdater.getUserMap().get("0000333"));
+        assertEquals(grant.getCoPis().get(0), passUpdater.getUserMap().get("0000222"));
+
+        assertEquals("12345678", grant.getAwardNumber());
+        assertEquals(AwardStatus.ACTIVE, grant.getAwardStatus());
+        assertEquals("johnshopkins.edu:grant:8675309", grant.getLocalKey());
+        assertEquals(DateTimeUtil.createZonedDateTime("01/01/2000"), grant.getAwardDate());
+        assertEquals(DateTimeUtil.createZonedDateTime("01/01/2001"), grant.getStartDate());
+        assertEquals(DateTimeUtil.createZonedDateTime("01/01/2002"), grant.getEndDate());
+        assertEquals("Moo Project", grant.getProjectName());
+
+        assertEquals("johnshopkins.edu:grant:8675309", grant.getLocalKey());
+    }
+
+    private List<Map<String, String>> buildTestInputResultSet() {
         List<Map<String, String>> resultSet = new ArrayList<>();
 
         String awardNumber = "12345678";
@@ -163,29 +170,53 @@ public class JhuPassUpdaterTest {
         rowMap.put(CoeusFieldNames.C_PRIMARY_FUNDER_POLICY, directFunderPolicy);
 
         resultSet.add(rowMap);
+        return resultSet;
+    }
 
-        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
-        passUpdater.updatePass(resultSet, "grant");
+    private void preparePassClientMockCalls() throws IOException {
+        Funder directFunder = new Funder("000029282");
+        directFunder.setLocalKey("johnshopkins.edu:funder:000029282");
+        PassClientResult<PassEntity> mockFunderResult1 = new PassClientResult<>(List.of(directFunder), 1);
+        doReturn(mockFunderResult1)
+                .when(passClientMock)
+                .selectObjects(
+                        argThat(passClientSelector ->
+                                passClientSelector.getFilter().equals("localKey=='johnshopkins.edu:funder:000029282'")));
 
-        Map<URI, Grant> grantMap = passUpdater.getGrantUriMap();
-        assertEquals(1, grantMap.size());
-        Grant grant = grantMap.get(grantUri);
-        assertEquals(1, grant.getCoPis().size());
-        assertEquals(2, passUpdater.getFunderMap().size());
-        assertEquals(grant.getDirectFunder(), passUpdater.getFunderMap().get(directFunderId));
-        assertEquals(grant.getPrimaryFunder(), passUpdater.getFunderMap().get(primaryFunderId));
-        assertEquals(grant.getPi(), passUpdater.getUserMap().get("0000333"));
-        assertEquals(grant.getCoPis().get(0), passUpdater.getUserMap().get("0000222"));
+        Funder primaryFunder = new Funder("8675309");
+        directFunder.setLocalKey("johnshopkins.edu:funder:8675309");
+        PassClientResult<PassEntity> mockFunderResult2 = new PassClientResult<>(List.of(primaryFunder), 1);
+        doReturn(mockFunderResult2)
+                .when(passClientMock)
+                .selectObjects(
+                        argThat(passClientSelector2 ->
+                                passClientSelector2.getFilter().equals("localKey=='johnshopkins.edu:funder:8675309'")));
 
-        assertEquals(awardNumber, grant.getAwardNumber());
-        assertEquals(Grant.AwardStatus.ACTIVE, grant.getAwardStatus());
-        assertEquals("johnshopkins.edu:grant:8675309", grant.getLocalKey());
-        assertEquals(DateTimeUtil.createZonedDateTime(awardDate), grant.getAwardDate());
-        assertEquals(DateTimeUtil.createZonedDateTime(startDate), grant.getStartDate());
-        assertEquals(DateTimeUtil.createZonedDateTime(endDate), grant.getEndDate());
-        assertEquals(projectName, grant.getProjectName());
+        User user1 = new User("0000333");
+        PassClientResult<PassEntity> mockFunderResult3 = new PassClientResult<>(List.of(user1), 1);
+        doReturn(mockFunderResult3)
+                .when(passClientMock)
+                .selectObjects(
+                        argThat(passClientSelector3 ->
+                                passClientSelector3.getFilter().equals(
+                                        "locatorIds=in=('johnshopkins.edu:employeeid:0000333')")));
 
-        assertEquals("johnshopkins.edu:grant:8675309", grant.getLocalKey());
+        User user2 = new User("0000222");
+        PassClientResult<PassEntity> mockFunderResult4 = new PassClientResult<>(List.of(user2), 1);
+        doReturn(mockFunderResult4)
+                .when(passClientMock)
+                .selectObjects(
+                        argThat(passClientSelector4 ->
+                                passClientSelector4.getFilter().equals(
+                                        "locatorIds=in=('johnshopkins.edu:employeeid:0000222')")));
+
+        PassClientResult<PassEntity> mockFunderResult5 = new PassClientResult<>(Collections.emptyList(), 0);
+        doReturn(mockFunderResult5)
+                .when(passClientMock)
+                .selectObjects(
+                        argThat(passClientSelector5 ->
+                                passClientSelector5.getFilter().equals(
+                                        "localKey=='johnshopkins.edu:grant:8675309'")));
     }
 
     @Test
@@ -224,36 +255,45 @@ public class JhuPassUpdaterTest {
 
         assertEquals("Funder Name", newFunder.getName());
         assertEquals("8675309", newFunder.getLocalKey());
-        assertEquals("https://localhost:8080/fcrepo/rest/policy1", newFunder.getPolicy().toString());
+        assertEquals("policy1", newFunder.getPolicy().getId());
 
     }
 
     @Test(expected = RuntimeException.class)
-    public void testGrantModeCheck() {
+    public void testUpdatePassUser_Fail_ModeCheck() {
         List<Map<String, String>> grantResultSet = new ArrayList<>();
         Map<String, String> rowMap = new HashMap<>();
         rowMap.put(CoeusFieldNames.C_GRANT_LOCAL_KEY, CoeusFieldNames.C_GRANT_LOCAL_KEY);
         grantResultSet.add(rowMap);
 
-        PassClient passClient = PassClientFactory.getPassClient();
-        JhuPassUpdater passUpdater = new JhuPassUpdater(passClient);
+        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
 
         passUpdater.updatePass(grantResultSet, "user");
 
     }
 
     @Test(expected = RuntimeException.class)
-    public void testUserModeCheck() {
+    public void testUpdatePassGrant_Fail_ModeCheck() {
         List<Map<String, String>> userResultSet = new ArrayList<>();
         Map<String, String> rowMap = new HashMap<>();
         rowMap.put(CoeusFieldNames.C_USER_EMPLOYEE_ID, CoeusFieldNames.C_USER_EMPLOYEE_ID);
         userResultSet.add(rowMap);
 
-        PassClient passClient = PassClientFactory.getPassClient();
-        JhuPassUpdater passUpdater = new JhuPassUpdater(passClient);
+        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
 
         passUpdater.updatePass(userResultSet, "grant");
+    }
 
+    @Test(expected = RuntimeException.class)
+    public void testUpdatePassFunder_Fail_ModeCheck() {
+        List<Map<String, String>> userResultSet = new ArrayList<>();
+        Map<String, String> rowMap = new HashMap<>();
+        rowMap.put(CoeusFieldNames.C_USER_EMPLOYEE_ID, CoeusFieldNames.C_USER_EMPLOYEE_ID);
+        userResultSet.add(rowMap);
+
+        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
+
+        passUpdater.updatePass(userResultSet, "funder");
     }
 
 }

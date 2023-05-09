@@ -15,6 +15,7 @@
  */
 package org.eclipse.pass.support.grant.data;
 
+import static java.lang.String.format;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_ABBREVIATED_ROLE;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_DIRECT_FUNDER_LOCAL_KEY;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_DIRECT_FUNDER_NAME;
@@ -80,7 +81,7 @@ public class DefaultPassUpdater implements PassUpdater {
     private final PassUpdateStatistics statistics = new PassUpdateStatistics();
     private final PassEntityUtil passEntityUtil;
 
-    private final Map<String, Grant> grantMap = new HashMap<>();
+    private final Map<String, Grant> grantResultMap = new HashMap<>();
 
     //some entities may be referenced many times during an update, but just need to be updated the first time
     //they are encountered. these include Users and Funders. we save the overhead of redundant updates
@@ -131,7 +132,7 @@ public class DefaultPassUpdater implements PassUpdater {
 
         //a grant will have several rows in the ResultSet if there are co-pis. so we put the grant on this
         //Map and add to it as additional rows add information.
-        Map<String, Grant> grantMap = new HashMap<>();
+        Map<String, Grant> grantRowMap = new HashMap<>();
 
         LOG.info("Processing result set with {} rows", results.size());
         boolean modeChecked = false;
@@ -182,13 +183,13 @@ public class DefaultPassUpdater implements PassUpdater {
 
                 //if this is the first record for this Grant, it will not be on the Map
                 Grant grant;
-                if (!grantMap.containsKey(grantLocalKey)) {
+                if (!grantRowMap.containsKey(grantLocalKey)) {
                     grant = new Grant();
                     grant.setLocalKey(grantLocalKey);
-                    grantMap.put(grantLocalKey, grant);
+                    grantRowMap.put(grantLocalKey, grant);
                 }
 
-                grant = grantMap.get(grantLocalKey);
+                grant = grantRowMap.get(grantLocalKey);
 
                 String abbreviatedRole = rowMap.get(C_ABBREVIATED_ROLE);
                 //anybody who was ever a co-pi in an iteration will be in this list
@@ -231,9 +232,12 @@ public class DefaultPassUpdater implements PassUpdater {
                     //status should be the latest one
                     String status = rowMap.getOrDefault(C_GRANT_AWARD_STATUS, null);
                     try {
-                        AwardStatus awardStatus = AwardStatus.of(status);
+                        String lowercaseStatus = StringUtils.lowerCase(status);
+                        AwardStatus awardStatus = AwardStatus.of(lowercaseStatus);
                         grant.setAwardStatus(awardStatus);
                     } catch (IllegalArgumentException e) {
+                        LOG.error(format(
+                                "Invalid AwardStatus %s for Grant Row %s, setting to null", status, grantLocalKey));
                         grant.setAwardStatus(null);
                     }
 
@@ -257,8 +261,7 @@ public class DefaultPassUpdater implements PassUpdater {
                 }
 
                 //we are done with this record, let's save the state of this Grant
-                Grant updateGrant = updateGrantInPass(grant);
-                grantMap.put(grantLocalKey, updateGrant);
+                grantRowMap.put(grantLocalKey, grant);
                 //see if this is the latest grant updated
                 if (rowMap.containsKey(C_UPDATE_TIMESTAMP)) {
                     String grantUpdateString = rowMap.get(C_UPDATE_TIMESTAMP);
@@ -266,14 +269,25 @@ public class DefaultPassUpdater implements PassUpdater {
                         grantUpdateString, latestUpdateString);
                 }
             } catch (IOException e) {
-                LOG.error("Error processing Grant localKey: " + grantLocalKey, e);
+                LOG.error("Error building Grant Row with localKey: " + grantLocalKey, e);
+            }
+        }
+
+        //now put updated grant objects in pass
+        for (Grant grant : grantRowMap.values()) {
+            String grantLocalKey = grant.getLocalKey();
+            try {
+                Grant updatedGrant = updateGrantInPass(grant);
+                grantResultMap.put(grantLocalKey, updatedGrant);
+            } catch (IOException e) {
+                LOG.error("Error updating Grant with localKey: " + grantLocalKey, e);
             }
         }
 
         //success - we capture some information to report
-        if (grantMap.size() > 0) {
+        if (grantResultMap.size() > 0) {
             statistics.setLatestUpdateString(latestUpdateString);
-            statistics.setReport(results.size(), grantMap.size());
+            statistics.setReport(results.size(), grantResultMap.size());
         } else {
             System.out.println("No records were processed in this update");
         }
@@ -558,8 +572,8 @@ public class DefaultPassUpdater implements PassUpdater {
         return statistics;
     }
 
-    public Map<String, Grant> getGrantMap() {
-        return grantMap;
+    public Map<String, Grant> getGrantResultMap() {
+        return grantResultMap;
     }
 
     //this is used by an integration test
