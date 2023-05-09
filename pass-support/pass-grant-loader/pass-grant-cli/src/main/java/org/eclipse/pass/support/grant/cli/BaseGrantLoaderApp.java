@@ -131,15 +131,9 @@ abstract class BaseGrantLoaderApp {
         File connectionPropertiesFile = new File(appHome, connectionPropertiesFileName);
         String mailPropertiesFileName = "mail.properties";
         File mailPropertiesFile = new File(appHome, mailPropertiesFileName);
-        String systemPropertiesFileName = "system.properties";
-        File systemPropertiesFile = new File(appHome, systemPropertiesFileName);
         String policyPropertiesFileName = "policy.properties";
         File policyPropertiesFile = new File(appHome, policyPropertiesFileName);
         File dataFile = new File(dataFileName);
-
-        //let's be careful about overwriting system properties
-        String[] systemProperties = {"pass.fedora.user", "pass.fedora.password", "pass.fedora.baseurl",
-                                     "pass.elasticsearch.url", "pass.elasticsearch.limit"};
 
         updateTimestampsFile = new File(appHome, updateTimestampsFileName);
         Properties connectionProperties;
@@ -162,17 +156,6 @@ abstract class BaseGrantLoaderApp {
         }
         if (!appHome.canRead() || !appHome.canWrite()) {
             throw processException(ERR_HOME_DIRECTORY_NOT_READABLE_AND_WRITABLE, null);
-        }
-
-        //add new system properties if we have any
-        if (systemPropertiesFile.exists() && systemPropertiesFile.canRead()) {
-            Properties sysProps = loadProperties(systemPropertiesFile);
-            for (String key : systemProperties) {
-                String value = sysProps.getProperty(key);
-                if (value != null) {
-                    System.setProperty(key, value);
-                }
-            }
         }
 
         //check suitability of our input file
