@@ -95,7 +95,7 @@ public class JhuGrantLoaderCLI {
      */
     @Option(name = "-a", aliases = {"-action", "--action"},
             usage = "Action to be taken - 'pull' is for COEUS pull only," +
-                    "'load' is for Fedora load only. Either option requires a file path specified as an argument " +
+                    "'load' is for PASS load only. Either option requires a file path specified as an argument " +
                     "after all options - an" +
                     "output file in the case of 'pull', and an input file in the case of 'load'. If no action is " +
                     "specified, " +
