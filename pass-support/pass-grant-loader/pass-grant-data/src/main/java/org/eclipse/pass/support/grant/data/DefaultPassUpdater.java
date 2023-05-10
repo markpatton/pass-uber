@@ -225,9 +225,10 @@ public class DefaultPassUpdater implements PassUpdater {
                 //set values that should match the latest iteration of the grant
                 //use !isBefore in case more than one PI is specified, need to process more than one
                 //we mostly have awardDate, but will use end date as a fallback if not
-                if ((awardDate != null && (grant.getAwardDate() == null || !awardDate.isBefore(grant.getAwardDate()))) ||
-                    awardDate == null && (endDate != null && (grant.getEndDate() == null || !endDate.isBefore(
-                        grant.getEndDate())))) {
+                if ((awardDate != null
+                        && (grant.getAwardDate() == null || !awardDate.isBefore(grant.getAwardDate())))
+                        || awardDate == null
+                        && (endDate != null && (grant.getEndDate() == null || !endDate.isBefore(grant.getEndDate())))) {
                     grant.setEndDate(endDate);
                     //status should be the latest one
                     String status = rowMap.getOrDefault(C_GRANT_AWARD_STATUS, null);
