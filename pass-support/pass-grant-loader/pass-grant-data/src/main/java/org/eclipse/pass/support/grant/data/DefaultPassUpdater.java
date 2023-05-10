@@ -444,6 +444,7 @@ public class DefaultPassUpdater implements PassUpdater {
                 statistics.addFundersUpdated();
                 return updatedFunder;
             }
+            return storedFunder;
         } else { //don't have a stored Funder for this URI - this one is new to Pass
             if (systemFunder.getName() != null) { //only add if we have a name
                 passClient.createObject(systemFunder);
@@ -512,6 +513,7 @@ public class DefaultPassUpdater implements PassUpdater {
         LOG.debug("Looking for grant with localKey {}", fullLocalKey);
         PassClientSelector<Grant> selector = new PassClientSelector<>(Grant.class);
         selector.setFilter(RSQL.equals("localKey", fullLocalKey));
+        selector.setInclude("primaryFunder", "directFunder", "pi", "coPis");
         PassClientResult<Grant> result = passClient.selectObjects(selector);
 
         if (!result.getObjects().isEmpty()) {
@@ -525,6 +527,7 @@ public class DefaultPassUpdater implements PassUpdater {
                 LOG.debug("Updating grant with local key {}", systemGrant.getLocalKey());
                 return updatedGrant;
             }
+            return storedGrant;
         } else { //don't have a stored Grant for this URI - this one is new to Pass
             passClient.createObject(systemGrant);
             statistics.addGrantsCreated();

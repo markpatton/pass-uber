@@ -15,7 +15,6 @@
  */
 package org.eclipse.pass.support.grant;
 
-import static java.lang.Thread.sleep;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_ABBREVIATED_ROLE;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_DIRECT_FUNDER_LOCAL_KEY;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_DIRECT_FUNDER_NAME;
@@ -40,20 +39,22 @@ import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_LAST_NA
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_MIDDLE_NAME;
 import static org.eclipse.pass.support.grant.data.DateTimeUtil.createZonedDateTime;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.PassClientResult;
+import org.eclipse.pass.support.client.PassClientSelector;
+import org.eclipse.pass.support.client.RSQL;
 import org.eclipse.pass.support.client.model.AwardStatus;
 import org.eclipse.pass.support.client.model.Grant;
 import org.eclipse.pass.support.client.model.Policy;
+import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.support.grant.data.JhuPassInitUpdater;
 import org.eclipse.pass.support.grant.data.PassUpdateStatistics;
 import org.junit.Before;
@@ -118,7 +119,7 @@ public class JhuPassInitUpdaterIT {
      * @throws InterruptedException from data time creation
      */
     @Test
-    public void processInitGrantIT() throws InterruptedException {
+    public void processInitGrantIT() throws IOException {
         List<Map<String, String>> resultSet = new ArrayList<>();
 
         //put in last iteration as existing record - PI is Einstein
@@ -126,70 +127,86 @@ public class JhuPassInitUpdaterIT {
         resultSet.add(piRecord2);
 
         passUpdater.updatePass(resultSet, "grant");
-        sleep(10000);
 
-//        URI passGrantUri = passClient.findByAttribute(Grant.class, "localKey", grantIdPrefix + grantLocalKey[2]);
-//        assertNotNull(passGrantUri);
-//
-//        URI passUser1Uri = passClient.findByAttribute(User.class, "locatorIds", employeeidPrefix + userEmployeeId[1]);
-//        assertNotNull(passUser1Uri);
-//
-//        Grant passGrant = passClient.readResource(passGrantUri, Grant.class);
-//
-//        assertEquals(grantAwardNumber[2], passGrant.getAwardNumber());
-//        assertEquals(AwardStatus.ACTIVE, passGrant.getAwardStatus());
-//        assertEquals(grantIdPrefix + grantLocalKey[2], passGrant.getLocalKey());
-//        assertEquals(grantProjectName[2], passGrant.getProjectName());
-//        assertEquals(createZonedDateTime(grantAwardDate[2]), passGrant.getAwardDate());
-//        assertEquals(createZonedDateTime(grantStartDate[2]), passGrant.getStartDate());
-//        assertEquals(createZonedDateTime(grantEndDate[2]), passGrant.getEndDate());
-//        assertEquals(passUser1Uri, passGrant.getPi()); //Einstein
-//        assertEquals(0, passGrant.getCoPis().size());
-//
-//        //check statistics
-//        assertEquals(1, statistics.getGrantsCreated());
-//        assertEquals(1, statistics.getUsersCreated());
-//        assertEquals(1, statistics.getPisAdded());
-//        assertEquals(0, statistics.getCoPisAdded());
-//
-//        //now simulate a complete pull from the Beginning of Time and adjust the stored grant
-//        //we add a new co-pi Jones in the "1" iteration, and change the pi to Einstein in the "2" iteration
-//        //we drop co-pi jones in the last iteration
-//        Map<String, String> piRecord0 = makeRowMap(0, 0, "P");
-//        Map<String, String> coPiRecord0 = makeRowMap(0, 1, "C");
-//        Map<String, String> piRecord1 = makeRowMap(1, 0, "P");
-//        Map<String, String> coPiRecord1 = makeRowMap(1, 1, "C");
-//        Map<String, String> newCoPiRecord1 = makeRowMap(1, 2, "C");
-//
-//        //in the initial pull, we will find all of the records (check?)
-//        resultSet.clear();
-//        resultSet.add(piRecord0);
-//        resultSet.add(coPiRecord0);
-//        resultSet.add(piRecord1);
-//        resultSet.add(coPiRecord1);
-//        resultSet.add(newCoPiRecord1);
-//        resultSet.add(piRecord2);
-//
-//        passUpdater.updatePass(resultSet, "grant");
-//        sleep(10000);
-//
-//        passGrant = passClient.readResource(passGrantUri, Grant.class);
-//        URI passUser0Uri = passClient.findByAttribute(User.class, "locatorIds", employeeidPrefix + userEmployeeId[0]);
-//        assertNotNull(passUser0Uri);
-//        URI passUser2Uri = passClient.findByAttribute(User.class, "locatorIds", employeeidPrefix + userEmployeeId[2]);
-//        assertNotNull(passUser2Uri);
-//
-//        assertEquals(grantAwardNumber[0], passGrant.getAwardNumber());//initial
-//        assertEquals(Grant.AwardStatus.ACTIVE, passGrant.getAwardStatus());
-//        assertEquals(grantIdPrefix + grantLocalKey[0], passGrant.getLocalKey());
-//        assertEquals(grantProjectName[0], passGrant.getProjectName());//initial
-//        assertEquals(createZonedDateTime(grantAwardDate[0]), passGrant.getAwardDate());//initial
-//        assertEquals(createZonedDateTime(grantStartDate[0]), passGrant.getStartDate());//initial
-//        assertEquals(createZonedDateTime(grantEndDate[2]), passGrant.getEndDate());//latest
-//        assertEquals(passUser1Uri, passGrant.getPi());//Einstein
-//        assertEquals(2, passGrant.getCoPis().size());
-//        assertTrue(passGrant.getCoPis().contains(passUser0Uri));//Melon
-//        assertTrue(passGrant.getCoPis().contains(passUser2Uri));//Jones
+        PassClientSelector<Grant> grantSelector = new PassClientSelector<>(Grant.class);
+        grantSelector.setFilter(RSQL.equals("localKey", grantIdPrefix + grantLocalKey[2]));
+        grantSelector.setInclude("primaryFunder", "directFunder", "pi", "coPis");
+        PassClientResult<Grant> resultGrant = passClient.selectObjects(grantSelector);
+        assertEquals(1, resultGrant.getTotal());
+        Grant passGrant = resultGrant.getObjects().get(0);
+
+        PassClientSelector<User> userSelector = new PassClientSelector<>(User.class);
+        userSelector.setFilter(RSQL.hasMember("locatorIds", employeeidPrefix + userEmployeeId[1]));
+        PassClientResult<User> resultUser = passClient.selectObjects(userSelector);
+        assertEquals(1, resultUser.getTotal());
+        User userGrantPi = resultUser.getObjects().get(0);
+
+        assertEquals(grantAwardNumber[2], passGrant.getAwardNumber());
+        assertEquals(AwardStatus.ACTIVE, passGrant.getAwardStatus());
+        assertEquals(grantIdPrefix + grantLocalKey[2], passGrant.getLocalKey());
+        assertEquals(grantProjectName[2], passGrant.getProjectName());
+        assertEquals(createZonedDateTime(grantAwardDate[2]), passGrant.getAwardDate());
+        assertEquals(createZonedDateTime(grantStartDate[2]), passGrant.getStartDate());
+        assertEquals(createZonedDateTime(grantEndDate[2]), passGrant.getEndDate());
+        assertEquals(userGrantPi, passGrant.getPi()); //Einstein
+        assertEquals(0, passGrant.getCoPis().size());
+
+        //check statistics
+        assertEquals(1, statistics.getGrantsCreated());
+        assertEquals(1, statistics.getUsersCreated());
+        assertEquals(1, statistics.getPisAdded());
+        assertEquals(0, statistics.getCoPisAdded());
+
+        //now simulate a complete pull from the Beginning of Time and adjust the stored grant
+        //we add a new co-pi Jones in the "1" iteration, and change the pi to Einstein in the "2" iteration
+        //we drop co-pi jones in the last iteration
+        Map<String, String> piRecord0 = makeRowMap(0, 0, "P");
+        Map<String, String> coPiRecord0 = makeRowMap(0, 1, "C");
+        Map<String, String> piRecord1 = makeRowMap(1, 0, "P");
+        Map<String, String> coPiRecord1 = makeRowMap(1, 1, "C");
+        Map<String, String> newCoPiRecord1 = makeRowMap(1, 2, "C");
+
+        //in the initial pull, we will find all of the records (check?)
+        resultSet.clear();
+        resultSet.add(piRecord0);
+        resultSet.add(coPiRecord0);
+        resultSet.add(piRecord1);
+        resultSet.add(coPiRecord1);
+        resultSet.add(newCoPiRecord1);
+        resultSet.add(piRecord2);
+
+        passUpdater.updatePass(resultSet, "grant");
+
+        resultGrant = passClient.selectObjects(grantSelector);
+        assertEquals(1, resultGrant.getTotal());
+        Grant updatePassGrant = resultGrant.getObjects().get(0);
+
+        userSelector.setFilter(RSQL.hasMember("locatorIds", employeeidPrefix + userEmployeeId[0]));
+        resultUser = passClient.selectObjects(userSelector);
+        assertEquals(1, resultUser.getTotal());
+        User user0 = resultUser.getObjects().get(0);
+
+        userSelector.setFilter(RSQL.hasMember("locatorIds", employeeidPrefix + userEmployeeId[1]));
+        resultUser = passClient.selectObjects(userSelector);
+        assertEquals(1, resultUser.getTotal());
+        User user1 = resultUser.getObjects().get(0);
+
+        userSelector.setFilter(RSQL.hasMember("locatorIds", employeeidPrefix + userEmployeeId[2]));
+        resultUser = passClient.selectObjects(userSelector);
+        assertEquals(1, resultUser.getTotal());
+        User user2 = resultUser.getObjects().get(0);
+
+        assertEquals(grantAwardNumber[0], updatePassGrant.getAwardNumber());//initial
+        assertEquals(AwardStatus.ACTIVE, updatePassGrant.getAwardStatus());
+        assertEquals(grantIdPrefix + grantLocalKey[0], updatePassGrant.getLocalKey());
+        assertEquals(grantProjectName[0], updatePassGrant.getProjectName());//initial
+        assertEquals(createZonedDateTime(grantAwardDate[0]), updatePassGrant.getAwardDate());//initial
+        assertEquals(createZonedDateTime(grantStartDate[0]), updatePassGrant.getStartDate());//initial
+        assertEquals(createZonedDateTime(grantEndDate[2]), updatePassGrant.getEndDate());//latest
+        assertEquals(user1, updatePassGrant.getPi());//Einstein
+        assertEquals(2, updatePassGrant.getCoPis().size());
+        assertTrue(updatePassGrant.getCoPis().contains(user0));//Melon
+        assertTrue(updatePassGrant.getCoPis().contains(user2));//Jones
     }
 
     /**
