@@ -18,7 +18,7 @@ package org.eclipse.pass.support.grant.data;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,14 +59,14 @@ public class DateTimeUtil {
                     String[] secondParts = timeParts[2].split("\\.");
                     int second = Integer.parseInt(secondParts[0]);
                     int millisecond = Integer.parseInt(secondParts[1]);//seems to be always 0 in our data
-                    dateTime = ZonedDateTime.of(year, month, day, hour, minute, second, millisecond, ZoneId.of("UTC"));
+                    dateTime = ZonedDateTime.of(year, month, day, hour, minute, second, millisecond, ZoneOffset.UTC);
                 }
             } else if (verifyDate(dateString)) { //we may have just a date - date format is mm/day/year
                 parts = dateString.split("/");
                 int month = Integer.parseInt(parts[0]);
                 int day = Integer.parseInt(parts[1]);
                 int year = Integer.parseInt(parts[2]);
-                dateTime = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, ZoneId.of("UTC"));;
+                dateTime = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.UTC);;
             }
             return dateTime;
         } else {
