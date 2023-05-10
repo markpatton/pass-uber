@@ -472,7 +472,8 @@ public class DefaultPassUpdater implements PassUpdater {
                 PassClientSelector<User> selector = new PassClientSelector<>(User.class);
                 selector.setFilter(RSQL.hasMember("locatorIds", id));
                 PassClientResult<User> result = passClient.selectObjects(selector);
-                passUser = result.getObjects().get(0);
+                // TODO any possibility this should contain more than 1 item?
+                passUser = result.getObjects().isEmpty() ? null : result.getObjects().get(0);
             }
         }
 
