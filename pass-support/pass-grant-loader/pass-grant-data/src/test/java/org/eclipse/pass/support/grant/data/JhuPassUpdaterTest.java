@@ -199,7 +199,7 @@ public class JhuPassUpdaterTest {
                 .selectObjects(
                         argThat(passClientSelector3 ->
                                 passClientSelector3.getFilter().equals(
-                                        "locatorIds=in=('johnshopkins.edu:employeeid:0000333')")));
+                                        "locatorIds=hasmember='johnshopkins.edu:employeeid:0000333'")));
 
         User user2 = new User("0000222");
         PassClientResult<PassEntity> mockFunderResult4 = new PassClientResult<>(List.of(user2), 1);
@@ -208,7 +208,7 @@ public class JhuPassUpdaterTest {
                 .selectObjects(
                         argThat(passClientSelector4 ->
                                 passClientSelector4.getFilter().equals(
-                                        "locatorIds=in=('johnshopkins.edu:employeeid:0000222')")));
+                                        "locatorIds=hasmember='johnshopkins.edu:employeeid:0000222'")));
 
         PassClientResult<PassEntity> mockFunderResult5 = new PassClientResult<>(Collections.emptyList(), 0);
         doReturn(mockFunderResult5)

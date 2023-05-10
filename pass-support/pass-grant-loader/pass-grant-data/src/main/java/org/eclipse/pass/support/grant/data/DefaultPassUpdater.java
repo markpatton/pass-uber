@@ -470,7 +470,7 @@ public class DefaultPassUpdater implements PassUpdater {
             String id = String.valueOf(idIterator.next());
             if (id != null) {
                 PassClientSelector<User> selector = new PassClientSelector<>(User.class);
-                selector.setFilter(RSQL.in("locatorIds", id));
+                selector.setFilter(RSQL.hasMember("locatorIds", id));
                 PassClientResult<User> result = passClient.selectObjects(selector);
                 passUser = result.getObjects().get(0);
             }
