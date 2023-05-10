@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -297,7 +298,7 @@ public class JsonApiPassClientIT {
         PassClientResult<User> result = client.selectObjects(selector);
 
         assertTrue(result.getObjects().size() > 0);
-        assertTrue(result.getObjects().stream().noneMatch(user -> user.getUsername().equals("johndoe2")));
+        assertTrue(result.getObjects().stream().noneMatch(user -> Objects.equals(user.getUsername(), "johndoe2")));
     }
 
     private static ZonedDateTime dt(String s) {
