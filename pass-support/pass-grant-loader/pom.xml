@@ -41,7 +41,6 @@
     <commons-codec.version>1.14</commons-codec.version>
     <commons.csv.version>1.8</commons.csv.version>
     <poi.version>4.1.2</poi.version>
-    <docker-maven-plugin.version>0.30.0</docker-maven-plugin.version>
     <greenmail.version>1.5.13</greenmail.version>
     <javax.mail.version>1.6.2</javax.mail.version>
     <junit.version>4.13</junit.version>
