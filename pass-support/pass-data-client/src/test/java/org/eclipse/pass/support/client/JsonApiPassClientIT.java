@@ -3,6 +3,7 @@ package org.eclipse.pass.support.client;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.URI;
@@ -250,6 +251,53 @@ public class JsonApiPassClientIT {
         selector = new PassClientSelector<>(Publication.class, 0, 2, filter, "id");
         pubs.forEach(p -> p.setJournal(new Journal(journal.getId())));
         assertIterableEquals(pubs, client.streamObjects(selector).collect(Collectors.toList()));
+    }
+
+    @Test
+    public void testSelectUserObjects_Success_HasMember() throws IOException {
+        User pi = new User();
+        pi.setAffiliation(Collections.singleton("affil"));
+        pi.setDisplayName("John");
+        pi.setEmail("johndoe@example.com");
+        pi.setFirstName("John");
+        pi.setLastName("Doe");
+        pi.setLocatorIds(List.of("locator-a", "locator-b"));
+        pi.setOrcidId("11xx-xxxx-xxxx-xxxx");
+        pi.setRoles(Arrays.asList(UserRole.SUBMITTER));
+        pi.setUsername("johndoe1");
+
+        client.createObject(pi);
+
+        PassClientSelector<User> selector = new PassClientSelector<>(User.class);
+        selector.setFilter(RSQL.hasMember("locatorIds", "locator-b"));
+        PassClientResult<User> result = client.selectObjects(selector);
+
+        assertEquals(1, result.getTotal());
+        User selectedUser = result.getObjects().get(0);
+        assertEquals(pi, selectedUser);
+    }
+
+    @Test
+    public void testSelectUserObjects_Success_HasNoMember() throws IOException {
+        User pi = new User();
+        pi.setAffiliation(Collections.singleton("affil"));
+        pi.setDisplayName("John2");
+        pi.setEmail("johndoe2@example.com");
+        pi.setFirstName("John2");
+        pi.setLastName("Doe2");
+        pi.setLocatorIds(List.of("locator-a", "locator-foobar"));
+        pi.setOrcidId("22xx-xxxx-xxxx-xxxx");
+        pi.setRoles(Arrays.asList(UserRole.SUBMITTER));
+        pi.setUsername("johndoe2");
+
+        client.createObject(pi);
+
+        PassClientSelector<User> selector = new PassClientSelector<>(User.class);
+        selector.setFilter(RSQL.hasNoMember("locatorIds", "locator-foobar"));
+        PassClientResult<User> result = client.selectObjects(selector);
+
+        assertTrue(result.getObjects().size() > 0);
+        assertTrue(result.getObjects().stream().noneMatch(user -> user.getUsername().equals("johndoe2")));
     }
 
     private static ZonedDateTime dt(String s) {
