@@ -108,4 +108,17 @@ public class DateTimeUtil {
         }
         return true;
     }
+
+    /**
+     * Compare two timestamps and return the later of them
+     *
+     * @param currentUpdateString the current latest timestamp string
+     * @param latestUpdateString  the new timestamp to be compared against the current latest timestamp
+     * @return the later of the two parameters
+     */
+    static String returnLaterUpdate(String currentUpdateString, String latestUpdateString) {
+        ZonedDateTime grantUpdateTime = createZonedDateTime(currentUpdateString);
+        ZonedDateTime previousLatestUpdateTime = createZonedDateTime(latestUpdateString);
+        return grantUpdateTime.isAfter(previousLatestUpdateTime) ? currentUpdateString : latestUpdateString;
+    }
 }

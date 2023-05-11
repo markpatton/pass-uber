@@ -133,4 +133,21 @@ public class DateTimeUtilTest {
         assertFalse(DateTimeUtil.verifyDate(null));
     }
 
+    /**
+     * Test static timestamp utility method to verify it returns the later of two supplied timestamps
+     */
+    @Test
+    public void testReturnLatestUpdate() {
+        String baseString = "1980-01-01 00:00:00.0";
+        String earlyDate = "2018-01-02 03:04:05.0";
+        String laterDate = "2018-01-02 04:08:09.0";
+
+        String latestDate = DateTimeUtil.returnLaterUpdate(baseString, earlyDate);
+        assertEquals(earlyDate, latestDate);
+        latestDate = DateTimeUtil.returnLaterUpdate(latestDate, laterDate);
+        assertEquals(laterDate, latestDate);
+
+        assertEquals(earlyDate, DateTimeUtil.returnLaterUpdate(earlyDate, earlyDate));
+    }
+
 }

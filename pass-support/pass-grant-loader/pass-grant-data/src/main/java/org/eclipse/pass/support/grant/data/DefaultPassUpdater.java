@@ -266,8 +266,10 @@ public class DefaultPassUpdater implements PassUpdater {
                 //see if this is the latest grant updated
                 if (rowMap.containsKey(C_UPDATE_TIMESTAMP)) {
                     String grantUpdateString = rowMap.get(C_UPDATE_TIMESTAMP);
-                    latestUpdateString = latestUpdateString.length() == 0 ? grantUpdateString : returnLaterUpdate(
-                        grantUpdateString, latestUpdateString);
+                    latestUpdateString =
+                            latestUpdateString.length() == 0
+                                    ? grantUpdateString
+                                    : DateTimeUtil.returnLaterUpdate(grantUpdateString, latestUpdateString);
                 }
             } catch (IOException e) {
                 LOG.error("Error building Grant Row with localKey: " + grantLocalKey, e);
@@ -316,8 +318,10 @@ public class DefaultPassUpdater implements PassUpdater {
                 userProcessedCounter++;
                 if (rowMap.containsKey(C_UPDATE_TIMESTAMP)) {
                     String userUpdateString = rowMap.get(C_UPDATE_TIMESTAMP);
-                    latestUpdateString = latestUpdateString.length() == 0 ? userUpdateString : returnLaterUpdate(
-                        userUpdateString, latestUpdateString);
+                    latestUpdateString =
+                            latestUpdateString.length() == 0
+                                    ? userUpdateString
+                                    : DateTimeUtil.returnLaterUpdate(userUpdateString, latestUpdateString);
                 }
             } catch (IOException e) {
                 LOG.error("Error processing User: " + rowUser, e);
@@ -474,7 +478,6 @@ public class DefaultPassUpdater implements PassUpdater {
                 PassClientSelector<User> selector = new PassClientSelector<>(User.class);
                 selector.setFilter(RSQL.hasMember("locatorIds", id));
                 PassClientResult<User> result = passClient.selectObjects(selector);
-                // TODO could this have more than one object?
                 passUser = result.getObjects().isEmpty() ? null : result.getObjects().get(0);
             }
         }
@@ -535,19 +538,6 @@ public class DefaultPassUpdater implements PassUpdater {
             LOG.debug("Creating grant with local key {}", systemGrant.getLocalKey());
         }
         return systemGrant;
-    }
-
-    /**
-     * Compare two timestamps and return the later of them
-     *
-     * @param currentUpdateString the current latest timestamp string
-     * @param latestUpdateString  the new timestamp to be compared against the current latest timestamp
-     * @return the later of the two parameters
-     */
-    static String returnLaterUpdate(String currentUpdateString, String latestUpdateString) {
-        ZonedDateTime grantUpdateTime = createZonedDateTime(currentUpdateString);
-        ZonedDateTime previousLatestUpdateTime = createZonedDateTime(latestUpdateString);
-        return grantUpdateTime.isAfter(previousLatestUpdateTime) ? currentUpdateString : latestUpdateString;
     }
 
     /**
