@@ -54,7 +54,14 @@ public class JhuPassUpdaterTest {
     public void testUpdatePassGrant_Success_NewGrant() throws IOException {
 
         List<Map<String, String>> resultSet = buildTestInputResultSet();
-        preparePassClientMockCalls();
+        preparePassClientMockCallsGrantRelations();
+        PassClientResult<PassEntity> mockGrantResult = new PassClientResult<>(Collections.emptyList(), 0);
+        doReturn(mockGrantResult)
+                .when(passClientMock)
+                .selectObjects(
+                        argThat(passClientSelector ->
+                                passClientSelector.getFilter().equals(
+                                        "localKey=='johnshopkins.edu:grant:8675309'")));
 
         JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
         passUpdater.updatePass(resultSet, "grant");
@@ -78,6 +85,28 @@ public class JhuPassUpdaterTest {
         assertEquals("Moo Project", grant.getProjectName());
 
         assertEquals("johnshopkins.edu:grant:8675309", grant.getLocalKey());
+    }
+
+    @Test
+    public void testUpdatePassGrant_Success_SkipDuplicateGrantInPass() throws IOException {
+
+        List<Map<String, String>> resultSet = buildTestInputResultSet();
+        preparePassClientMockCallsGrantRelations();
+        Grant grant1 = new Grant("8675309");
+        Grant grant2 = new Grant("8675309");
+        PassClientResult<PassEntity> mockGrantResult = new PassClientResult<>(List.of(grant1, grant2), 2);
+        doReturn(mockGrantResult)
+                .when(passClientMock)
+                .selectObjects(
+                        argThat(passClientSelector ->
+                                passClientSelector.getFilter().equals(
+                                        "localKey=='johnshopkins.edu:grant:8675309'")));
+
+        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
+        passUpdater.updatePass(resultSet, "grant");
+
+        Map<String, Grant> grantMap = passUpdater.getGrantResultMap();
+        assertEquals(0, grantMap.size()); // no update to grant since pass returns duplicate
     }
 
     private List<Map<String, String>> buildTestInputResultSet() {
@@ -156,7 +185,7 @@ public class JhuPassUpdaterTest {
         return resultSet;
     }
 
-    private void preparePassClientMockCalls() throws IOException {
+    private void preparePassClientMockCallsGrantRelations() throws IOException {
         Funder directFunder = new Funder("000029282");
         directFunder.setLocalKey("johnshopkins.edu:funder:000029282");
         PassClientResult<PassEntity> mockFunderResult1 = new PassClientResult<>(List.of(directFunder), 1);
@@ -175,8 +204,8 @@ public class JhuPassUpdaterTest {
                                 passClientSelector2.getFilter().equals("localKey=='johnshopkins.edu:funder:8675309'")));
 
         User user1 = new User("0000333");
-        PassClientResult<PassEntity> mockFunderResult3 = new PassClientResult<>(List.of(user1), 1);
-        doReturn(mockFunderResult3)
+        PassClientResult<PassEntity> mockUserResult3 = new PassClientResult<>(List.of(user1), 1);
+        doReturn(mockUserResult3)
                 .when(passClientMock)
                 .selectObjects(
                         argThat(passClientSelector3 ->
@@ -184,21 +213,13 @@ public class JhuPassUpdaterTest {
                                         "locatorIds=hasmember='johnshopkins.edu:employeeid:0000333'")));
 
         User user2 = new User("0000222");
-        PassClientResult<PassEntity> mockFunderResult4 = new PassClientResult<>(List.of(user2), 1);
-        doReturn(mockFunderResult4)
+        PassClientResult<PassEntity> mockUserResult4 = new PassClientResult<>(List.of(user2), 1);
+        doReturn(mockUserResult4)
                 .when(passClientMock)
                 .selectObjects(
                         argThat(passClientSelector4 ->
                                 passClientSelector4.getFilter().equals(
                                         "locatorIds=hasmember='johnshopkins.edu:employeeid:0000222'")));
-
-        PassClientResult<PassEntity> mockFunderResult5 = new PassClientResult<>(Collections.emptyList(), 0);
-        doReturn(mockFunderResult5)
-                .when(passClientMock)
-                .selectObjects(
-                        argThat(passClientSelector5 ->
-                                passClientSelector5.getFilter().equals(
-                                        "localKey=='johnshopkins.edu:grant:8675309'")));
     }
 
     @Test

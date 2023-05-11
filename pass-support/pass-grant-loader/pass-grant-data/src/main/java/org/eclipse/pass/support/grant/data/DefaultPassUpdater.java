@@ -54,6 +54,7 @@ import org.eclipse.pass.support.client.RSQL;
 import org.eclipse.pass.support.client.model.AwardStatus;
 import org.eclipse.pass.support.client.model.Funder;
 import org.eclipse.pass.support.client.model.Grant;
+import org.eclipse.pass.support.client.model.PassEntity;
 import org.eclipse.pass.support.client.model.Policy;
 import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.support.client.model.UserRole;
@@ -271,7 +272,7 @@ public class DefaultPassUpdater implements PassUpdater {
                                     ? grantUpdateString
                                     : DateTimeUtil.returnLaterUpdate(grantUpdateString, latestUpdateString);
                 }
-            } catch (IOException e) {
+            } catch (IOException | GrantDataException e) {
                 LOG.error("Error building Grant Row with localKey: " + grantLocalKey, e);
             }
         }
@@ -282,7 +283,7 @@ public class DefaultPassUpdater implements PassUpdater {
             try {
                 Grant updatedGrant = updateGrantInPass(grant);
                 grantResultMap.put(grantLocalKey, updatedGrant);
-            } catch (IOException e) {
+            } catch (IOException | GrantDataException e) {
                 LOG.error("Error updating Grant with localKey: " + grantLocalKey, e);
             }
         }
@@ -323,7 +324,7 @@ public class DefaultPassUpdater implements PassUpdater {
                                     ? userUpdateString
                                     : DateTimeUtil.returnLaterUpdate(userUpdateString, latestUpdateString);
                 }
-            } catch (IOException e) {
+            } catch (IOException | GrantDataException e) {
                 LOG.error("Error processing User: " + rowUser, e);
             }
         }
@@ -361,7 +362,7 @@ public class DefaultPassUpdater implements PassUpdater {
             try {
                 updateFunderInPass(rowFunder);
                 funderProcessedCounter++;
-            } catch (IOException e) {
+            } catch (IOException | GrantDataException e) {
                 LOG.error("Error processing Funder localKey: " + rowFunder.getLocalKey(), e);
             }
         }
@@ -430,7 +431,7 @@ public class DefaultPassUpdater implements PassUpdater {
      * @param systemFunder the new Funder object populated from COEUS
      * @return the localKey for the resource representing the updated Funder in Pass
      */
-    private Funder updateFunderInPass(Funder systemFunder) throws IOException {
+    private Funder updateFunderInPass(Funder systemFunder) throws IOException, GrantDataException {
         String baseLocalKey = systemFunder.getLocalKey();
         String fullLocalKey = GrantDataUtils.buildLocalKey(domain, FUNDER_ID_TYPE, baseLocalKey);
         systemFunder.setLocalKey(fullLocalKey);
@@ -441,8 +442,7 @@ public class DefaultPassUpdater implements PassUpdater {
         PassClientResult<Funder> result = passClient.selectObjects(selector);
 
         if (!result.getObjects().isEmpty()) {
-            // TODO could this have more than one object?
-            Funder storedFunder = result.getObjects().get(0);
+            Funder storedFunder = getSingleObject(result, fullLocalKey);
             Funder updatedFunder = passEntityUtil.update(systemFunder, storedFunder);
             if (Objects.nonNull(updatedFunder)) { //need to update
                 passClient.updateObject(updatedFunder);
@@ -466,7 +466,7 @@ public class DefaultPassUpdater implements PassUpdater {
      * @param systemUser the new User object populated from COEUS
      * @return the URI for the resource representing the updated User in Pass
      */
-    private User updateUserInPass(User systemUser) throws IOException {
+    private User updateUserInPass(User systemUser) throws IOException, GrantDataException {
         //we first check to see if the user is known by the Hopkins ID. If not, we check the employee ID.
         //last attempt is the JHED ID. this order is specified by the order of the List as constructed on updatedUser
         User passUser = null;
@@ -478,7 +478,9 @@ public class DefaultPassUpdater implements PassUpdater {
                 PassClientSelector<User> selector = new PassClientSelector<>(User.class);
                 selector.setFilter(RSQL.hasMember("locatorIds", id));
                 PassClientResult<User> result = passClient.selectObjects(selector);
-                passUser = result.getObjects().isEmpty() ? null : result.getObjects().get(0);
+                passUser = result.getObjects().isEmpty()
+                        ? null
+                        : getSingleObject(result, id);;
             }
         }
 
@@ -509,7 +511,7 @@ public class DefaultPassUpdater implements PassUpdater {
      * @param systemGrant the new Grant object populated from COEUS
      * @return the PASS identifier for the Grant object
      */
-    private Grant updateGrantInPass(Grant systemGrant) throws IOException {
+    private Grant updateGrantInPass(Grant systemGrant) throws IOException, GrantDataException {
         String baseLocalKey = systemGrant.getLocalKey();
         String fullLocalKey = GrantDataUtils.buildLocalKey(domain, GRANT_ID_TYPE, baseLocalKey);
         systemGrant.setLocalKey(fullLocalKey);
@@ -522,8 +524,7 @@ public class DefaultPassUpdater implements PassUpdater {
 
         if (!result.getObjects().isEmpty()) {
             LOG.debug("Found grant with localKey {}", fullLocalKey);
-            // TODO could this have more than one object?
-            Grant storedGrant = result.getObjects().get(0);
+            Grant storedGrant = getSingleObject(result, fullLocalKey);
             Grant updatedGrant = passEntityUtil.update(systemGrant, storedGrant);
             if (Objects.nonNull(updatedGrant)) { //need to update
                 passClient.updateObject(updatedGrant);
@@ -538,6 +539,13 @@ public class DefaultPassUpdater implements PassUpdater {
             LOG.debug("Creating grant with local key {}", systemGrant.getLocalKey());
         }
         return systemGrant;
+    }
+
+    private <T extends PassEntity> T getSingleObject(PassClientResult<T> result, String key) throws GrantDataException {
+        if (result.getObjects().size() > 1) {
+            throw new GrantDataException("More than a single object returned for key: " + key);
+        }
+        return result.getObjects().get(0);
     }
 
     /**
