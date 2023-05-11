@@ -15,10 +15,14 @@
  */
 package org.eclipse.pass.support.grant.data;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.time.ZonedDateTime;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for static utility methods
@@ -34,51 +38,51 @@ public class DateTimeUtilTest {
     public void testVerifyDateTimeFormat() {
         //check that zeroes in the time of day are ok
         String date = "2018-12-22 00:00:00.0";
-        Assert.assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
+        assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
 
         //check that the "." is correctly escaped
         date = "2018-01-01 12:14:55h1";
-        Assert.assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
+        assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
 
         //zero month not allowed
         date = "2018-00-01 12:14:55.1";
-        Assert.assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
+        assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
 
         //zero day not allowed
         date = "2018-12-00 00:00:00.0";
-        Assert.assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
+        assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
 
         //24 hour times work
         date = "2018-01-01 23:14:55.0";
-        Assert.assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
+        assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
 
         //hours limited to 23
         date = "2018-01-01 24:14:55.1";
-        Assert.assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
+        assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
 
         //59 minutes work ...
         date = "2018-01-01 23:59:55.0";
-        Assert.assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
+        assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
 
         // ... but 60 do not
         date = "2018-01-01 23:60:55.1";
-        Assert.assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
+        assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
 
         //59 seconds work ...
         date = "2018-01-01 23:59:59.0";
-        Assert.assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
+        assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
 
         // ... but 60 do not
         date = "2018-01-01 23:59:60.1";
-        Assert.assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
+        assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
 
         // three decimal places for milliseconds are ok ...
         date = "2018-01-01 07:59:16.199";
-        Assert.assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
+        assertTrue(DateTimeUtil.verifyDateTimeFormat(date));
 
         // .. but not 4
         date = "2018-01-01 07:59:16.1998";
-        Assert.assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
+        assertFalse(DateTimeUtil.verifyDateTimeFormat(date));
 
     }
 
@@ -90,29 +94,29 @@ public class DateTimeUtilTest {
     public void testCreateZonedDateTime() {
         String timestamp = "2018-01-30 23:59:58.0";
         ZonedDateTime dateTime = DateTimeUtil.createZonedDateTime(timestamp);
-        Assert.assertNotNull(dateTime);
+        assertNotNull(dateTime);
 
-        Assert.assertEquals(2018, dateTime.getYear());
-        Assert.assertEquals(1, dateTime.getMonthValue());
-        Assert.assertEquals(30, dateTime.getDayOfMonth());
+        assertEquals(2018, dateTime.getYear());
+        assertEquals(1, dateTime.getMonthValue());
+        assertEquals(30, dateTime.getDayOfMonth());
 
-        Assert.assertEquals(23, dateTime.getHour());
-        Assert.assertEquals(59, dateTime.getMinute());
-        Assert.assertEquals(58, dateTime.getSecond());
+        assertEquals(23, dateTime.getHour());
+        assertEquals(59, dateTime.getMinute());
+        assertEquals(58, dateTime.getSecond());
 
-        Assert.assertEquals(0, dateTime.getNano());
+        assertEquals(0, dateTime.getNano());
 
         String date = "01/30/2018";
         dateTime = DateTimeUtil.createZonedDateTime(date);
-        Assert.assertEquals(2018, dateTime.getYear());
-        Assert.assertEquals(1, dateTime.getMonthValue());
-        Assert.assertEquals(30, dateTime.getDayOfMonth());
+        assertEquals(2018, dateTime.getYear());
+        assertEquals(1, dateTime.getMonthValue());
+        assertEquals(30, dateTime.getDayOfMonth());
 
-        Assert.assertEquals(0, dateTime.getHour());
-        Assert.assertEquals(0, dateTime.getMinute());
-        Assert.assertEquals(0, dateTime.getSecond());
+        assertEquals(0, dateTime.getHour());
+        assertEquals(0, dateTime.getMinute());
+        assertEquals(0, dateTime.getSecond());
 
-        Assert.assertEquals(0, dateTime.getNano());
+        assertEquals(0, dateTime.getNano());
     }
 
     /**
@@ -121,12 +125,12 @@ public class DateTimeUtilTest {
     @Test
     public void testDateVerify() {
         String date = "01/01/2011";
-        Assert.assertTrue(DateTimeUtil.verifyDate(date));
+        assertTrue(DateTimeUtil.verifyDate(date));
 
         date = "02/30/1999";
-        Assert.assertFalse(DateTimeUtil.verifyDate(date));
+        assertFalse(DateTimeUtil.verifyDate(date));
 
-        Assert.assertFalse(DateTimeUtil.verifyDate(null));
+        assertFalse(DateTimeUtil.verifyDate(null));
     }
 
 }

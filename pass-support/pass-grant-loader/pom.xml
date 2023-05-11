@@ -43,12 +43,8 @@
     <poi.version>4.1.2</poi.version>
     <greenmail.version>1.5.13</greenmail.version>
     <javax.mail.version>1.6.2</javax.mail.version>
-    <junit.version>4.13</junit.version>
-    <logback-classic.version>1.2.3</logback-classic.version>
-    <mockito.version>3.3.3</mockito.version>
     <ojdbc10.version>19.3.0.0</ojdbc10.version>
     <openpojo.version>0.8.13</openpojo.version>
-    <slf4j.version>1.7.30</slf4j.version>
     <unitils.version>3.4.6</unitils.version>
   </properties>
 
@@ -107,17 +103,31 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>${logback-classic.version}</version>
+        <version>${logback.version}</version>
       </dependency>
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${junit.jupiter.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${junit.jupiter.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
         <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.unitils</groupId>

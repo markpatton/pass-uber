@@ -38,8 +38,8 @@ import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_INSTITU
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_LAST_NAME;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_USER_MIDDLE_NAME;
 import static org.eclipse.pass.support.grant.data.DateTimeUtil.createZonedDateTime;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,8 +55,8 @@ import org.eclipse.pass.support.client.model.AwardStatus;
 import org.eclipse.pass.support.client.model.Grant;
 import org.eclipse.pass.support.client.model.Policy;
 import org.eclipse.pass.support.client.model.User;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JhuPassUpdaterIT {
 
@@ -93,7 +93,7 @@ public class JhuPassUpdaterIT {
     private final JhuPassUpdater passUpdater = new JhuPassUpdater(passClient);
     private final PassUpdateStatistics statistics = passUpdater.getStatistics();
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         Policy policy1 = new Policy();
         policy1.setTitle("Primary Policy 2");

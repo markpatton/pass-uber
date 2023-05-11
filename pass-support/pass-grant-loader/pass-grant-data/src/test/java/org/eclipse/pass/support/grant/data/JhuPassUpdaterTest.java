@@ -15,7 +15,8 @@
  */
 package org.eclipse.pass.support.grant.data;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 
@@ -33,18 +34,17 @@ import org.eclipse.pass.support.client.model.Funder;
 import org.eclipse.pass.support.client.model.Grant;
 import org.eclipse.pass.support.client.model.PassEntity;
 import org.eclipse.pass.support.client.model.User;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Test class for building the {@code List} of {@code Grant}s
  *
  * @author jrm@jhu.edu
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JhuPassUpdaterTest {
 
     @Mock
@@ -64,7 +64,7 @@ public class JhuPassUpdaterTest {
         latestDate = DefaultPassUpdater.returnLaterUpdate(latestDate, laterDate);
         assertEquals(laterDate, latestDate);
 
-        Assert.assertEquals(earlyDate, DefaultPassUpdater.returnLaterUpdate(earlyDate, earlyDate));
+        assertEquals(earlyDate, DefaultPassUpdater.returnLaterUpdate(earlyDate, earlyDate));
     }
 
     @Test
@@ -258,41 +258,46 @@ public class JhuPassUpdaterTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testUpdatePassUser_Fail_ModeCheck() {
-        List<Map<String, String>> grantResultSet = new ArrayList<>();
-        Map<String, String> rowMap = new HashMap<>();
-        rowMap.put(CoeusFieldNames.C_GRANT_LOCAL_KEY, CoeusFieldNames.C_GRANT_LOCAL_KEY);
-        grantResultSet.add(rowMap);
+        assertThrows(RuntimeException.class, () -> {
+            List<Map<String, String>> grantResultSet = new ArrayList<>();
+            Map<String, String> rowMap = new HashMap<>();
+            rowMap.put(CoeusFieldNames.C_GRANT_LOCAL_KEY, CoeusFieldNames.C_GRANT_LOCAL_KEY);
+            grantResultSet.add(rowMap);
 
-        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
+            JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
 
-        passUpdater.updatePass(grantResultSet, "user");
-
+            passUpdater.updatePass(grantResultSet, "user");
+        });
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testUpdatePassGrant_Fail_ModeCheck() {
-        List<Map<String, String>> userResultSet = new ArrayList<>();
-        Map<String, String> rowMap = new HashMap<>();
-        rowMap.put(CoeusFieldNames.C_USER_EMPLOYEE_ID, CoeusFieldNames.C_USER_EMPLOYEE_ID);
-        userResultSet.add(rowMap);
+        assertThrows(RuntimeException.class, () -> {
+            List<Map<String, String>> userResultSet = new ArrayList<>();
+            Map<String, String> rowMap = new HashMap<>();
+            rowMap.put(CoeusFieldNames.C_USER_EMPLOYEE_ID, CoeusFieldNames.C_USER_EMPLOYEE_ID);
+            userResultSet.add(rowMap);
 
-        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
+            JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
 
-        passUpdater.updatePass(userResultSet, "grant");
+            passUpdater.updatePass(userResultSet, "grant");
+        });
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testUpdatePassFunder_Fail_ModeCheck() {
-        List<Map<String, String>> userResultSet = new ArrayList<>();
-        Map<String, String> rowMap = new HashMap<>();
-        rowMap.put(CoeusFieldNames.C_USER_EMPLOYEE_ID, CoeusFieldNames.C_USER_EMPLOYEE_ID);
-        userResultSet.add(rowMap);
+        assertThrows(RuntimeException.class, () -> {
+            List<Map<String, String>> userResultSet = new ArrayList<>();
+            Map<String, String> rowMap = new HashMap<>();
+            rowMap.put(CoeusFieldNames.C_USER_EMPLOYEE_ID, CoeusFieldNames.C_USER_EMPLOYEE_ID);
+            userResultSet.add(rowMap);
 
-        JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
+            JhuPassUpdater passUpdater = new JhuPassUpdater(passClientMock);
 
-        passUpdater.updatePass(userResultSet, "funder");
+            passUpdater.updatePass(userResultSet, "funder");
+        });
     }
 
 }

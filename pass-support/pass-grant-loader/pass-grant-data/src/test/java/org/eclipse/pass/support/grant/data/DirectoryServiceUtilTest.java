@@ -18,14 +18,15 @@ package org.eclipse.pass.support.grant.data;
 import static org.eclipse.pass.support.grant.data.DirectoryServiceUtil.DIRECTORY_SERVICE_BASE_URL;
 import static org.eclipse.pass.support.grant.data.DirectoryServiceUtil.DIRECTORY_SERVICE_CLIENT_ID;
 import static org.eclipse.pass.support.grant.data.DirectoryServiceUtil.DIRECTORY_SERVICE_CLIENT_SECRET;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 import java.util.Properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -44,14 +45,14 @@ import org.junit.Test;
  *
  * @author jrm
  */
-@Ignore
+@Disabled
 public class DirectoryServiceUtilTest {
     private DirectoryServiceUtil underTest;
 
     private final String validEeid = ""; //actual employee id
     private final String validHopkinsId = ""; //actual matching hopkins id
 
-    @Before
+    @BeforeEach
     public void setup() {
         final String serviceUrl = "https://the.service/url";
         final String clientId = "the-client-id";
@@ -67,18 +68,18 @@ public class DirectoryServiceUtilTest {
     @Test
     public void testGetHopkinsId() throws java.io.IOException {
         String result = underTest.getHopkinsIdForEmployeeId(validEeid);
-        Assert.assertEquals(validHopkinsId, result);
+        assertEquals(validHopkinsId, result);
     }
 
     @Test
     public void testGetEmployeeId() throws java.io.IOException {
         String result = underTest.getEmployeeIdForHopkinsId(validHopkinsId);
-        Assert.assertEquals(validEeid, result);
+        assertEquals(validEeid, result);
     }
 
     @Test
     public void testGetEmployeeIdIsNull() throws IOException {
         String result = underTest.getEmployeeIdForHopkinsId("SomeBadValue");
-        Assert.assertNull(result);
+        assertNull(result);
     }
 }

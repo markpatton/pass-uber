@@ -15,14 +15,16 @@
  */
 package org.eclipse.pass.support.grant.data;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for the COEUS connector
@@ -38,7 +40,7 @@ public class CoeusConnectorTest {
 
     private Properties policyProperties = new Properties();
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         try (InputStream resourceStream = new FileInputStream(policyPropertiesFile)) {
@@ -75,7 +77,7 @@ public class CoeusConnectorTest {
                                      "(UPPER(B.ROLE), '^CO ?-?INVESTIGATOR$'))" +
                                      " AND A.GRANT_NUMBER IS NOT NULL";
 
-        Assert.assertEquals(expectedQueryString,
+        assertEquals(expectedQueryString,
                             connector.buildQueryString("2018-06-01 06:00:00.0", "01/01/2011", "grant", null));
 
         expectedQueryString = "SELECT A.AWARD_ID, A.AWARD_STATUS, A.GRANT_NUMBER, A.TITLE, A.AWARD_DATE," +
@@ -98,7 +100,7 @@ public class CoeusConnectorTest {
                               ".ROLE), '^CO ?-?INVESTIGATOR$'))" +
                               " AND A.GRANT_NUMBER IS NOT NULL";
 
-        Assert.assertEquals(expectedQueryString,
+        assertEquals(expectedQueryString,
                             connector.buildQueryString("2018-06-01 06:00:00.0", "02/03/1999", "grant", null));
 
         expectedQueryString = "SELECT A.AWARD_ID, A.AWARD_STATUS, A.GRANT_NUMBER, A.TITLE, A.AWARD_DATE," +
@@ -121,7 +123,7 @@ public class CoeusConnectorTest {
                               ".ROLE), '^CO ?-?INVESTIGATOR$'))" +
                               " AND A.GRANT_NUMBER = '12345678'";
 
-        Assert.assertEquals(expectedQueryString,
+        assertEquals(expectedQueryString,
                             connector.buildQueryString("2018-06-01 06:00:00.0", "02/03/1999", "grant", "12345678"));
     }
 
@@ -132,7 +134,7 @@ public class CoeusConnectorTest {
                                      " " +
                                      "UPDATE_TIMESTAMP FROM COEUS.JHU_FACULTY_FORCE_PRSN_DETAIL " +
                                      "WHERE UPDATE_TIMESTAMP > TIMESTAMP '2018-13-14 06:00:00.0'";
-        Assert.assertEquals(expectedQueryString,
+        assertEquals(expectedQueryString,
                             connector.buildQueryString("2018-13-14 06:00:00.0", "01/01/2011", "user", null));
 
     }
@@ -145,7 +147,7 @@ public class CoeusConnectorTest {
         String expectedQueryString2 =
             "SELECT SPONSOR_NAME, SPONSOR_CODE FROM COEUS.SWIFT_SPONSOR WHERE SPONSOR_CODE IN (baa, moo)";
         String actualQueryString = connector.buildQueryString(null, null, "funder", null);
-        Assert.assertTrue(expectedQueryString1.equals(actualQueryString) ||
+        assertTrue(expectedQueryString1.equals(actualQueryString) ||
                           expectedQueryString2.equals(actualQueryString));
     }
 }
