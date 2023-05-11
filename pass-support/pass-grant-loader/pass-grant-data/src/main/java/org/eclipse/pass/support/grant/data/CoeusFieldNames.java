@@ -27,44 +27,44 @@ package org.eclipse.pass.support.grant.data;
  *
  * @author jrm@jhu.edu
  */
-public class CoeusFieldNames {
+class CoeusFieldNames {
     private CoeusFieldNames () {
         //never called
     }
 
-    public static final String C_GRANT_AWARD_NUMBER = "AWARD_ID";
-    public static final String C_GRANT_AWARD_STATUS = "AWARD_STATUS";
-    public static final String C_GRANT_LOCAL_KEY = "GRANT_NUMBER";
-    public static final String C_GRANT_PROJECT_NAME = "TITLE";
-    public static final String C_GRANT_AWARD_DATE = "AWARD_DATE";
-    public static final String C_GRANT_START_DATE = "AWARD_START";
-    public static final String C_GRANT_END_DATE = "AWARD_END";
+    static final String C_GRANT_AWARD_NUMBER = "AWARD_ID";
+    static final String C_GRANT_AWARD_STATUS = "AWARD_STATUS";
+    static final String C_GRANT_LOCAL_KEY = "GRANT_NUMBER";
+    static final String C_GRANT_PROJECT_NAME = "TITLE";
+    static final String C_GRANT_AWARD_DATE = "AWARD_DATE";
+    static final String C_GRANT_START_DATE = "AWARD_START";
+    static final String C_GRANT_END_DATE = "AWARD_END";
 
-    public static final String C_DIRECT_FUNDER_LOCAL_KEY = "SPOSNOR_CODE";// misspelling in COEUS view - if this gets
+    static final String C_DIRECT_FUNDER_LOCAL_KEY = "SPOSNOR_CODE";// misspelling in COEUS view - if this gets
     // corrected
     //it will collide with C_PRIMARY_SPONSOR_CODE below - this field will then have to be aliased in order to
     //access it in the ResultSet
-    public static final String C_DIRECT_FUNDER_NAME = "SPONSOR";
-    public static final String C_PRIMARY_FUNDER_LOCAL_KEY = "SPONSOR_CODE";
-    public static final String C_PRIMARY_FUNDER_NAME = "SPONSOR_NAME";
+    static final String C_DIRECT_FUNDER_NAME = "SPONSOR";
+    static final String C_PRIMARY_FUNDER_LOCAL_KEY = "SPONSOR_CODE";
+    static final String C_PRIMARY_FUNDER_NAME = "SPONSOR_NAME";
 
-    public static final String C_USER_FIRST_NAME = "FIRST_NAME";
-    public static final String C_USER_MIDDLE_NAME = "MIDDLE_NAME";
-    public static final String C_USER_LAST_NAME = "LAST_NAME";
-    public static final String C_USER_EMAIL = "EMAIL_ADDRESS";
-    public static final String C_USER_INSTITUTIONAL_ID = "JHED_ID";
-    public static final String C_USER_EMPLOYEE_ID = "EMPLOYEE_ID";
-    //public static final String C_USER_AFFILIATION = "";
-    //public static final String C_USER_ORCID_ID = "";
+    static final String C_USER_FIRST_NAME = "FIRST_NAME";
+    static final String C_USER_MIDDLE_NAME = "MIDDLE_NAME";
+    static final String C_USER_LAST_NAME = "LAST_NAME";
+    static final String C_USER_EMAIL = "EMAIL_ADDRESS";
+    static final String C_USER_INSTITUTIONAL_ID = "JHED_ID";
+    static final String C_USER_EMPLOYEE_ID = "EMPLOYEE_ID";
+    //static final String C_USER_AFFILIATION = "";
+    //static final String C_USER_ORCID_ID = "";
 
     //these fields are accessed for processing, but are not mapped to PASS objects
-    public static final String C_UPDATE_TIMESTAMP = "UPDATE_TIMESTAMP";
-    public static final String C_ABBREVIATED_ROLE = "ABBREVIATED_ROLE";
+    static final String C_UPDATE_TIMESTAMP = "UPDATE_TIMESTAMP";
+    static final String C_ABBREVIATED_ROLE = "ABBREVIATED_ROLE";
 
     //this is not a COEUS field, but is a place in our row map to put a hopkins id if it exists
-    public static final String C_USER_HOPKINS_ID = "HOPKINS_ID";
+    static final String C_USER_HOPKINS_ID = "HOPKINS_ID";
     //also not a field name, but something provided in a properties file
-    public static final String C_PRIMARY_FUNDER_POLICY = "PRIMARY_FUNDER_POLICY";
-    public static final String C_DIRECT_FUNDER_POLICY = "DIRECT_FUNDER_POLICY";
+    static final String C_PRIMARY_FUNDER_POLICY = "PRIMARY_FUNDER_POLICY";
+    static final String C_DIRECT_FUNDER_POLICY = "DIRECT_FUNDER_POLICY";
 
 }

@@ -18,19 +18,41 @@ package org.eclipse.pass.support.grant.data;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.Grant;
 
+/**
+ * An interface specifying behavior of a class that processes grant data into PASS.
+ */
 public interface PassUpdater {
+
+    /**
+     * Update PASS using the data in results.
+     * @param results the source grant data
+     * @param mode the mode of update
+     */
     void updatePass(Collection<Map<String, String>> results, String mode);
 
+    /**
+     * Returns the latest update timestamp string.
+     * @return the latest update timestamp string
+     */
     String getLatestUpdate();
 
+    /**
+     * Returns a string contains report of update results.
+     * @return the report
+     */
     String getReport();
 
+    /**
+     * Returns statistics of update.
+     * @return an object containing the statisitics
+     */
     PassUpdateStatistics getStatistics();
 
+    /**
+     * Returns a Map of the grants that were processed.
+     * @return the map of grants.
+     */
     Map<String, Grant> getGrantResultMap();
-
-    PassClient getPassClient();
 }

@@ -92,8 +92,9 @@ public class DateTimeUtil {
 
     /**
      * Date must be in the form "mm/dd/yyyy"
+     * @param date the date to verify
+     * @return true if date format is valid, false if not
      */
-
     public static boolean verifyDate(String date) {
         if (date == null) {
             return false;

@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author jrm@jhu.edu
  */
-
 public class JhuPassUpdater extends DefaultPassUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(JhuPassUpdater.class);
@@ -46,11 +45,18 @@ public class JhuPassUpdater extends DefaultPassUpdater {
     private static final String HOPKINS_ID_TYPE = "hopkinsid";
     private static final String JHED_ID_TYPE = "jhed";
 
+    /**
+     * Class constructor.
+     * @param passClient a client instance for Pass
+     */
     public JhuPassUpdater(PassClient passClient) {
         super(new CoeusPassEntityUtil(), passClient);
         super.setDomain(DOMAIN);
     }
 
+    /**
+     * Default class constructor.
+     */
     public JhuPassUpdater() {
         super(new CoeusPassEntityUtil());
         super.setDomain(DOMAIN);

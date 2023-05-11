@@ -582,11 +582,6 @@ public class DefaultPassUpdater implements PassUpdater {
         return grantResultMap;
     }
 
-    //this is used by an integration test
-    public PassClient getPassClient() {
-        return passClient;
-    }
-
     //used in unit test
     Map<String, Funder> getFunderMap() {
         return funderMap;

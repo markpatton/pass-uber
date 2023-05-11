@@ -51,6 +51,11 @@ public class CoeusConnector implements GrantConnector {
 
     private DirectoryServiceUtil directoryServiceUtil;
 
+    /**
+     * Class constructor.
+     * @param connectionProperties the connection props
+     * @param funderPolicyProperties the funder policy props
+     */
     public CoeusConnector(Properties connectionProperties, Properties funderPolicyProperties) {
         if (connectionProperties != null) {
 

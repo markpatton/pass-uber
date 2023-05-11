@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.eclipse.pass.support.grant;
+package org.eclipse.pass.support.grant.data;
 
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_ABBREVIATED_ROLE;
 import static org.eclipse.pass.support.grant.data.CoeusFieldNames.C_DIRECT_FUNDER_LOCAL_KEY;
@@ -55,8 +55,6 @@ import org.eclipse.pass.support.client.model.AwardStatus;
 import org.eclipse.pass.support.client.model.Grant;
 import org.eclipse.pass.support.client.model.Policy;
 import org.eclipse.pass.support.client.model.User;
-import org.eclipse.pass.support.grant.data.JhuPassInitUpdater;
-import org.eclipse.pass.support.grant.data.PassUpdateStatistics;
 import org.junit.Before;
 import org.junit.Test;
 

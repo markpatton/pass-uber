@@ -31,6 +31,9 @@ import org.eclipse.pass.support.client.model.UserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Init Grant Pass Updater for data sourced from Jhu Coeus.
+ */
 public class JhuPassInitUpdater extends DefaultPassUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(JhuPassInitUpdater.class);
@@ -39,11 +42,18 @@ public class JhuPassInitUpdater extends DefaultPassUpdater {
     private static final String HOPKINS_ID_TYPE = "hopkinsid";
     private static final String JHED_ID_TYPE = "jhed";
 
+    /**
+     * Class constructor.
+     * @param passClient a client instance for Pass
+     */
     public JhuPassInitUpdater(PassClient passClient) {
         super(new CoeusPassInitEntityUtil(), passClient);
         super.setDomain(DOMAIN);
     }
 
+    /**
+     * Default class constructor.
+     */
     public JhuPassInitUpdater() {
         super(new CoeusPassInitEntityUtil());
         super.setDomain(DOMAIN);

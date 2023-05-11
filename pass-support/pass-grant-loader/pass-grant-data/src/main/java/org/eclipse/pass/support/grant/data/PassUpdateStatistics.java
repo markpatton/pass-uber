@@ -20,7 +20,7 @@ import static java.lang.String.format;
 /**
  * A utility class to collect and disseminate statistics related to an update
  */
-public class PassUpdateStatistics {
+class PassUpdateStatistics {
 
     private int grantsUpdated = 0;
     private int fundersUpdated = 0;
@@ -93,7 +93,7 @@ public class PassUpdateStatistics {
         report = "";
     }
 
-    public int getGrantsUpdated() {
+    int getGrantsUpdated() {
         return grantsUpdated;
     }
 
@@ -101,7 +101,7 @@ public class PassUpdateStatistics {
         grantsUpdated++;
     }
 
-    public int getFundersUpdated() {
+    int getFundersUpdated() {
         return fundersUpdated;
     }
 
@@ -109,7 +109,7 @@ public class PassUpdateStatistics {
         fundersUpdated++;
     }
 
-    public int getUsersUpdated() {
+    int getUsersUpdated() {
         return usersUpdated;
     }
 
@@ -117,7 +117,7 @@ public class PassUpdateStatistics {
         usersUpdated++;
     }
 
-    public int getGrantsCreated() {
+    int getGrantsCreated() {
         return grantsCreated;
     }
 
@@ -125,7 +125,7 @@ public class PassUpdateStatistics {
         grantsCreated++;
     }
 
-    public int getFundersCreated() {
+    int getFundersCreated() {
         return fundersCreated;
     }
 
@@ -133,7 +133,7 @@ public class PassUpdateStatistics {
         fundersCreated++;
     }
 
-    public int getUsersCreated() {
+    int getUsersCreated() {
         return usersCreated;
     }
 
@@ -141,7 +141,7 @@ public class PassUpdateStatistics {
         usersCreated++;
     }
 
-    public int getPisAdded() {
+    int getPisAdded() {
         return pisAdded;
     }
 
@@ -149,7 +149,7 @@ public class PassUpdateStatistics {
         pisAdded++;
     }
 
-    public int getCoPisAdded() {
+    int getCoPisAdded() {
         return coPisAdded;
     }
 
@@ -157,7 +157,7 @@ public class PassUpdateStatistics {
         coPisAdded++;
     }
 
-    public String getLatestUpdateString() {
+    String getLatestUpdateString() {
         return latestUpdateString;
     }
 
