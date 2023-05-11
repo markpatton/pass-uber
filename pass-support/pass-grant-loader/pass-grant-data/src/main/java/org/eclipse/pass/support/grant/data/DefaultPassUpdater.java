@@ -433,10 +433,11 @@ public class DefaultPassUpdater implements PassUpdater {
 
         PassClientSelector<Funder> selector = new PassClientSelector<>(Funder.class);
         selector.setFilter(RSQL.equals("localKey", fullLocalKey));
+        selector.setInclude("policy");
         PassClientResult<Funder> result = passClient.selectObjects(selector);
 
         if (!result.getObjects().isEmpty()) {
-            // TODO Is the localKey unique, should I handle more than one match?
+            // TODO could this have more than one object?
             Funder storedFunder = result.getObjects().get(0);
             Funder updatedFunder = passEntityUtil.update(systemFunder, storedFunder);
             if (Objects.nonNull(updatedFunder)) { //need to update
@@ -473,7 +474,7 @@ public class DefaultPassUpdater implements PassUpdater {
                 PassClientSelector<User> selector = new PassClientSelector<>(User.class);
                 selector.setFilter(RSQL.hasMember("locatorIds", id));
                 PassClientResult<User> result = passClient.selectObjects(selector);
-                // TODO any possibility this should contain more than 1 item?
+                // TODO could this have more than one object?
                 passUser = result.getObjects().isEmpty() ? null : result.getObjects().get(0);
             }
         }
@@ -518,7 +519,7 @@ public class DefaultPassUpdater implements PassUpdater {
 
         if (!result.getObjects().isEmpty()) {
             LOG.debug("Found grant with localKey {}", fullLocalKey);
-            // TODO Is the localKey unique, should I handle more than one match?
+            // TODO could this have more than one object?
             Grant storedGrant = result.getObjects().get(0);
             Grant updatedGrant = passEntityUtil.update(systemGrant, storedGrant);
             if (Objects.nonNull(updatedGrant)) { //need to update

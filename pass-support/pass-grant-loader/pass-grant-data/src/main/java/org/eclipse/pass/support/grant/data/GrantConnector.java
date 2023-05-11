@@ -28,8 +28,10 @@ public interface GrantConnector {
     /**
      * If the grant data source is a database, we will need a query string
      *
-     * @param startDate - the date of the earlieat record we wish to get on this pull
+     * @param startDate - the date of the earliest record we wish to get on this pull
+     * @param awardEndDate - the end date of the award
      * @param mode      - indicates whether the data pull is for grants, or users
+     * @param grant      - a grant number
      * @return the query string
      */
     String buildQueryString(String startDate, String awardEndDate, String mode, String grant);

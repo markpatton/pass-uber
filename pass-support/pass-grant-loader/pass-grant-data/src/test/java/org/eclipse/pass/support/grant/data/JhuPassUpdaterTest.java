@@ -179,9 +179,8 @@ public class JhuPassUpdaterTest {
         PassClientResult<PassEntity> mockFunderResult1 = new PassClientResult<>(List.of(directFunder), 1);
         doReturn(mockFunderResult1)
                 .when(passClientMock)
-                .selectObjects(
-                        argThat(passClientSelector ->
-                                passClientSelector.getFilter().equals("localKey=='johnshopkins.edu:funder:000029282'")));
+                .selectObjects(argThat(passClientSelector ->
+                        passClientSelector.getFilter().equals("localKey=='johnshopkins.edu:funder:000029282'")));
 
         Funder primaryFunder = new Funder("8675309");
         directFunder.setLocalKey("johnshopkins.edu:funder:8675309");

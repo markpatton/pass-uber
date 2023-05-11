@@ -62,35 +62,35 @@ import org.junit.Test;
 
 public class JhuPassInitUpdaterIT {
 
-    String[] grantAwardNumber = {"A10000000", "A10000001", "A10000002"};
-    String[] grantLocalKey = {"10000000", "10000000", "10000000"}; //all the same
-    String[] grantProjectName = {"Awesome Research Project I", "Awesome Research Project II", "Awesome Research " +
-                                                                                              "Project III"};
-    String[] grantAwardDate = {"01/01/1999", "01/01/2001", "01/01/2003"};
-    String[] grantStartDate = {"07/01/2000", "07/01/2002", "07/01/2004"};
-    String[] grantEndDate = {"06/30/2002", "06/30/2004", "06/30/2006"};
-    String[] grantUpdateTimestamp = {"2006-03-11 00:00:00.0", "2010-04-05 00:00:00.0", "2015-11-11 00:00:00.0"};
-    String[] userEmployeeId = {"30000000", "30000001", "30000002"};
-    String[] userInstitutionalId = {"amelon1", "aeinst1", "jjones1"};
-    String[] userHopkinsId = {"RANDOM", "OMRNDA", "DRMONA"};
-    String[] userFirstName = {"Andrew", "Albert", "Junie"};
-    String[] userMiddleName = {"Smith", "Carnegie", "Beatrice"};
-    String[] userLastName = {"Melon", "Einstein", "Jones"};
-    String[] userEmail = {"amelon1@jhu.edu", "aeinst1@jhu.edu", "jjones1@jhu.edu"};
+    private final String[] grantAwardNumber = {"A10000000", "A10000001", "A10000002"};
+    private final String[] grantLocalKey = {"10000000", "10000000", "10000000"}; //all the same
+    private final String[] grantProjectName =
+        {"Awesome Research Project I", "Awesome Research Project II", "Awesome Research Project III"};
+    private final String[] grantAwardDate = {"01/01/1999", "01/01/2001", "01/01/2003"};
+    private final String[] grantStartDate = {"07/01/2000", "07/01/2002", "07/01/2004"};
+    private final String[] grantEndDate = {"06/30/2002", "06/30/2004", "06/30/2006"};
+    private final String[] grantUpdateTimestamp =
+        {"2006-03-11 00:00:00.0", "2010-04-05 00:00:00.0", "2015-11-11 00:00:00.0"};
+    private final String[] userEmployeeId = {"30000000", "30000001", "30000002"};
+    private final String[] userInstitutionalId = {"amelon1", "aeinst1", "jjones1"};
+    private final String[] userHopkinsId = {"RANDOM", "OMRNDA", "DRMONA"};
+    private final String[] userFirstName = {"Andrew", "Albert", "Junie"};
+    private final String[] userMiddleName = {"Smith", "Carnegie", "Beatrice"};
+    private final String[] userLastName = {"Melon", "Einstein", "Jones"};
+    private final String[] userEmail = {"amelon1@jhu.edu", "aeinst1@jhu.edu", "jjones1@jhu.edu"};
 
+    private String primaryFunderPolicyUriString;
+    private String directFunderPolicyUriString;
 
-    String primaryFunderPolicyUriString;
-    String directFunderPolicyUriString;
+    private final String grantIdPrefix = "johnshopkins.edu:grant:";
+    //private final String funderIdPrefix = "johnshopkins.edu:funder:";
+    //private final String hopkinsidPrefix = "johnshopkins.edu:hopkinsid:";
+    private final String employeeidPrefix = "johnshopkins.edu:employeeid:";
+    //private final String jhedidPrefis = "johnshopkins.edu:jhed:";
 
-    String grantIdPrefix = "johnshopkins.edu:grant:";
-    //String funderIdPrefix = "johnshopkins.edu:funder:";
-    //String hopkinsidPrefix = "johnshopkins.edu:hopkinsid:";
-    String employeeidPrefix = "johnshopkins.edu:employeeid:";
-    //String jhedidPrefis = "johnshopkins.edu:jhed:";
-
-    PassClient passClient = PassClient.newInstance();
-    JhuPassInitUpdater passUpdater = new JhuPassInitUpdater(passClient);
-    PassUpdateStatistics statistics = passUpdater.getStatistics();
+    private final PassClient passClient = PassClient.newInstance();
+    private final JhuPassInitUpdater passUpdater = new JhuPassInitUpdater(passClient);
+    private final PassUpdateStatistics statistics = passUpdater.getStatistics();
 
     @Before
     public void setup() throws IOException {
@@ -109,14 +109,13 @@ public class JhuPassInitUpdaterIT {
     }
 
     /**
-     * we put an initial award for a grant into fedora, then simulate a pull of all records related
+     * we put an initial award for a grant into PASS, then simulate a pull of all records related
      * to this grant from the Beginning of Time (including records which created the initial object)
      *
      * We expect to see some fields retained from the initial award, and others updated. The most
      * interesting fields are the investigator fields: all CO-PIs ever on the grant should stay on the
      * co-pi field throughout iterations. If a PI is changed, they should appear on the CO-PI field
      *
-     * @throws InterruptedException from data time creation
      */
     @Test
     public void processInitGrantIT() throws IOException {

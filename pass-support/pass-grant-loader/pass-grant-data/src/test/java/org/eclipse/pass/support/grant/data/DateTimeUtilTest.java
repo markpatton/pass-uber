@@ -15,10 +15,10 @@
  */
 package org.eclipse.pass.support.grant.data;
 
+import java.time.ZonedDateTime;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.time.ZonedDateTime;
 
 /**
  * Test class for static utility methods
