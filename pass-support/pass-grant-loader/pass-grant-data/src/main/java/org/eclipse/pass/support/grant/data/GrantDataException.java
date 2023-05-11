@@ -5,6 +5,10 @@ package org.eclipse.pass.support.grant.data;
  */
 public class GrantDataException extends Exception {
 
+    /**
+     * Class constructor.
+     * @param message error message
+     */
     public GrantDataException(String message) {
         super(message);
     }
