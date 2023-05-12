@@ -43,7 +43,7 @@
     <poi.version>4.1.2</poi.version>
     <greenmail.version>1.5.13</greenmail.version>
     <javax.mail.version>1.6.2</javax.mail.version>
-    <ojdbc10.version>19.3.0.0</ojdbc10.version>
+    <ojdbc10.version>19.18.0.0</ojdbc10.version>
     <openpojo.version>0.8.13</openpojo.version>
     <unitils.version>3.4.6</unitils.version>
   </properties>
@@ -76,7 +76,7 @@
         <version>${greenmail.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.oracle.ojdbc</groupId>
+        <groupId>com.oracle.database.jdbc</groupId>
         <artifactId>ojdbc10</artifactId>
         <version>${ojdbc10.version}</version>
       </dependency>
