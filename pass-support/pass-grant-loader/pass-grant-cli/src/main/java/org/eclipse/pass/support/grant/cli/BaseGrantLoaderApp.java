@@ -159,10 +159,12 @@ abstract class BaseGrantLoaderApp {
         }
 
         //check suitability of our input file
-        if (action.equals("load")) {
+        if (action.equals("load") || action.equals("pull")) {
             if (!dataFile.exists()) {
                 throw processException(format(ERR_REQUIRED_DATA_FILE_MISSING, dataFileName), null);
             } else if (!dataFile.canRead()) {
+                throw processException(format(ERR_DATA_FILE_CANNOT_READ, dataFileName), null);
+            } else if (action.equals("pull") && !dataFile.canWrite()) {
                 throw processException(format(ERR_DATA_FILE_CANNOT_READ, dataFileName), null);
             }
         }
