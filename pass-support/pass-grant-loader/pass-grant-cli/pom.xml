@@ -26,6 +26,13 @@
 
   <artifactId>pass-grant-cli</artifactId>
 
+  <properties>
+    <pass.core.port>8080</pass.core.port>
+    <pass.core.url>http://localhost:8080</pass.core.url>
+    <pass.core.user>backend</pass.core.user>
+    <pass.core.password>backend</pass.core.password>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>args4j</groupId>
@@ -74,4 +81,18 @@
       <artifactId>junit-jupiter-engine</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>
