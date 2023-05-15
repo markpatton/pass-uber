@@ -36,7 +36,7 @@ public class JhuGrantLoaderManualTest {
                 "full_path_to/pass-support/pass-grant-loader/pass-grant-cli/src/test/resources"
         );
         String[] args = {"-a", "pull", "-s", "2023-04-01 00:00:00.000", "-z", "04/01/2023",
-                "full_path_to/testresults"};
+            "full_path_to/testresults"};
         JhuGrantLoaderCLI.main(args);
     }
 
