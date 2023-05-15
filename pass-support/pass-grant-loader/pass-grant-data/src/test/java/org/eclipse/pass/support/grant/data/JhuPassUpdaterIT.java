@@ -155,6 +155,7 @@ public class JhuPassUpdaterIT {
         assertEquals(createZonedDateTime(grantAwardDate[0]), passGrant.getAwardDate());
         assertEquals(createZonedDateTime(grantStartDate[0]), passGrant.getStartDate());
         assertEquals(createZonedDateTime(grantEndDate[0]), passGrant.getEndDate());
+        assertEquals(grantUpdateTimestamp[0], passUpdater.getLatestUpdate());//latest
         assertEquals(user0, passGrant.getPi()); //Reckondwith
         assertEquals(1, passGrant.getCoPis().size());
         assertEquals(user1, passGrant.getCoPis().get(0));
@@ -200,6 +201,7 @@ public class JhuPassUpdaterIT {
         assertEquals(createZonedDateTime(grantAwardDate[0]), updatePassGrant.getAwardDate());//initial
         assertEquals(createZonedDateTime(grantStartDate[0]), updatePassGrant.getStartDate());//initial
         assertEquals(createZonedDateTime(grantEndDate[2]), updatePassGrant.getEndDate());//latest
+        assertEquals(grantUpdateTimestamp[2], passUpdater.getLatestUpdate());//latest
         assertEquals(user1, updatePassGrant.getPi());//Class
         assertEquals(2, updatePassGrant.getCoPis().size());
         assertTrue(updatePassGrant.getCoPis().contains(user0));//Reckondwith

@@ -82,6 +82,7 @@ public class JhuPassUpdaterTest {
         assertEquals(DateTimeUtil.createZonedDateTime("01/01/2000"), grant.getAwardDate());
         assertEquals(DateTimeUtil.createZonedDateTime("01/01/2001"), grant.getStartDate());
         assertEquals(DateTimeUtil.createZonedDateTime("01/01/2002"), grant.getEndDate());
+        assertEquals("2018-01-01 00:00:00.0", passUpdater.getLatestUpdate());//latest
         assertEquals("Moo Project", grant.getProjectName());
 
         assertEquals("johnshopkins.edu:grant:8675309", grant.getLocalKey());

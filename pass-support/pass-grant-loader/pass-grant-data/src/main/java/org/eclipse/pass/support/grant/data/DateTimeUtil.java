@@ -15,18 +15,26 @@
  */
 package org.eclipse.pass.support.grant.data;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 /**
  * This utility class provides static methods for intermunging ZonedDateTime objects and timestamp strings
  */
 public class DateTimeUtil {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss[[.SSS][.SS][.S]]")
+                .withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("MM/dd/uuuu")
+                .withResolverStyle(ResolverStyle.STRICT);
+
     private DateTimeUtil () {
         //never called
     }
@@ -35,59 +43,30 @@ public class DateTimeUtil {
      * A method to convert a timestamp string from our database to a ZonedDateTime object
      *
      * @param dateString the timestamp string
-     * @return the corresponding DataTime object
+     * @return the corresponding ZonedDateTime object or null if not able to parse string
      */
     public static ZonedDateTime createZonedDateTime(String dateString) {
-
-        if (dateString != null) {
-            ZonedDateTime dateTime = null;
-
-            String[] parts = dateString.split(" ");
-
-            //do we have time parts? the timestamp form is yyyy-mm-dd hh:mm:ss.m
-            if (parts.length > 1) {
-                if (verifyDateTimeFormat(dateString)) {
-                    String date = parts[0]; //yyyy-mm-dd
-                    String[] dateParts = date.split("-");
-                    int year = Integer.parseInt(dateParts[0]);
-                    int month = Integer.parseInt(dateParts[1]);
-                    int day = Integer.parseInt(dateParts[2]);
-                    String time = parts[1]; //hh:mm:ss.m{mm}
-                    String[] timeParts = time.split(":");
-                    int hour = Integer.parseInt(timeParts[0]);
-                    int minute = Integer.parseInt(timeParts[1]);
-                    String[] secondParts = timeParts[2].split("\\.");
-                    int second = Integer.parseInt(secondParts[0]);
-                    int millisecond = Integer.parseInt(secondParts[1]);//seems to be always 0 in our data
-                    dateTime = ZonedDateTime.of(year, month, day, hour, minute, second, millisecond, ZoneOffset.UTC);
-                }
-            } else if (verifyDate(dateString)) { //we may have just a date - date format is mm/day/year
-                parts = dateString.split("/");
-                int month = Integer.parseInt(parts[0]);
-                int day = Integer.parseInt(parts[1]);
-                int year = Integer.parseInt(parts[2]);
-                dateTime = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.UTC);;
-            }
-            return dateTime;
-        } else {
-            return null;
+        if (verifyDateTimeFormat(dateString)) {
+            LocalDateTime localDateTime = LocalDateTime.parse(dateString, DATE_TIME_FORMATTER);
+            return localDateTime.atZone(ZoneOffset.UTC);
         }
+        if (verifyDate(dateString)) { //we may have just a date - date format is mm/day/year
+            LocalDate localDate = LocalDate.parse(dateString, DATE_FORMATTER);
+            return localDate.atStartOfDay(ZoneOffset.UTC);
+        }
+        return null;
     }
 
     /**
-     * Dates must be specified in the format "yyyy-mm-dd hh:mm:ss.m{mm}" . We only check for this format, and not for
+     * Dates must be specified in the format "yyyy-mm-dd hh:mm:ss[.mmm]" . We only check for this format, and not for
      * validity
      * (for example, "2018-02-31 ... " passes)
      *
-     * @param date the date to be checked
+     * @param dateStr the date string to be checked
      * @return a boolean indicating whether the date matches the required format
      */
-    public static boolean verifyDateTimeFormat(String date) {
-        String regexJHU = "^[0-9]{4}-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9]) ([2][0-3]|[01][0-9])" +
-                          ":[0-5][0-9]:[0-5][0-9]\\.[0-9]{1,3}$";
-        Pattern patternJHU = Pattern.compile(regexJHU);
-        Matcher matcherJHU = patternJHU.matcher(date);
-        return matcherJHU.matches();
+    public static boolean verifyDateTimeFormat(String dateStr) {
+        return checkDateTimeFormat(dateStr, DATE_TIME_FORMATTER);
     }
 
     /**
@@ -96,14 +75,16 @@ public class DateTimeUtil {
      * @return true if date format is valid, false if not
      */
     public static boolean verifyDate(String date) {
-        if (date == null) {
+        return checkDateTimeFormat(date, DATE_FORMATTER);
+    }
+
+    private static boolean checkDateTimeFormat(String dateTimeStr, DateTimeFormatter formatter) {
+        if (dateTimeStr == null) {
             return false;
         }
-        DateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-        format.setLenient(false);
         try {
-            format.parse(date);
-        } catch (ParseException e) {
+            formatter.parse(dateTimeStr);
+        } catch (DateTimeParseException e) {
             return false;
         }
         return true;
@@ -117,8 +98,10 @@ public class DateTimeUtil {
      * @return the later of the two parameters
      */
     static String returnLaterUpdate(String currentUpdateString, String latestUpdateString) {
-        ZonedDateTime grantUpdateTime = createZonedDateTime(currentUpdateString);
-        ZonedDateTime previousLatestUpdateTime = createZonedDateTime(latestUpdateString);
-        return grantUpdateTime.isAfter(previousLatestUpdateTime) ? currentUpdateString : latestUpdateString;
+        ZonedDateTime currentUpdateTime = createZonedDateTime(currentUpdateString);
+        ZonedDateTime latestUpdateTime = createZonedDateTime(latestUpdateString);
+        return currentUpdateTime != null && currentUpdateTime.isAfter(latestUpdateTime)
+                ? currentUpdateString
+                : latestUpdateString;
     }
 }
