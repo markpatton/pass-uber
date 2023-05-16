@@ -60,3 +60,31 @@ in the PASS backend. The JHU implementation also treats the COEUS database as au
 data - the logic about whether updates are required is contained in the PassEntityUtil implementation for JHU. Details
 about operation are available at
 [JHU COEUS Loader](JHU-README.md)
+
+## Usage
+
+Using java system properties to launch the jhu grant loader:
+```
+    java -DCOEUS_HOME=<full_path_to_home> -Dpass.core.url=http://localhost:8080 -Dpass.core.user=USER -Dpass.core.password=PASS -jar jhu-grant-loader-0.6.0-SNAPSHOT.jar -startDateTime <yyyy-mm-dd hh:mm:ss.m{mm}> -awardEndDate <MM/dd/yyyy>
+
+```
+### Properties or Environment Variables
+
+The following may be provided as system properties on the command line `-Dprop-value`.
+
+`COEUS_HOME`
+The full path to where the connections.properties, policy.properties, and mail.properties are located
+
+`pass.core.url`
+The base url for the pass-core REST API such as `http://localhost:8080`
+
+`pass.core.user`
+The pass-core backend user.
+
+`pass.core.password`
+The pass-core backend user password.
+
+### Arguments
+
+You can run the above command with `-h` to get a full list of arguments for the grant loader.  In the example
+above, we use `startDateTime` and `awardEndDate` for an example.
