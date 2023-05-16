@@ -65,7 +65,7 @@ about operation are available at
 
 Using java system properties to launch the jhu grant loader:
 ```
-    java -DCOEUS_HOME=<full_path_to_home> -Dpass.core.url=http://localhost:8080 -Dpass.core.user=USER -Dpass.core.password=PASS -jar jhu-grant-loader-0.6.0-SNAPSHOT.jar -startDateTime <yyyy-mm-dd hh:mm:ss.m{mm}> -awardEndDate <MM/dd/yyyy>
+    java -DCOEUS_HOME=<full_path_to_home> -Dpass.core.url=http://localhost:8080 -Dpass.core.user=USER -Dpass.core.password=PASS -jar jhu-grant-loader-0.6.0-SNAPSHOT.jar -startDateTime "<yyyy-mm-dd hh:mm:ss.m{mm}>" -awardEndDate <MM/dd/yyyy>
 
 ```
 ### Properties or Environment Variables
