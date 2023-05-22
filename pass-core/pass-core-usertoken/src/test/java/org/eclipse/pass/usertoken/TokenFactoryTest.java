@@ -44,7 +44,7 @@ public class TokenFactoryTest {
 
         final URI reference = randomUri();
 
-        final Token token = new Token(toTest.codec, resource, reference);
+        final Token token = new Token(toTest.getCodec(), resource, reference);
 
         final Token fromString = toTest.from(token.toString());
 
@@ -80,7 +80,7 @@ public class TokenFactoryTest {
 
         final String TEST = "test";
 
-        assertEquals(TEST, factory.codec.decrypt(withKnownKey.encrypt(TEST)));
+        assertEquals(TEST, factory.getCodec().decrypt(withKnownKey.encrypt(TEST)));
 
     }
 

@@ -31,7 +31,14 @@ import java.util.Objects;
  * @author apb@jhu.edu
  */
 public class Token {
+    /**
+     * Param name for user token.
+     */
     public static final String USER_TOKEN_PARAM = "userToken";
+
+    /**
+     * Scheme name for pass resource.
+     */
     public static final String PASS_RESOURCE_SCHEME = "pass";
 
     private static final int REFERENCE_URI_INDEX = 0;
@@ -39,7 +46,7 @@ public class Token {
 
     private final URI resource;
     private final URI reference;
-    protected final Codec codec;
+    private final Codec codec;
 
     // Internal constructor
     Token(Codec codec, URI resource, URI reference) {
@@ -78,10 +85,18 @@ public class Token {
         return resource;
     }
 
+    /**
+     * Get the pass resource identifier.
+     * @return ID of pass resource
+     */
     public Long getPassResourceIdentifier() {
         return Long.parseLong(resource.getSchemeSpecificPart().split(":")[1]);
     }
 
+    /**
+     * Get the pass resource type.
+     * @return the type
+     */
     public String getPassResourceType() {
         return resource.getSchemeSpecificPart().split(":")[0];
     }

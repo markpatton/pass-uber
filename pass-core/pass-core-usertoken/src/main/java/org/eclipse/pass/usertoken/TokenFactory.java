@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * @author apb@jhu.edu
  */
 public class TokenFactory {
-    protected final Codec codec;
+    private final Codec codec;
 
     private static final Pattern userTokenPattern = Pattern.compile(".*" + Token.USER_TOKEN_PARAM + "=([A-Z2-7]+).*");
 
@@ -74,7 +74,7 @@ public class TokenFactory {
      *
      * @param encoded String containing the encoded token.
      * @return The token.
-     * @throws BadTokenException
+     * @throws BadTokenException thrown if encoded token is invalid
      */
     public Token from(String encoded) throws BadTokenException {
         return new Token(codec, encoded);
@@ -85,7 +85,7 @@ public class TokenFactory {
      *
      * @param uri The URI to inspect
      * @return the Token, or null if none are present.
-     * @throws BadTokenException
+     * @throws BadTokenException thrown if token is invalid
      */
     public Token fromUri(URI uri) throws BadTokenException {
         final Matcher tokenMatcher = userTokenPattern.matcher(uri.getQuery());
@@ -101,7 +101,7 @@ public class TokenFactory {
      *
      * @param query The query to inspect
      * @return the Token, or null if none are present.
-     * @throws BadTokenException
+     * @throws BadTokenException thrown if token is invalid
      */
     public Token fromUri(String query) throws BadTokenException {
         final Matcher tokenMatcher = userTokenPattern.matcher(query);
@@ -125,10 +125,14 @@ public class TokenFactory {
     /**
      * Determing if a query string has a token in it.
      *
-     * @param query
+     * @param query the query to check for token
      * @return true if the query has a token parameter in it
      */
     public boolean hasToken(String query) {
         return userTokenPattern.matcher(query).matches();
+    }
+
+    Codec getCodec() {
+        return codec;
     }
 }

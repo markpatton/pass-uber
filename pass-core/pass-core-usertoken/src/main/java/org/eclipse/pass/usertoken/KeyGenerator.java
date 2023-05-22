@@ -26,6 +26,10 @@ public class KeyGenerator {
     private KeyGenerator() {
     }
 
+    /**
+     * Generates a key.
+     * @return the key
+     */
     protected static String generateKey() {
         return Key.generate().toString().replaceAll("=", "");
     }

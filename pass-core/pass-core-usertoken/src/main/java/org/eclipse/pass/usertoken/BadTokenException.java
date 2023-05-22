@@ -23,10 +23,19 @@ public class BadTokenException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructor.
+     * @param message the error message
+     */
     public BadTokenException(String message) {
         super(message);
     }
 
+    /**
+     * Constructor taking the root throwable.
+     * @param message the error message
+     * @param e the root throwable
+     */
     public BadTokenException(String message, Throwable e) {
         super(message, e);
     }
