@@ -4,7 +4,7 @@ This module is a Spring Boot application which provides the PASS REST API.
 
 # Building
 
-Java 11 and Maven 3.8 required.
+Java 17 and Maven 3.8 required.
 
 ```
 mvn clean install
