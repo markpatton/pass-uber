@@ -46,10 +46,10 @@ import java.util.stream.Collectors;
 import javax.mail.Message;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.client.PassClient;
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
-import org.eclipse.pass.model.User;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
+import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.notification.NotificationApp;
 import org.eclipse.pass.notification.SimpleImapClientFactory;
 import org.eclipse.pass.notification.SpringBootIntegrationConfig;

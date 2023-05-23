@@ -31,11 +31,9 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.eclipse.pass.client.PassClient;
-import org.eclipse.pass.client.PassJsonAdapter;
-import org.eclipse.pass.client.adapter.PassJsonAdapterBasic;
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.dispatch.DispatchService;
 import org.eclipse.pass.notification.model.Notification;
 import org.junit.Before;

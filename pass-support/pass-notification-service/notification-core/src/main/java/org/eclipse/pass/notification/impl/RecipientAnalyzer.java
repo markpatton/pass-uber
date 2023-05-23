@@ -26,8 +26,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

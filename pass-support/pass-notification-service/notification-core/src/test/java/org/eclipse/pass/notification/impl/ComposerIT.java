@@ -57,9 +57,9 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.client.PassClient;
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.NotificationApp;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.model.Notification;

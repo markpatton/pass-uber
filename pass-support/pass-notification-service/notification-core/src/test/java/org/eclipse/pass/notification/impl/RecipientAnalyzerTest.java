@@ -33,8 +33,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -28,8 +28,8 @@ import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_VIEW;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.model.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,9 +17,9 @@ package org.eclipse.pass.notification.impl;
 
 import java.net.URI;
 
-import org.eclipse.pass.client.PassClient;
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.dispatch.DispatchService;
 import org.eclipse.pass.notification.model.Notification;
 import org.slf4j.Logger;

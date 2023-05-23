@@ -27,8 +27,8 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.util.Collections;
 
-import org.eclipse.pass.client.PassClient;
-import org.eclipse.pass.model.User;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.User;
 import org.junit.Before;
 import org.junit.Test;
 

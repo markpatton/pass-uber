@@ -17,11 +17,11 @@
 package org.eclipse.pass.notification.impl;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.pass.model.SubmissionEvent.EventType.APPROVAL_REQUESTED;
-import static org.eclipse.pass.model.SubmissionEvent.EventType.APPROVAL_REQUESTED_NEWUSER;
-import static org.eclipse.pass.model.SubmissionEvent.EventType.CANCELLED;
-import static org.eclipse.pass.model.SubmissionEvent.EventType.CHANGES_REQUESTED;
-import static org.eclipse.pass.model.SubmissionEvent.EventType.SUBMITTED;
+import static org.eclipse.pass.support.client.model.EventType.APPROVAL_REQUESTED;
+import static org.eclipse.pass.support.client.model.EventType.APPROVAL_REQUESTED_NEWUSER;
+import static org.eclipse.pass.support.client.model.EventType.CANCELLED;
+import static org.eclipse.pass.support.client.model.EventType.CHANGES_REQUESTED;
+import static org.eclipse.pass.support.client.model.EventType.SUBMITTED;
 import static org.eclipse.pass.notification.impl.LinksTest.randomUri;
 import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW;
 import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW_INVITE;
@@ -38,8 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.model.Link;
 import org.junit.Before;
 import org.junit.Test;

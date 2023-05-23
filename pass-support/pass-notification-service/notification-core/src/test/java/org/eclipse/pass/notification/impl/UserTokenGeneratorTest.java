@@ -30,9 +30,6 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.util.List;
 
-import org.eclipse.pass.authz.usertoken.Key;
-import org.eclipse.pass.authz.usertoken.Token;
-import org.eclipse.pass.authz.usertoken.TokenFactory;
 import org.eclipse.pass.model.Submission;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.model.config.NotificationConfig;

@@ -22,8 +22,7 @@ import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW_IN
 
 import java.util.function.UnaryOperator;
 
-import org.eclipse.pass.authz.usertoken.TokenFactory;
-import org.eclipse.pass.model.Submission;
+import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.model.config.NotificationConfig;
 import org.slf4j.Logger;

@@ -34,8 +34,8 @@ import java.util.function.Function;
 import javax.mail.Message.RecipientType;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.pass.client.PassClient;
-import org.eclipse.pass.model.User;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.notification.dispatch.DispatchException;
 import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.Notification.Param;

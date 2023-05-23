@@ -40,10 +40,8 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.text.StringEscapeUtils;
-import org.eclipse.pass.authz.usertoken.Key;
-import org.eclipse.pass.model.Submission;
-import org.eclipse.pass.model.SubmissionEvent;
-import org.eclipse.pass.model.SubmissionEvent.EventType;
+import org.eclipse.pass.support.client.model.Submission;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.Notification.Param;

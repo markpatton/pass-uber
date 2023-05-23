@@ -22,8 +22,8 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import org.eclipse.pass.client.PassClient;
-import org.eclipse.pass.model.User;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.User;
 
 class RecipientParser {
 

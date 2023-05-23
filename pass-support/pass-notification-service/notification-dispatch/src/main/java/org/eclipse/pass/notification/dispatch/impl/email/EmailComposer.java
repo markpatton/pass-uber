@@ -27,11 +27,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.eclipse.pass.client.PassClient;
-import org.eclipse.pass.model.User;
+
 import org.eclipse.pass.notification.dispatch.DispatchException;
 import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.config.template.NotificationTemplate;
+import org.eclipse.pass.support.client.PassClient;
+import org.eclipse.pass.support.client.model.User;
 import org.simplejavamail.email.Email;
 import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.email.EmailPopulatingBuilder;
