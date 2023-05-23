@@ -66,25 +66,14 @@
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.pass.notify</groupId>
-            <artifactId>dispatch-api</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.pass.notify</groupId>
-            <artifactId>notification-model</artifactId>
+            <groupId>org.eclipse.pass</groupId>
+            <artifactId>notification-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.pass</groupId>
-            <artifactId>pass-client-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.pass</groupId>
-            <artifactId>pass-model</artifactId>
+            <artifactId>pass-data-client</artifactId>
         </dependency>
 
         <dependency>

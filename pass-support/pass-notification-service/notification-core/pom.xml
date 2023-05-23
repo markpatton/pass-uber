@@ -66,25 +66,7 @@
 
       <dependency>
         <groupId>org.eclipse.pass</groupId>
-        <artifactId>pass-client-api</artifactId>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.pass</groupId>
         <artifactId>pass-data-client</artifactId>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.pass.notify</groupId>
-        <artifactId>notification-impl</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.pass.notify</groupId>
-        <artifactId>logging-aop</artifactId>
-        <version>${project.parent.version}</version>
-        <scope>runtime</scope>
       </dependency>
 
       <dependency>
@@ -97,18 +79,6 @@
             <artifactId>geronimo-jms_1.1_spec</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.pass.notify</groupId>
-        <artifactId>dispatch-api</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.pass.notify</groupId>
-        <artifactId>dispatch-impl</artifactId>
-        <version>${project.parent.version}</version>
       </dependency>
 
       <dependency>
