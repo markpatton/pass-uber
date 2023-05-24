@@ -59,12 +59,6 @@ public class NotificationConfig {
     @JsonProperty("smtp")
     private SmtpServerConfig smtpConfig;
 
-    /** 
-     * User invitation token encryption key.
-     */
-    @JsonProperty("user-token-generator")
-    private UserTokenGeneratorConfig tokenConfig;
-
     @JsonProperty("link-validators")
     private Collection<LinkValidationRule> linkValidatorConfig;
 
@@ -122,18 +116,6 @@ public class NotificationConfig {
         return smtpConfig;
     }
 
-    public void setSmtpConfig(SmtpServerConfig smtpConfig) {
-        this.smtpConfig = smtpConfig;
-    }
-
-    public UserTokenGeneratorConfig getUserTokenGeneratorConfig() {
-        return tokenConfig;
-    }
-
-    public void setUserTokenGeneratorConfig(UserTokenGeneratorConfig config) {
-        this.tokenConfig = config;
-    }
-
     public Collection<LinkValidationRule> getLinkValidatorConfigs() {
         return linkValidatorConfig;
     }
@@ -155,13 +137,12 @@ public class NotificationConfig {
                 Objects.equals(templates, that.templates) &&
                 Objects.equals(recipientConfigs, that.recipientConfigs) &&
                 Objects.equals(smtpConfig, that.smtpConfig) &&
-                Objects.equals(tokenConfig, that.tokenConfig) &&
                 Objects.equals(linkValidatorConfig, that.linkValidatorConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mode, templates, recipientConfigs, smtpConfig, tokenConfig, linkValidatorConfig);
+        return Objects.hash(mode, templates, recipientConfigs, smtpConfig, linkValidatorConfig);
     }
 
     @Override
@@ -171,7 +152,6 @@ public class NotificationConfig {
                 ", templates=" + templates +
                 ", recipientConfigs=" + recipientConfigs +
                 ", smtpConfig=" + smtpConfig +
-                ", tokenConfig=" + tokenConfig +
                 ", linkValidatorCOnfig=" + linkValidatorConfig +
                 '}';
     }

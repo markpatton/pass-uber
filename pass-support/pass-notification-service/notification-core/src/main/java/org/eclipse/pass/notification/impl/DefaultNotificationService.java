@@ -25,6 +25,7 @@ import org.eclipse.pass.notification.model.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Default implementation of {@link NotificationService} which processes {@link SubmissionEvent}s relating to proxy
@@ -33,17 +34,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
+@Service
 public class DefaultNotificationService implements NotificationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultNotificationService.class);
 
-    private PassClient passClient;
+    private final PassClient passClient;
+    private final DispatchService dispatchService;
+    private final Composer composer;
 
-    private DispatchService dispatchService;
-
-    private Composer composer;
-
-    @Autowired
     public DefaultNotificationService(PassClient passClient, DispatchService dispatchService, Composer composer) {
         this.passClient = passClient;
         this.dispatchService = dispatchService;
@@ -51,24 +50,15 @@ public class DefaultNotificationService implements NotificationService {
     }
 
     @Override
-    public void notify(String eventUri) {
-
-        // Retrieve SubmissionEvent
-        SubmissionEvent event = null;
-        try {
-            event = passClient.readResource(URI.create(eventUri), SubmissionEvent.class);
-        } catch (Exception e) {
-            LOG.error("Unable to retrieve SubmissionEvent '{}': {}", eventUri, e);
-            return;
-        }
+    public void notify(SubmissionEvent submissionEvent) {
 
         // Retrieve Submission
-        Submission submission = null;
+        Submission submission;
         try {
-            submission = passClient.readResource(event.getSubmission(), Submission.class);
+            submission = passClient.getObject(Submission.class, submissionEvent.getSubmission().getId());
         } catch (Exception e) {
-            LOG.error("Unable to retrieve Submission '{}' for SubmissionEvent '{}': {}",
-                    event.getSubmission(), eventUri, e);
+            LOG.error("Unable to retrieve Submission '{}' for SubmissionEvent '{}'",
+                    submissionEvent.getSubmission(), submissionEvent.getId(), e);
             return;
         }
 
@@ -80,13 +70,13 @@ public class DefaultNotificationService implements NotificationService {
             // then we are not dealing with proxy submission, we're dealing with self-submission.
             // in the case of self-submission, notifications are not produced, so short-circuit here
             LOG.debug("Dropping self-submission SubmissionEvent (Event URI: {}, Resource URI: {})",
-                    event.getId(),
+                    submissionEvent.getId(),
                     submission.getId());
             return;
         }
 
         // Compose Notification
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(submission, submissionEvent);
 
         // Invoke Dispatch
         dispatchService.dispatch(notification);

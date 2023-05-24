@@ -25,9 +25,7 @@ import javax.jms.Session;
 import org.eclipse.pass.notification.impl.NotificationService;
 import org.eclipse.pass.notification.impl.NotificationServiceErrorHandler;
 import org.eclipse.pass.notification.model.config.Mode;
-import org.eclipse.pass.notification.model.config.NotificationConfig;
-import org.eclipse.pass.support.messaging.constants.Constants;
-import org.eclipse.pass.support.messaging.json.JsonParser;
+import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +34,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-import org.springframework.jms.support.JmsHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.Header;
 
 /**
  * JMS configuration for Notification Services.  Primary entry point to the Notification Services stack when in
@@ -56,13 +51,7 @@ public class JmsConfig {
     private static final Logger LOG = LoggerFactory.getLogger(JmsConfig.class);
 
     @Autowired
-    private JsonParser jsonParser;
-
-    @Autowired
     private NotificationService notificationService;
-
-    @Autowired
-    private NotificationConfig config;
 
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(
@@ -81,44 +70,22 @@ public class JmsConfig {
         return factory;
     }
 
-    @JmsListener(destination = "${pass.notification.queue.event.name}", containerFactory =
-        "jmsListenerContainerFactory")
-    public void processMessage(@Header(Constants.JmsFcrepoHeader.FCREPO_RESOURCE_TYPE) String resourceType,
-                                         @Header(Constants.JmsFcrepoHeader.FCREPO_EVENT_TYPE) String eventType,
-                                         @Header(JmsHeaders.MESSAGE_ID) String id,
-                                         Message<String> message,
-                                         javax.jms.Message jmsMessage) {
+    // TODO use selector prop to only select submission event messages
+    @JmsListener(destination = "${pass.notification.queue.event.name}", containerFactory = "jmsListenerContainerFactory")
+    public void processMessage(SubmissionEvent submissionEvent) {
 
-        LOG.trace("Receiving message: {}", id);
+        LOG.trace("Receiving SubmissionEvent: {}", submissionEvent.getId());
 
-        if (Mode.DISABLED == config.getMode()) {
-            try {
-                LOG.trace("Discarding message {}, mode is {}", id, config.getMode());
-                jmsMessage.acknowledge();
-            } catch (JMSException e) {
-                LOG.warn("Error acknowledging JMS message {}: {}", id, e.getMessage(), e);
-            }
-            return;
-        }
-
-        if (!resourceType.contains(Constants.PassType.SUBMISSION_EVENT_RESOURCE) ||
-                !eventType.contains(Constants.JmsFcrepoEvent.RESOURCE_CREATION)) {
-            try {
-                LOG.trace("Discarding message {}, resource type {}, event type {}", id,
-                        resourceType, eventType);
-                jmsMessage.acknowledge();
-            } catch (JMSException e) {
-                LOG.warn("Error acknowledging JMS message {}: {}", id, e.getMessage(), e);
-            }
-            return;
-        }
-
-        LOG.trace("Processing message {}, resource type {}, event type {}", id,
-                resourceType, eventType);
-
-        String eventUri = jsonParser.parseId(message.getPayload().getBytes());
-
-        LOG.trace("Processing notification for {}", eventUri);
+        // TODO do we need to keep the DISABLED mode?
+//        if (Mode.DISABLED == config.getMode()) {
+//            try {
+//                LOG.trace("Discarding message {}, mode is {}", id, config.getMode());
+//                jmsMessage.acknowledge();
+//            } catch (JMSException e) {
+//                LOG.warn("Error acknowledging JMS message {}: {}", id, e.getMessage(), e);
+//            }
+//            return;
+//        }
 
         try {
             notificationService.notify(eventUri);

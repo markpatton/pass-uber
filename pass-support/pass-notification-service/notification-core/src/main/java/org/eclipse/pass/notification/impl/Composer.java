@@ -32,10 +32,12 @@ import java.util.function.Predicate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.eclipse.pass.notification.model.NotificationParam;
+import org.eclipse.pass.notification.model.NotificationType;
+import org.eclipse.pass.support.client.model.EventType;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.model.SimpleNotification;
 import org.eclipse.pass.notification.model.config.NotificationConfig;
 import org.eclipse.pass.notification.model.config.RecipientConfig;
 import org.slf4j.Logger;
@@ -57,8 +59,8 @@ import org.springframework.util.ReflectionUtils;
  *
  * @author Elliot Metsger (emetsger@jhu.edu)
  * @see RecipientConfig
- * @see Notification.Type
- * @see Notification.Param
+ * @see NotificationType
+ * @see NotificationParam
  */
 public class Composer implements BiFunction<Submission, SubmissionEvent, Notification> {
 
@@ -104,76 +106,49 @@ public class Composer implements BiFunction<Submission, SubmissionEvent, Notific
         Objects.requireNonNull(submission, "Submission must not be null.");
         Objects.requireNonNull(event, "Event must not be null.");
 
-        if (!event.getSubmission().equals(submission.getId())) {
+        if (!event.getSubmission().getId().equals(submission.getId())) {
             // todo: exception?
             LOG.warn("Composing a Notification for tuple [{},{}] but {} references a different Submission: {}.",
                     submission.getId(), event.getId(), event.getId(), event.getSubmission());
         }
 
-        SimpleNotification notification = new SimpleNotification();
-        HashMap<Notification.Param, String> params = new HashMap<>();
+        Notification notification = new Notification();
+        HashMap<NotificationParam, String> params = new HashMap<>();
         notification.setParameters(params);
 
-        notification.setEventUri(event.getId());
-        params.put(Notification.Param.EVENT_METADATA, eventMetadata(event, mapper));
+        notification.setEventId(event.getId());
+        params.put(NotificationParam.EVENT_METADATA, eventMetadata(event, mapper));
 
         Collection<String> cc = recipientConfig.getGlobalCc();
         if (cc != null && !cc.isEmpty()) {
             notification.setCc(cc);
-            params.put(Notification.Param.CC, join(",", cc));
+            params.put(NotificationParam.CC, join(",", cc));
         }
 
         Collection<String> bcc = recipientConfig.getGlobalBcc();
         if (bcc != null && !bcc.isEmpty()) {
             notification.setBcc(bcc);
-            params.put(Notification.Param.BCC, join(",", bcc));
+            params.put(NotificationParam.BCC, join(",", bcc));
         }
 
-        notification.setResourceUri(submission.getId());
-        params.put(Notification.Param.RESOURCE_METADATA, resourceMetadata(submission, mapper));
+        notification.setResourceId(submission.getId());
+        params.put(NotificationParam.RESOURCE_METADATA, resourceMetadata(submission, mapper));
 
         String from = recipientConfig.getFromAddress();
         notification.setSender(from);
-        params.put(Notification.Param.FROM, from);
+        params.put(NotificationParam.FROM, from);
 
         Collection<String> recipients = recipientAnalyzer.apply(submission, event);
         notification.setRecipients(recipients);
-        params.put(Notification.Param.TO, join(",", recipients));
+        params.put(NotificationParam.TO, join(",", recipients));
 
-        params.put(Notification.Param.LINKS, concat(submissionLinkAnalyzer.apply(submission, event))
+        params.put(NotificationParam.LINKS, concat(submissionLinkAnalyzer.apply(submission, event))
                 .filter(linkValidator)
                 .collect(serialized()));
 
-        switch (event.getEventType()) {
-            case APPROVAL_REQUESTED_NEWUSER: {
-                notification.setType(Notification.Type.SUBMISSION_APPROVAL_INVITE);
-                break;
-            }
-
-            case APPROVAL_REQUESTED: {
-                notification.setType(Notification.Type.SUBMISSION_APPROVAL_REQUESTED);
-                break;
-            }
-
-            case CHANGES_REQUESTED: {
-                notification.setType(Notification.Type.SUBMISSION_CHANGES_REQUESTED);
-                break;
-            }
-
-            case SUBMITTED: {
-                notification.setType(Notification.Type.SUBMISSION_SUBMISSION_SUBMITTED);
-                break;
-            }
-
-            case CANCELLED: {
-                notification.setType(Notification.Type.SUBMISSION_SUBMISSION_CANCELLED);
-                break;
-            }
-
-            default: {
-                throw new RuntimeException("Unknown SubmissionEvent type '" + event.getEventType() + "'");
-            }
-        }
+        EventType eventType = event.getEventType();
+        NotificationType notificationType = NotificationType.findForEventType(eventType);
+        notification.setType(notificationType);
 
         return notification;
     }
@@ -182,16 +157,8 @@ public class Composer implements BiFunction<Submission, SubmissionEvent, Notific
         return recipientConfig;
     }
 
-    void setRecipientConfig(RecipientConfig recipientConfig) {
-        this.recipientConfig = recipientConfig;
-    }
-
     RecipientAnalyzer getRecipientAnalyzer() {
         return recipientAnalyzer;
-    }
-
-    void setRecipientAnalyzer(RecipientAnalyzer recipientAnalyzer) {
-        this.recipientAnalyzer = recipientAnalyzer;
     }
 
     static RecipientConfig getRecipientConfig(NotificationConfig config) {

@@ -15,11 +15,13 @@
  */
 package org.eclipse.pass.notification.impl;
 
+import org.eclipse.pass.support.client.model.SubmissionEvent;
+
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
 public interface NotificationService {
 
-    void notify(String eventUri);
+    void notify(SubmissionEvent submissionEvent);
 
 }

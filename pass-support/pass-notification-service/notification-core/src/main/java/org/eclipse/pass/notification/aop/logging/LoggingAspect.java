@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+// TODO is this really needed, or can we just log at appropriate point and try/catch
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */

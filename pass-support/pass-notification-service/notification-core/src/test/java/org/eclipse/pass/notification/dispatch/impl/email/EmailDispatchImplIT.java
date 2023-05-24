@@ -58,7 +58,6 @@ import org.eclipse.pass.notification.impl.Composer;
 import org.eclipse.pass.notification.impl.ComposerIT;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.model.SimpleNotification;
 import org.eclipse.pass.notification.model.config.Mode;
 import org.eclipse.pass.notification.model.config.NotificationConfig;
 import org.eclipse.pass.notification.model.config.RecipientConfig;
@@ -138,7 +137,7 @@ public class EmailDispatchImplIT {
     public void simpleSuccess() throws Exception {
         String expectedBody = "Approval Invite Body\r\n\r\nApproval Invite Footer";
 
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setCc(singleton(CC));
@@ -167,7 +166,7 @@ public class EmailDispatchImplIT {
     public void simpleBccSuccess() throws Exception {
         String expectedBody = "Approval Invite Body\r\n\r\nApproval Invite Footer";
 
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setBcc(singleton(BCC));
@@ -214,7 +213,7 @@ public class EmailDispatchImplIT {
         recipientUser.setEmail(RECIPIENT);
         URI recipientUri = passClient.createResource(recipientUser);
 
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setRecipients(singleton(recipientUri.toString()));
@@ -254,7 +253,7 @@ public class EmailDispatchImplIT {
 
         config.setTemplates(singleton(template));
 
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setResourceUri(SUBMISSION_RESOURCE_URI);
@@ -308,7 +307,7 @@ public class EmailDispatchImplIT {
 
         Link link = new Link(URI.create("http://example.org/email/dispatch/myLink"), SUBMISSION_REVIEW_INVITE);
 
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setRecipients(singleton("mailto:" + RECIPIENT));
@@ -352,7 +351,7 @@ public class EmailDispatchImplIT {
     @Test
     public void nonExistentEmailAddress() {
         String nonExistentRecipientAddress = "moo-thru@bar.edu";
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setResourceUri(SUBMISSION_RESOURCE_URI);
@@ -390,7 +389,7 @@ public class EmailDispatchImplIT {
     @Test
     public void testWhitelistFilter() throws Exception {
         String unlistedRecipient = "mailto:facultyWithNoGrants@jhu.edu";
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setResourceUri(SUBMISSION_RESOURCE_URI);
@@ -429,7 +428,7 @@ public class EmailDispatchImplIT {
         assertTrue(recipientConfig(config).getWhitelist().contains(RECIPIENT));
         assertFalse(recipientConfig(config).getWhitelist().contains("facultyWithNoGrants@jhu.edu"));
 
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setResourceUri(SUBMISSION_RESOURCE_URI);
@@ -486,7 +485,7 @@ public class EmailDispatchImplIT {
         underTest.getComposer().setWhitelist(new SimpleWhitelist(recipientConfig));
 
         String secondRecipient = "facultyWithNoGrants@jhu.edu";
-        SimpleNotification n = new SimpleNotification();
+        Notification n = new Notification();
         n.setType(SUBMISSION_APPROVAL_INVITE);
         n.setSender(SENDER);
         n.setResourceUri(SUBMISSION_RESOURCE_URI);
