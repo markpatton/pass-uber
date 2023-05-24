@@ -18,131 +18,158 @@ package org.eclipse.pass.notification.model;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
- * Represents a Notification that is to be dispatched to a set of recipients.
+ * Encapsulates {@link Notification} metadata used to dispatch the notification.
  *
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-public interface Notification {
+public class Notification {
 
     /**
-     * Type of Notification
-     * todo: see how these line up with SubmissionEvent, and potentially use the SubmissionEvent name as the
-     * notification type.
+     * The primary recipients of the notification, may URIs to a PASS {@code User} or 'mailto' URIs
      */
-    enum Type {
-
-        /**
-         * Preparer has requested approval of a Submission by an Authorized Submitter
-         */
-        SUBMISSION_APPROVAL_REQUESTED,
-
-        /**
-         * Preparer has requested approval of a Submission by an Authorized Submitter who does not have a {@code User}
-         * in PASS.  The notification will include an invitation to join PASS (and upon login, a {@code User} created
-         * for the Authorized Submitter)
-         */
-        SUBMISSION_APPROVAL_INVITE,
-
-        /**
-         * Authorized Submitter has requested changes to the Submission by the Preparer.
-         */
-        SUBMISSION_CHANGES_REQUESTED,
-
-        /**
-         * Submission was submitted by the Authorized Submitter
-         */
-        SUBMISSION_SUBMISSION_SUBMITTED,
-
-        /**
-         * Submission was cancelled by either the Authorized Submitter or Preparer
-         */
-        SUBMISSION_SUBMISSION_CANCELLED
-
-    }
+    private Collection<String> recipients;
 
     /**
-     * Well-known parameter names suitable for use as keys.  Parameter names may be used to map to values that
-     * parametrize notification metadata or a notification body.
+     * The sender of the notification.
      */
-    enum Param {
+    private String sender;
 
-        /**
-         * Placeholder for the addressee of the notification
-         */
-        TO("to"),
+    /**
+     * Additional recipients, may be URIs to PASS {@code User}s
+     */
+    private Collection<String> cc;
 
-        /**
-         * Placeholder for notification carbon copies
-         */
-        CC("cc"),
+    /**
+     * Additional recipients, must be RFC 822 email addresses.  URIs must not be used.
+     */
+    private Collection<String> bcc;
 
-        /**
-         * Placeholder for notification blind carbon copies
-         */
-        BCC("bcc"),
+    /**
+     * The type of {@link Notification}
+     */
+    private NotificationType type;
 
-        /**
-         * Placeholder for the sender of the notification
-         */
-        FROM("from"),
+    /**
+     * Parameter map used for resolving placeholders in notification templates
+     *
+     * @see NotificationParam
+     */
+    private Map<NotificationParam, String> parameters;
 
-        /**
-         * Placeholder for the subject of the notification
-         */
-        SUBJECT("subject"),
+    /**
+     * The ID to the {@code SubmissionEvent} this notification is in response to
+     */
+    private String eventId;
 
-        /**
-         * Placeholder for a data structure carrying metadata about the submission that relates to this notification
-         */
-        RESOURCE_METADATA("resource_metadata"),
+    /**
+     * The ID to the PASS resource this notification is in response to; likely to be the same as the
+     * {@code SubmissionEvent#submissionUri}
+     */
+    private String resourceId;
 
-        /**
-         * Placeholder for a data structure carrying metadata about the event prompting the notification
-         */
-        EVENT_METADATA("event_metadata"),
-
-        /**
-         * Placeholder for a data structure carrying links and their descriptions that may be included in the
-         * notification
-         */
-        LINKS("link_metadata");
-
-        /**
-         * String representation of the parameter name, suitable for use as a key in a key-value pair.
-         */
-        private String paramName;
-
-        private Param(String paramName) {
-            this.paramName = paramName;
-        }
-
-        /**
-         * String representation of the parameter name, suitable for use as a key in a key-value pair.
-         *
-         * @return the string representation of the parameter name
-         */
-        public String paramName() {
-            return this.paramName;
-        }
-
+    public Collection<String> getRecipients() {
+        return recipients;
     }
 
-    Collection<String> getRecipients();
+    public void setRecipients(Collection<String> recipients) {
+        this.recipients = recipients;
+    }
 
-    Collection<String> getCc();
+    public Collection<String> getCc() {
+        return cc;
+    }
 
-    Collection<String> getBcc();
+    public void setCc(Collection<String> cc) {
+        this.cc = cc;
+    }
 
-    Type getType();
+    public Collection<String> getBcc() {
+        return bcc;
+    }
 
-    Map<Param, String> getParameters();
+    public void setBcc(Collection<String> bcc) {
+        this.bcc = bcc;
+    }
 
-    URI getEventUri();
+    public NotificationType getType() {
+        return type;
+    }
 
-    URI getResourceUri();
+    public void setType(NotificationType type) {
+        this.type = type;
+    }
 
-    String getSender();
+    public Map<NotificationParam, String> getParameters() {
+        return parameters;
+    }
 
+    public void setParameters(Map<NotificationParam, String> parameters) {
+        this.parameters = parameters;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner("\n  ", Notification.class.getSimpleName() + "[", "]")
+                .add("recipients=" + recipients)
+                .add("sender='" + sender + "'")
+                .add("cc=" + cc)
+                .add("bcc=" + bcc)
+                .add("type=" + type)
+                .add("parameters=" + parameters)
+                .add("eventUri=" + eventUri)
+                .add("resourceUri=" + resourceUri)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Notification that = (Notification) o;
+        return Objects.equals(recipients, that.recipients) &&
+                Objects.equals(sender, that.sender) &&
+                Objects.equals(cc, that.cc) &&
+                Objects.equals(bcc, that.bcc) &&
+                type == that.type &&
+                Objects.equals(parameters, that.parameters) &&
+                Objects.equals(eventUri, that.eventUri) &&
+                Objects.equals(resourceUri, that.resourceUri);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(recipients, sender, cc, bcc, type, parameters, eventUri, resourceUri);
+    }
 }
