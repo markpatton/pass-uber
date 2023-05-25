@@ -19,9 +19,9 @@ package org.eclipse.pass.notification.service;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Stream.empty;
-import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW;
-import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW_INVITE;
-import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_VIEW;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_VIEW;
 import static org.eclipse.pass.notification.service.LinksUtil.optional;
 import static org.eclipse.pass.notification.service.LinksUtil.required;
 

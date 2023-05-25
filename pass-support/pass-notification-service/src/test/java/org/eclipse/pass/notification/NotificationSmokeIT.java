@@ -17,8 +17,8 @@ package org.eclipse.pass.notification;
 
 import static java.nio.charset.Charset.forName;
 import static org.apache.commons.io.IOUtils.resourceToString;
-import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW;
-import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW_INVITE;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

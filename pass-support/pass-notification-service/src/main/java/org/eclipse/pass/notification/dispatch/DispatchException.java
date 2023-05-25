@@ -22,15 +22,7 @@ import org.eclipse.pass.notification.model.Notification;
  */
 public class DispatchException extends RuntimeException {
 
-    private Notification notification;
-
-    public DispatchException() {
-
-    }
-
-    public DispatchException(Notification notification) {
-        this.notification = notification;
-    }
+    private final Notification notification;
 
     public DispatchException(String message, Notification notification) {
         super(message);
@@ -39,17 +31,6 @@ public class DispatchException extends RuntimeException {
 
     public DispatchException(String message, Throwable cause, Notification notification) {
         super(message, cause);
-        this.notification = notification;
-    }
-
-    public DispatchException(Throwable cause, Notification notification) {
-        super(cause);
-        this.notification = notification;
-    }
-
-    public DispatchException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace,
-                             Notification notification) {
-        super(message, cause, enableSuppression, writableStackTrace);
         this.notification = notification;
     }
 

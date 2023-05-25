@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.config.LinkValidationRule;
 import org.eclipse.pass.notification.config.NotificationConfig;
@@ -51,7 +52,6 @@ public class LinkValidatorTest {
     LinkValidationRule RULE;
 
     private NotificationConfig config;
-
     private Set<LinkValidationRule> rules;
 
     @Before
@@ -75,7 +75,8 @@ public class LinkValidatorTest {
 
         rules.add(RULE);
 
-        final LinkValidator toTest = new LinkValidator(config);
+        // TODO possibly change this to spring test
+        final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertTrue(toTest.test(GOOD_LINK));
         assertFalse(toTest.test(BAD_LINK));
     }
@@ -87,7 +88,7 @@ public class LinkValidatorTest {
         RULE.setThrowExceptionOnFailure(true);
         rules.add(RULE);
 
-        final LinkValidator toTest = new LinkValidator(config);
+        final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertTrue(toTest.test(GOOD_LINK));
 
         try {
@@ -106,7 +107,7 @@ public class LinkValidatorTest {
     public void noRulesTest() {
         rules.clear();
 
-        final LinkValidator toTest = new LinkValidator(config);
+        final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertTrue(toTest.test(GOOD_LINK));
         assertTrue(toTest.test(BAD_LINK));
     }
@@ -123,7 +124,7 @@ public class LinkValidatorTest {
 
         rules.addAll(asList(RULE, DIFFERENT_RULE));
 
-        final LinkValidator toTest = new LinkValidator(config);
+        final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertTrue(toTest.test(GOOD_LINK));
         assertFalse(toTest.test(BAD_LINK));
 
@@ -144,7 +145,7 @@ public class LinkValidatorTest {
 
         rules.add(RULE);
 
-        final LinkValidator toTest = new LinkValidator(config);
+        final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertFalse(toTest.test(BAD_LINK));
 
         BAD_LINK.setRel(OTHER_REL_NON_MATCHING);
@@ -164,7 +165,7 @@ public class LinkValidatorTest {
 
         rules.add(RULE);
 
-        final LinkValidator toTest = new LinkValidator(config);
+        final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertFalse(toTest.test(BAD_LINK));
 
         BAD_LINK.setRel(OTHER_REL_NON_MATCHING);
@@ -180,7 +181,7 @@ public class LinkValidatorTest {
         RULE.setRequiredBaseURI(null);
         rules.add(RULE);
 
-        final LinkValidator toTest = new LinkValidator(config);
+        final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertTrue(toTest.test(GOOD_LINK));
         assertTrue(toTest.test(BAD_LINK));
     }

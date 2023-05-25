@@ -22,6 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.pass.notification.config.smtp.SmtpServerConfig;
+import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.NotificationTemplate;
 
 /**
