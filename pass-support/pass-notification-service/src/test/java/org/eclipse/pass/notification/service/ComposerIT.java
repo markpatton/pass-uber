@@ -19,13 +19,7 @@
 package org.eclipse.pass.notification.service;
 
 import static java.lang.String.join;
-import static java.nio.charset.Charset.forName;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static org.apache.commons.io.IOUtils.resourceToString;
-import static org.eclipse.pass.notification.service.Composer.getRecipientConfig;
-import static org.eclipse.pass.notification.service.Links.deserialize;
-import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW_INVITE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -33,39 +27,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.support.client.PassClient;
-import org.eclipse.pass.support.client.model.Submission;
-import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.NotificationApp;
-import org.eclipse.pass.notification.model.Link;
-import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.config.Mode;
-import org.eclipse.pass.notification.config.NotificationConfig;
-import org.eclipse.pass.notification.config.RecipientConfig;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)

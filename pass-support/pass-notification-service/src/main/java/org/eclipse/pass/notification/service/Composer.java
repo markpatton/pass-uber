@@ -17,8 +17,8 @@ package org.eclipse.pass.notification.service;
 
 import static java.lang.String.join;
 import static org.eclipse.pass.notification.service.Composer.RecipientConfigFilter.modeFilter;
-import static org.eclipse.pass.notification.service.Links.concat;
-import static org.eclipse.pass.notification.service.Links.serialized;
+import static org.eclipse.pass.notification.service.LinksUtil.concat;
+import static org.eclipse.pass.notification.service.LinksUtil.serialized;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -34,14 +34,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.pass.notification.config.NotificationConfig;
+import org.eclipse.pass.notification.config.RecipientConfig;
+import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.NotificationParam;
 import org.eclipse.pass.notification.model.NotificationType;
 import org.eclipse.pass.support.client.model.EventType;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
-import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.config.NotificationConfig;
-import org.eclipse.pass.notification.config.RecipientConfig;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -64,16 +65,13 @@ import org.springframework.util.ReflectionUtils;
  */
 @Slf4j
 @AllArgsConstructor
+@Component
 public class Composer implements BiFunction<Submission, SubmissionEvent, Notification> {
 
     private final RecipientConfig recipientConfig;
-
     private final RecipientAnalyzer recipientAnalyzer;
-
     private final SubmissionLinkAnalyzer submissionLinkAnalyzer;
-
     private final LinkValidator linkValidator;
-
     private final ObjectMapper mapper;
 
     /**

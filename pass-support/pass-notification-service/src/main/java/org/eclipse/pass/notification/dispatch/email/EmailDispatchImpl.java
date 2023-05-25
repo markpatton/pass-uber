@@ -23,13 +23,13 @@ import javax.mail.Message;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.pass.notification.config.NotificationConfig;
 import org.eclipse.pass.notification.dispatch.DispatchException;
 import org.eclipse.pass.notification.dispatch.DispatchService;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.model.NotificationType;
-import org.eclipse.pass.notification.config.NotificationConfig;
 import org.eclipse.pass.notification.model.NotificationTemplate;
 import org.eclipse.pass.notification.model.NotificationTemplateName;
+import org.eclipse.pass.notification.model.NotificationType;
 import org.simplejavamail.email.Email;
 import org.simplejavamail.mailer.Mailer;
 import org.springframework.stereotype.Service;

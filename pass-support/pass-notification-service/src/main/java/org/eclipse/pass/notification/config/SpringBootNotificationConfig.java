@@ -20,8 +20,8 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.eclipse.pass.notification.dispatch.email.SimpleWhitelist;
 import org.eclipse.pass.notification.config.smtp.SmtpServerConfig;
+import org.eclipse.pass.notification.dispatch.email.SimpleWhitelist;
 import org.eclipse.pass.support.client.PassClient;
 import org.simplejavamail.mailer.Mailer;
 import org.simplejavamail.mailer.MailerBuilder;

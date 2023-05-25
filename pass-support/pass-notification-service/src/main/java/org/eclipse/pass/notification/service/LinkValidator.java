@@ -17,29 +17,30 @@
 package org.eclipse.pass.notification.service;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.config.LinkValidationRule;
 import org.eclipse.pass.notification.config.NotificationConfig;
+import org.eclipse.pass.notification.model.Link;
+import org.springframework.stereotype.Component;
 
 /**
  * @author apb@jhu.edu
  */
+@Component
 public class LinkValidator implements Predicate<Link> {
 
     private final Collection<LinkValidationRule> rules;
+    private final ObjectMapper objectMapper;
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    public LinkValidator(NotificationConfig config) {
+    public LinkValidator(NotificationConfig config,
+                         ObjectMapper objectMapper) {
         this.rules = config.getLinkValidatorConfig();
-        requireNonNull(this.rules, "No configuration supplied to link validator");
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -58,7 +59,7 @@ public class LinkValidator implements Predicate<Link> {
                 .allMatch(rule -> apply(rule, link));
     }
 
-    private static boolean apply(LinkValidationRule cfg, Link link) {
+    private boolean apply(LinkValidationRule cfg, Link link) {
         if (cfg.getRequiredBaseURI() != null) {
             final boolean isValid = link.getHref().toString().startsWith(cfg.getRequiredBaseURI());
 

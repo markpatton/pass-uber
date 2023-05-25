@@ -17,11 +17,11 @@ package org.eclipse.pass.notification.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.pass.notification.dispatch.DispatchService;
+import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
-import org.eclipse.pass.notification.dispatch.DispatchService;
-import org.eclipse.pass.notification.model.Notification;
 import org.springframework.stereotype.Service;
 
 /**

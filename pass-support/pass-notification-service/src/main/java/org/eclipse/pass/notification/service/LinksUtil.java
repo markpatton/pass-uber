@@ -45,9 +45,9 @@ import org.eclipse.pass.notification.model.Link;
  * @author apb@jhu.edu
  */
 @Slf4j
-public class Links {
+public class LinksUtil {
 
-    private Links() {
+    private LinksUtil() {
     }
 
     private static final ObjectMapper mapper = new ObjectMapper();

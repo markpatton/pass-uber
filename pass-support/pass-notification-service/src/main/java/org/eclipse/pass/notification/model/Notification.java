@@ -15,12 +15,12 @@
  */
 package org.eclipse.pass.notification.model;
 
+import java.util.Collection;
+import java.util.Map;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Encapsulates {@link Notification} metadata used to dispatch the notification.

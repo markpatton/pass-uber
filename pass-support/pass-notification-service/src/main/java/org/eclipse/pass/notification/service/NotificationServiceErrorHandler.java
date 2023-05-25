@@ -15,9 +15,8 @@
  */
 package org.eclipse.pass.notification.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.pass.notification.dispatch.DispatchException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ErrorHandler;
 
@@ -26,15 +25,14 @@ import org.springframework.util.ErrorHandler;
  *
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
+@Slf4j
 @Component
 public class NotificationServiceErrorHandler implements ErrorHandler {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ErrorHandler.class);
 
     @Override
     public void handleError(Throwable throwable) {
         if (!(throwable instanceof DispatchException)) {
-            LOG.error("Encountered an unrecoverable error: {}", throwable.getMessage(), throwable);
+            log.error("Encountered an unrecoverable error: {}", throwable.getMessage(), throwable);
         }
     }
 

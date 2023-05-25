@@ -19,19 +19,20 @@ package org.eclipse.pass.notification.service;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Stream.empty;
-import static org.eclipse.pass.notification.service.Links.optional;
-import static org.eclipse.pass.notification.service.Links.required;
 import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW;
 import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW_INVITE;
 import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_VIEW;
+import static org.eclipse.pass.notification.service.LinksUtil.optional;
+import static org.eclipse.pass.notification.service.LinksUtil.required;
 
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
-import org.eclipse.pass.notification.model.Link;
+import org.springframework.stereotype.Component;
 
 /**
  * Analyzes a submission+event pair and emits a stream of submission-related {@link Link}s
@@ -39,6 +40,7 @@ import org.eclipse.pass.notification.model.Link;
  * @author apb@jhu.edu
  */
 @Slf4j
+@Component
 public class SubmissionLinkAnalyzer implements BiFunction<Submission, SubmissionEvent, Stream<Link>> {
 
     /**

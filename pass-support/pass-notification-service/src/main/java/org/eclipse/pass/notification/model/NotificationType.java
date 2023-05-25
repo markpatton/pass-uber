@@ -1,14 +1,14 @@
 package org.eclipse.pass.notification.model;
 
-import org.eclipse.pass.support.client.model.EventType;
-
-import java.util.stream.Stream;
-
 import static org.eclipse.pass.support.client.model.EventType.APPROVAL_REQUESTED;
 import static org.eclipse.pass.support.client.model.EventType.APPROVAL_REQUESTED_NEWUSER;
 import static org.eclipse.pass.support.client.model.EventType.CANCELLED;
 import static org.eclipse.pass.support.client.model.EventType.CHANGES_REQUESTED;
 import static org.eclipse.pass.support.client.model.EventType.SUBMITTED;
+
+import java.util.stream.Stream;
+
+import org.eclipse.pass.support.client.model.EventType;
 
 public enum NotificationType {
     /**

@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.eclipse.pass.notification.config;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * @author apb@jhu.edu

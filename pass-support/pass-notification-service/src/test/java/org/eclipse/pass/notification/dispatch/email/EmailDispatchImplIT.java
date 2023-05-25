@@ -15,14 +15,8 @@
  */
 package org.eclipse.pass.notification.dispatch.email;
 
-import static java.nio.charset.Charset.forName;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
 import static org.apache.commons.io.IOUtils.resourceToString;
-import static org.eclipse.pass.notification.service.Links.serialized;
-import static org.eclipse.pass.notification.model.Link.Rels.SUBMISSION_REVIEW_INVITE;
 import static org.eclipse.pass.notification.util.PathUtil.packageAsPath;
-import static org.eclipse.pass.notification.util.mail.SimpleImapClient.getBodyAsText;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -30,42 +24,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-import javax.mail.Message;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.support.client.PassClient;
-import org.eclipse.pass.support.client.model.Submission;
-import org.eclipse.pass.support.client.model.SubmissionEvent;
-import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.notification.NotificationApp;
-import org.eclipse.pass.notification.SimpleImapClientFactory;
 import org.eclipse.pass.notification.SpringBootIntegrationConfig;
-import org.eclipse.pass.notification.dispatch.DispatchException;
-import org.eclipse.pass.notification.service.Composer;
-import org.eclipse.pass.notification.service.ComposerIT;
-import org.eclipse.pass.notification.model.Link;
-import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.config.Mode;
-import org.eclipse.pass.notification.config.NotificationConfig;
-import org.eclipse.pass.notification.config.RecipientConfig;
-import org.eclipse.pass.notification.model.NotificationTemplate;
-import org.eclipse.pass.notification.util.mail.SimpleImapClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**

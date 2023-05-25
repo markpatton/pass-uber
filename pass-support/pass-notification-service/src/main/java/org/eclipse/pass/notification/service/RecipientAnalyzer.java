@@ -29,12 +29,14 @@ import java.util.function.BiFunction;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.support.client.model.User;
+import org.springframework.stereotype.Component;
 
 /**
  * Examines the {@link Submission} and {@link SubmissionEvent}, and determines who should receive the notification.
  *
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
+@Component
 public class RecipientAnalyzer implements BiFunction<Submission, SubmissionEvent, Collection<String>> {
 
     @Override

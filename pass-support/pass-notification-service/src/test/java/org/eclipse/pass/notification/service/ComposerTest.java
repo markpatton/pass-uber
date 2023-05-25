@@ -17,7 +17,6 @@ package org.eclipse.pass.notification.service;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.eclipse.pass.notification.service.Links.deserialize;
 import static org.eclipse.pass.notification.service.LinksTest.randomUri;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,28 +26,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.text.StringEscapeUtils;
-import org.eclipse.pass.support.client.model.Submission;
-import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.model.Link;
-import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.config.Mode;
 import org.eclipse.pass.notification.config.NotificationConfig;
-import org.eclipse.pass.notification.config.RecipientConfig;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)

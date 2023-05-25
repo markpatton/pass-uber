@@ -71,7 +71,8 @@ public class JmsConfig {
     }
 
     // TODO use selector prop to only select submission event messages
-    @JmsListener(destination = "${pass.notification.queue.event.name}", containerFactory = "jmsListenerContainerFactory")
+    @JmsListener(destination = "${pass.notification.queue.event.name}",
+        containerFactory = "jmsListenerContainerFactory")
     public void processMessage(SubmissionEvent submissionEvent) {
 
         LOG.trace("Receiving SubmissionEvent: {}", submissionEvent.getId());
