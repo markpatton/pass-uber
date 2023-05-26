@@ -17,16 +17,21 @@ package org.eclipse.pass.notification.config;
 
 import static org.eclipse.pass.notification.config.Mode.DEMO;
 import static org.eclipse.pass.notification.config.Mode.PRODUCTION;
+import static org.eclipse.pass.notification.config.NotificationTemplateName.BODY;
+import static org.eclipse.pass.notification.config.NotificationTemplateName.FOOTER;
+import static org.eclipse.pass.notification.config.NotificationTemplateName.SUBJECT;
 import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_APPROVAL_INVITE;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
+import org.eclipse.pass.notification.model.NotificationType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
@@ -63,5 +68,14 @@ public class NotificationConfigTest {
                 .stream().filter(tc -> tc.getNotificationType() == SUBMISSION_APPROVAL_INVITE).findAny()
                 .orElseThrow(() -> new RuntimeException(
                     "Missing NotificationTemplate for type SUBMISSION_APPROVAL_INVITE"));
+
+        NotificationTemplate template = new ArrayList<>(notificationConfig.getTemplates()).get(0);
+        assertEquals(NotificationType.SUBMISSION_APPROVAL_INVITE, template.getNotificationType());
+        assertEquals(3, template.getTemplates().size());
+        assertEquals("PASS Submission Approval: ${RESOURCE_METADATA.title}",
+            template.getTemplates().get(SUBJECT));
+        assertEquals("classpath*:pass-body-submission-approval-invite-template.vm",
+            template.getTemplates().get(BODY));
+        assertEquals("classpath*:pass-footer-template.vm", template.getTemplates().get(FOOTER));
     }
 }

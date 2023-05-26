@@ -54,7 +54,6 @@ public class Link {
     public static final String SUBMISSION_REVIEW_INVITE = "submission-review-invite";
 
     private String rel;
-
     private URI href;
 
     public Link(URI href, String rel) {

@@ -77,6 +77,7 @@ public class NotificationApp {
 
     }
 
+    // TODO remove this most likely
     /**
      * Echos out the git commit that the notification-boot jar was created from and every environment variable.
      * If an environment variable has a Spring property placeholder as a value, the property placeholder is resolved

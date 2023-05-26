@@ -75,6 +75,7 @@ public class EmailDispatchImpl implements DispatchService {
 
             MimeMessage email = composer.compose(notification, parameterizedTemplates);
 
+            // TODO come back to this
 //            email.getRecipients(Message.RecipientType.TO).stream()
 //                    .findAny()
 //                    .orElseThrow(() -> new DispatchException(
