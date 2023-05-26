@@ -63,7 +63,5 @@ public class NotificationConfigTest {
                 .stream().filter(tc -> tc.getNotificationType() == SUBMISSION_APPROVAL_INVITE).findAny()
                 .orElseThrow(() -> new RuntimeException(
                     "Missing NotificationTemplate for type SUBMISSION_APPROVAL_INVITE"));
-        assertNotNull(notificationConfig.getSmtpConfig());
-        assertEquals("smtp.gmail.com", notificationConfig.getSmtpConfig().getHost());
     }
 }

@@ -20,7 +20,6 @@ import java.util.Collection;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.eclipse.pass.notification.config.smtp.SmtpServerConfig;
 import org.eclipse.pass.notification.model.Notification;
 
 /**
@@ -63,13 +62,6 @@ public class NotificationConfig {
      */
     @JsonProperty("recipient-config")
     private Collection<RecipientConfig> recipientConfigs;
-
-    /**
-     * The settings used to send email notifications using SMTP.  Unlike other portions of this configuration, it is
-     * <em>not</em> a function of {@link #getMode() the runtime mode}.
-     */
-    @JsonProperty("smtp")
-    private SmtpServerConfig smtpConfig;
 
     @JsonProperty("link-validators")
     private Collection<LinkValidationRule> linkValidatorConfig;

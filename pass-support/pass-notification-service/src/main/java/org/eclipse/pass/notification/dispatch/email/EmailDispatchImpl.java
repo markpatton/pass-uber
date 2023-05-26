@@ -20,6 +20,8 @@ import static java.lang.String.join;
 import java.util.Arrays;
 import java.util.Map;
 
+import jakarta.mail.Message;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.pass.notification.config.NotificationConfig;
@@ -29,6 +31,7 @@ import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.config.NotificationTemplate;
 import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.eclipse.pass.notification.model.NotificationType;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 /**
@@ -61,30 +64,26 @@ public class EmailDispatchImpl implements DispatchService {
 
     private final Parameterizer parameterizer;
     private final EmailComposer composer;
+    private final JavaMailSender javaMailSender;
 
     @Override
-    public String dispatch(Notification notification) {
+    public void dispatch(Notification notification) {
         try {
             NotificationType notificationType = notification.getType();
             Map<NotificationTemplateName, String> parameterizedTemplates = parameterizer.
                     resolveAndParameterize(notification, notificationType);
 
-//            Email email = composer.compose(notification, parameterizedTemplates);
-//
-//            email.getRecipients().stream()
-//                    .filter(r -> Message.RecipientType.TO == r.getType())
+            MimeMessage email = composer.compose(notification, parameterizedTemplates);
+
+//            email.getRecipients(Message.RecipientType.TO).stream()
 //                    .findAny()
 //                    .orElseThrow(() -> new DispatchException(
 //                        "Cannot dispatch email with an empty To: address for notification tuple [" +
 //                        notificationTuple(notification) + "]", notification));
-//
-//            // send email
-//            mailer.sendMail(email);
-//
-//            log.trace("Dispatched email with id '{}'", email.getId());
-//
-//            return email.getId();
-            return "";
+
+            // send email
+            javaMailSender.send(email);
+            log.trace("Dispatched email with id '{}'", notification.getEventId());
         } catch (DispatchException e) {
             throw e;
         } catch (Exception e) {

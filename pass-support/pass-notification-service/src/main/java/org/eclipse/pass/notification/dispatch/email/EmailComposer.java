@@ -26,6 +26,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.pass.notification.dispatch.DispatchException;
@@ -33,6 +36,8 @@ import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.User;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,11 +52,11 @@ public class EmailComposer {
     public static final String NOTIFICATION_TYPE_SMTP_HEADER = "X-PASS-Notification-Type";
 
     // TODO create a PassClientFactory that gets passed in and used to create PassClient
-    private PassClient passClient;
+    private final PassClient passClient;
+    private final SimpleWhitelist whitelist;
+    private final JavaMailSender javaMailSender;
 
-    private SimpleWhitelist whitelist;
-
-    void compose(Notification n, Map<NotificationTemplateName, String> templates) {
+    MimeMessage compose(Notification n, Map<NotificationTemplateName, String> templates) throws MessagingException {
         if (n.getSender() == null || n.getSender().trim().length() == 0) {
             throw new DispatchException("Notification must not have a null or empty sender!", n);
         }
@@ -85,9 +90,9 @@ public class EmailComposer {
 
         log.debug("Whitelisted recipients: [{}]", join(", ", whitelistedRecipients));
 
-        String emailToAddress = join(",", whitelistedRecipients);
+        String[] emailToAddresses = whitelistedRecipients.toArray(String[]::new);
 
-        if (emailToAddress == null || emailToAddress.trim().length() == 0) {
+        if (emailToAddresses.length == 0) {
             throw new DispatchException("Notification must not have a null or empty to address!", n);
         }
 
@@ -112,34 +117,36 @@ public class EmailComposer {
                 SUBMISSION_SMTP_HEADER, n.getResourceId(),
                 NOTIFICATION_TYPE_SMTP_HEADER, n.getType().toString(),
                 "From", from,
-                "To", emailToAddress,
+                "To", emailToAddresses,
                 "CC", cc.orElse("<CC not specified, will not be included in email>"),
                 "BCC", bcc.orElse("<BCC not specified, will not be included in email>"),
                 "Subject", subject,
                 "body text", body,
                 "footer text", footer);
 
-//        EmailPopulatingBuilder builder = EmailBuilder.startingBlank()
-//                .from(from)
-//                .to(emailToAddress)
-//                .withSubject(subject)
-//                .withPlainText(join("\n\n",
-//                        body,
-//                        footer));
-//
-//        // These should never be null in production; being defensive because some tests may not set them
-//        if (n.getResourceId() != null) {
-//            builder.withHeader(SUBMISSION_SMTP_HEADER, n.getResourceId());
-//        }
-//
-//        if (n.getType() != null) {
-//            builder.withHeader(NOTIFICATION_TYPE_SMTP_HEADER, n.getType().toString());
-//        }
-//
-//        cc.ifPresent(builder::cc);
-//        bcc.ifPresent(builder::bcc);
-//
-//        return builder.buildEmail();
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom(from);
+        helper.setTo(emailToAddresses);
+        helper.setSubject(subject);
+        helper.setText(join("\n\n", body, footer));
+
+        // These should never be null in production; being defensive because some tests may not set them
+        if (n.getResourceId() != null) {
+            message.setHeader(SUBMISSION_SMTP_HEADER, n.getResourceId());
+        }
+
+        if (n.getType() != null) {
+            message.setHeader(NOTIFICATION_TYPE_SMTP_HEADER, n.getType().toString());
+        }
+
+        // TODO fix this
+//        cc.ifPresent(ccValue -> {
+//            helper.setCc(ccValue);
+//        });
+//        bcc.ifPresent(helper::setBcc);
+
+        return message;
     }
 
     /**

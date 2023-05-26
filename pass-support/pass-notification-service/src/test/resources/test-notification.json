@@ -29,11 +29,5 @@
           "FOOTER": "classpath*:pass-footer-template.vm"
         }
       }
-    ],
-    "smtp": {
-      "host": "smtp.gmail.com",
-      "port": "587",
-      "smtpUser": "foo",
-      "smtpPassword": "bar"
-    }
+    ]
 }

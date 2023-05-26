@@ -16,11 +16,8 @@
 package org.eclipse.pass.notification.config;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.notification.config.smtp.SmtpServerConfig;
-import org.eclipse.pass.notification.dispatch.email.SimpleWhitelist;
 import org.eclipse.pass.support.client.PassClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -51,25 +48,6 @@ public class SpringBootNotificationConfig {
     public NotificationConfig notificationConfiguration(ObjectMapper objectMapper) throws IOException {
         return objectMapper.readValue(notificationConfigResource.getInputStream(), NotificationConfig.class);
     }
-
-//    @Bean
-//    public Mailer mailer(NotificationConfig config) {
-//        SmtpServerConfig smtpConfig = config.getSmtpConfig();
-//        Objects.requireNonNull(smtpConfig,
-//                               "Missing SMTP server configuration from '" + config + "'");
-//        MailerBuilder.MailerRegularBuilder builder = MailerBuilder
-//                .withSMTPServerHost(smtpConfig.getHost())
-//                .withSMTPServerPort(Integer.parseInt(smtpConfig.getPort()))
-//                .withTransportStrategy(TransportStrategy.valueOf(smtpConfig.getSmtpTransport().toUpperCase()))
-//                .withDebugLogging(mailerDebug);
-//
-//        if (smtpConfig.getSmtpUser() != null && smtpConfig.getSmtpUser().trim().length() > 0) {
-//            builder = builder.withSMTPServerUsername(smtpConfig.getSmtpUser())
-//                    .withSMTPServerPassword(smtpConfig.getSmtpPassword());
-//        }
-//
-//        return builder.buildMailer();
-//    }
 
     @Bean
     public RecipientConfig recipientConfig(NotificationConfig config) {
