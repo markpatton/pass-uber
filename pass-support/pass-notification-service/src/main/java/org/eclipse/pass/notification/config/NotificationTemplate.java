@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.eclipse.pass.notification.model;
+package org.eclipse.pass.notification.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.eclipse.pass.notification.config.NotificationConfig;
+import org.eclipse.pass.notification.model.NotificationType;
 
 /**
  * Allows for the customization of notification subject, body, and footer for each notification type.  Each notification

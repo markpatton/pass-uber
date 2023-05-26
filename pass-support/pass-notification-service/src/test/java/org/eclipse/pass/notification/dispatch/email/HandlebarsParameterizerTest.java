@@ -29,7 +29,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.pass.notification.model.NotificationParam;
-import org.eclipse.pass.notification.model.NotificationTemplateName;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.junit.Before;
 import org.junit.Test;
 

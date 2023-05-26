@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
-import javax.mail.Message;
-import javax.mail.search.HeaderTerm;
 
 import okhttp3.Credentials;
 import okhttp3.MediaType;

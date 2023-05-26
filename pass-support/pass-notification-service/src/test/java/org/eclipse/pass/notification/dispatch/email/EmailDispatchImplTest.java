@@ -21,33 +21,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.function.Function;
-import javax.mail.Message.RecipientType;
-
-import org.apache.commons.io.IOUtils;
-import org.eclipse.pass.notification.model.NotificationTemplateName;
-import org.eclipse.pass.notification.model.NotificationParam;
-import org.eclipse.pass.support.client.PassClient;
-import org.eclipse.pass.support.client.model.User;
-import org.eclipse.pass.notification.dispatch.DispatchException;
-import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.config.NotificationConfig;
-import org.eclipse.pass.notification.model.NotificationTemplate;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.simplejavamail.email.Email;
-import org.simplejavamail.email.Recipient;
-import org.simplejavamail.mailer.Mailer;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)

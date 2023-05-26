@@ -18,12 +18,10 @@ package org.eclipse.pass.notification.config;
 import java.util.Collection;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.pass.notification.config.smtp.SmtpServerConfig;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.model.NotificationTemplate;
 
 /**
  * The Notification Services runtime configuration.
@@ -39,7 +37,6 @@ import org.eclipse.pass.notification.model.NotificationTemplate;
  */
 @Getter
 @Setter
-@EqualsAndHashCode
 public class NotificationConfig {
 
     /**

@@ -1,0 +1,39 @@
+{
+    "mode": "DEMO",
+    "recipient-config": [
+      {
+        "mode": "PRODUCTION",
+        "global_cc": [
+          "pass@pass.jhu.edu"
+        ]
+      },
+      {
+        "mode": "DEMO",
+        "global_cc": [
+          "demo@pass.jhu.edu"
+        ],
+        "whitelist": [
+          "emetsger@jhu.edu",
+          "hvu@jhu.edu",
+          "apb@jhu.edu",
+          "khanson@jhu.edu"
+        ]
+      }
+    ],
+    "templates": [
+      {
+        "notification": "SUBMISSION_APPROVAL_INVITE",
+        "templates": {
+          "SUBJECT": "PASS Submission Approval: ${RESOURCE_METADATA.title}",
+          "BODY": "classpath*:pass-body-submission-approval-invite-template.vm",
+          "FOOTER": "classpath*:pass-footer-template.vm"
+        }
+      }
+    ],
+    "smtp": {
+      "host": "smtp.gmail.com",
+      "port": "587",
+      "smtpUser": "foo",
+      "smtpPassword": "bar"
+    }
+}

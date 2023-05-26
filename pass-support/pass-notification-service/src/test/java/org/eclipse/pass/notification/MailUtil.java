@@ -21,7 +21,6 @@ import static java.lang.System.getProperty;
 import static java.lang.System.getenv;
 
 import java.util.Properties;
-import javax.mail.Session;
 
 /**
  * Utility class to support and encapsulate the creation of Java messaging objects.  It is meant to be used when
@@ -94,25 +93,25 @@ public class MailUtil {
     private int timeout = parseInt(getenv().getOrDefault("MAIL_IMAP_TIMEOUT",
             getProperty("mail.imap.timeout", "60")));
 
-    /**
-     * Answers a configured Session based on the state encapsulated by this instance.
-     *
-     * @return a configured Session
-     */
-    Session mailSession() {
-        return Session.getDefaultInstance(new Properties() {
-            {
-                put("mail.imap.host", imapHost);
-                put("mail.imap.port", imapPort);
-                put("mail.imap.ssl.enable", useSsl);
-                put("mail.imap.ssl.trust", sslTrust);
-                put("mail.imap.starttls.enable", enableTlsIfSupported);
-                put("mail.imap.finalizecleanclose", closeOnFinalize);
-                put("mail.imap.connectiontimeout", connectTimeout);
-                put("mail.imap.timeout", timeout);
-            }
-        });
-    }
+//    /**
+//     * Answers a configured Session based on the state encapsulated by this instance.
+//     *
+//     * @return a configured Session
+//     */
+//    Session mailSession() {
+//        return Session.getDefaultInstance(new Properties() {
+//            {
+//                put("mail.imap.host", imapHost);
+//                put("mail.imap.port", imapPort);
+//                put("mail.imap.ssl.enable", useSsl);
+//                put("mail.imap.ssl.trust", sslTrust);
+//                put("mail.imap.starttls.enable", enableTlsIfSupported);
+//                put("mail.imap.finalizecleanclose", closeOnFinalize);
+//                put("mail.imap.connectiontimeout", connectTimeout);
+//                put("mail.imap.timeout", timeout);
+//            }
+//        });
+//    }
 
     String getImapUser() {
         return imapUser;

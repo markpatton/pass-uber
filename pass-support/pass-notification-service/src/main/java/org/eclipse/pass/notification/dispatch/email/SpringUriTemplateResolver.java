@@ -23,7 +23,7 @@ import java.net.URI;
 import java.nio.file.InvalidPathException;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.pass.notification.model.NotificationTemplateName;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;

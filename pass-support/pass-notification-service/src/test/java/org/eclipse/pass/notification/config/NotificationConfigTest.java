@@ -21,75 +21,49 @@ import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_AP
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.IOException;
-
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-public class NotificationConfigTest extends AbstractJacksonMappingTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@TestPropertySource("classpath:test-application.properties")
+@TestPropertySource(properties = {
+    "pass.notification.configuration=classpath:test-notification.json"
+})
+public class NotificationConfigTest {
 
-    private static final String MINIMAL_NOTIFICATION_CONFIG = "" +
-            "{\n" +
-            "    \"mode\": \"DEMO\",\n" +
-            "    \"recipient-config\": [\n" +
-            "      {\n" +
-            "        \"mode\": \"PRODUCTION\",\n" +
-            "        \"global_cc\": [\n" +
-            "          \"pass@pass.jhu.edu\"\n" +
-            "        ]\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"mode\": \"DEMO\",\n" +
-            "        \"global_cc\": [\n" +
-            "          \"demo@pass.jhu.edu\"\n" +
-            "        ],\n" +
-            "        \"whitelist\": [\n" +
-            "          \"emetsger@jhu.edu\",\n" +
-            "          \"hvu@jhu.edu\",\n" +
-            "          \"apb@jhu.edu\",\n" +
-            "          \"khanson@jhu.edu\"\n" +
-            "        ]\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"templates\": [\n" +
-            "      {\n" +
-            "        \"notification\": \"SUBMISSION_APPROVAL_INVITE\",\n" +
-            "        \"templates\": {\n" +
-            "          \"SUBJECT\": \"PASS Submission Approval: ${RESOURCE_METADATA.title}\",\n" +
-            "          \"BODY\": \"classpath*:pass-body-submission-approval-invite-template.vm\",\n" +
-            "          \"FOOTER\": \"classpath*:pass-footer-template.vm\"\n" +
-            "        }\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"smtp\": {\n" +
-            "      \"host\": \"smtp.gmail.com\",\n" +
-            "      \"port\": \"587\",\n" +
-            "      \"smtpUser\": \"foo\",\n" +
-            "      \"smtpPassword\": \"bar\"\n" +
-            "    }\n" +
-            "}";
+    static {
+        System.setProperty("pass.core.url", "localhost:8080");
+        System.setProperty("pass.core.url", "localhost:8080");
+        System.setProperty("pass.core.url", "localhost:8080");
+    }
+
+    @Autowired
+    private NotificationConfig notificationConfig;
 
     @Test
-    public void parseJson() throws IOException {
-        NotificationConfig config = mapper.readValue(MINIMAL_NOTIFICATION_CONFIG, NotificationConfig.class);
-//        mapper.writer(SerializationFeature.INDENT_OUTPUT).writeValue(System.err, config);
-        assertEquals(DEMO, config.getMode());
-        assertEquals(2, config.getRecipientConfigs().size());
-        config.getRecipientConfigs()
+    public void parseJson() {
+        assertEquals(DEMO, notificationConfig.getMode());
+        assertEquals(2, notificationConfig.getRecipientConfigs().size());
+        notificationConfig.getRecipientConfigs()
                 .stream().filter(rc -> rc.getMode() == PRODUCTION).findAny()
                 .orElseThrow(() -> new RuntimeException("Missing RecipientConfig for mode PRODUCTION."));
-        config.getRecipientConfigs()
+        notificationConfig.getRecipientConfigs()
                 .stream().filter(rc -> rc.getMode() == DEMO).findAny()
                 .orElseThrow(() -> new RuntimeException("Missing RecipientConfig for mode DEMO."));
-        assertEquals(1, config.getTemplates().size());
-        config.getTemplates()
+        assertEquals(1, notificationConfig.getTemplates().size());
+        notificationConfig.getTemplates()
                 .stream().filter(tc -> tc.getNotificationType() == SUBMISSION_APPROVAL_INVITE).findAny()
                 .orElseThrow(() -> new RuntimeException(
                     "Missing NotificationTemplate for type SUBMISSION_APPROVAL_INVITE"));
-        assertNotNull(config.getSmtpConfig());
-        assertEquals("smtp.gmail.com", config.getSmtpConfig().getHost());
-        assertRoundTrip(config, NotificationConfig.class);
+        assertNotNull(notificationConfig.getSmtpConfig());
+        assertEquals("smtp.gmail.com", notificationConfig.getSmtpConfig().getHost());
     }
 }

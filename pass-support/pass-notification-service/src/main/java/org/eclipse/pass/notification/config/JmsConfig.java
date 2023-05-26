@@ -18,9 +18,9 @@
 
 package org.eclipse.pass.notification.config;
 
-import javax.jms.ConnectionFactory;
 import javax.jms.Session;
 
+import jakarta.jms.ConnectionFactory;
 import org.eclipse.pass.notification.service.NotificationService;
 import org.eclipse.pass.notification.service.NotificationServiceErrorHandler;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -44,8 +45,8 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
  *
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-@EnableJms
-@Configuration
+//@EnableJms
+//@Configuration
 public class JmsConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(JmsConfig.class);
@@ -55,17 +56,18 @@ public class JmsConfig {
 
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(
-            @Value("${spring.jms.listener.concurrency}")
+        @Value("${spring.jms.listener.concurrency}")
             String concurrency,
-            @Value("${spring.jms.listener.auto-startup}")
+        @Value("${spring.jms.listener.auto-startup}")
             boolean autoStart,
-            ConnectionFactory connectionFactory,
-            NotificationServiceErrorHandler errorHandler) {
+        ConnectionFactory connectionFactory,
+        DefaultJmsListenerContainerFactoryConfigurer configurer,
+        NotificationServiceErrorHandler errorHandler) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
         factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
         factory.setErrorHandler(errorHandler);
         factory.setConcurrency(concurrency);
-        factory.setConnectionFactory(connectionFactory);
         factory.setAutoStartup(autoStart);
         return factory;
     }

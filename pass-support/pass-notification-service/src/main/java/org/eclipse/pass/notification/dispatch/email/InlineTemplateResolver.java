@@ -18,7 +18,7 @@ package org.eclipse.pass.notification.dispatch.email;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.eclipse.pass.notification.model.NotificationTemplateName;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.springframework.stereotype.Component;
 
 /**

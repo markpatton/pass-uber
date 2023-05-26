@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.pass.notification.model.NotificationTemplateName;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.springframework.stereotype.Component;
 
 /**

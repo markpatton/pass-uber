@@ -17,7 +17,7 @@ package org.eclipse.pass.notification.dispatch.email;
 
 import java.io.InputStream;
 
-import org.eclipse.pass.notification.model.NotificationTemplateName;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 
 /**
  * Resolves the named template, interpreting the template string as either a locator (i.e. URI) or an inline template.

@@ -1,4 +1,4 @@
-package org.eclipse.pass.notification.model;
+package org.eclipse.pass.notification.config;
 
 import lombok.Getter;
 

@@ -16,10 +16,7 @@
 package org.eclipse.pass.notification;
 
 import java.util.Properties;
-import javax.mail.MessagingException;
-import javax.mail.Session;
 
-import com.sun.mail.imap.IMAPStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +26,7 @@ import org.springframework.context.annotation.Scope;
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-@Configuration
+//@Configuration
 public class SimpleImapClientFactoryConfiguration {
 
     @Value("${mail.imap.user}")
@@ -61,31 +58,5 @@ public class SimpleImapClientFactoryConfiguration {
 
     @Value("${mail.imap.timeout}")
     private int timeout;
-
-    @Bean
-    public Session mailSession() {
-        return Session.getDefaultInstance(new Properties() {
-            {
-                put("mail.imap.host", imapHost);
-                put("mail.imap.port", imapPort);
-                put("mail.imap.ssl.enable", useSsl);
-                put("mail.imap.ssl.trust", sslTrust);
-                put("mail.imap.starttls.enable", enableTlsIfSupported);
-                put("mail.imap.finalizecleanclose", closeOnFinalize);
-                put("mail.imap.connectiontimeout", connectTimeout);
-                put("mail.imap.timeout", timeout);
-            }
-        });
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public IMAPStore imapStore(Session session) {
-        try {
-            return (IMAPStore) session.getStore("imap");
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 }

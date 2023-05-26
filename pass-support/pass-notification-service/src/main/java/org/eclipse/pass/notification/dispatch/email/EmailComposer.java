@@ -30,12 +30,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.pass.notification.dispatch.DispatchException;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.model.NotificationTemplateName;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.User;
-import org.simplejavamail.email.Email;
-import org.simplejavamail.email.EmailBuilder;
-import org.simplejavamail.email.EmailPopulatingBuilder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,7 +51,7 @@ public class EmailComposer {
 
     private SimpleWhitelist whitelist;
 
-    Email compose(Notification n, Map<NotificationTemplateName, String> templates) {
+    void compose(Notification n, Map<NotificationTemplateName, String> templates) {
         if (n.getSender() == null || n.getSender().trim().length() == 0) {
             throw new DispatchException("Notification must not have a null or empty sender!", n);
         }
@@ -122,27 +119,27 @@ public class EmailComposer {
                 "body text", body,
                 "footer text", footer);
 
-        EmailPopulatingBuilder builder = EmailBuilder.startingBlank()
-                .from(from)
-                .to(emailToAddress)
-                .withSubject(subject)
-                .withPlainText(join("\n\n",
-                        body,
-                        footer));
-
-        // These should never be null in production; being defensive because some tests may not set them
-        if (n.getResourceId() != null) {
-            builder.withHeader(SUBMISSION_SMTP_HEADER, n.getResourceId());
-        }
-
-        if (n.getType() != null) {
-            builder.withHeader(NOTIFICATION_TYPE_SMTP_HEADER, n.getType().toString());
-        }
-
-        cc.ifPresent(builder::cc);
-        bcc.ifPresent(builder::bcc);
-
-        return builder.buildEmail();
+//        EmailPopulatingBuilder builder = EmailBuilder.startingBlank()
+//                .from(from)
+//                .to(emailToAddress)
+//                .withSubject(subject)
+//                .withPlainText(join("\n\n",
+//                        body,
+//                        footer));
+//
+//        // These should never be null in production; being defensive because some tests may not set them
+//        if (n.getResourceId() != null) {
+//            builder.withHeader(SUBMISSION_SMTP_HEADER, n.getResourceId());
+//        }
+//
+//        if (n.getType() != null) {
+//            builder.withHeader(NOTIFICATION_TYPE_SMTP_HEADER, n.getType().toString());
+//        }
+//
+//        cc.ifPresent(builder::cc);
+//        bcc.ifPresent(builder::bcc);
+//
+//        return builder.buildEmail();
     }
 
     /**

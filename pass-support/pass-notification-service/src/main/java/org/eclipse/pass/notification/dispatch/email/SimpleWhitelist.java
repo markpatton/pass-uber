@@ -20,9 +20,10 @@ import java.util.Collections;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.pass.notification.config.RecipientConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Filters a list of notification recipients against a whitelist.
@@ -42,34 +43,31 @@ import org.slf4j.LoggerFactory;
  *
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
+@Slf4j
+@AllArgsConstructor
+@Component
 public class SimpleWhitelist implements Function<Collection<String>, Collection<String>> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SimpleWhitelist.class);
-
-    private RecipientConfig recipientConfig;
-
-    public SimpleWhitelist(RecipientConfig recipientConfig) {
-        this.recipientConfig = recipientConfig;
-    }
+    private final RecipientConfig recipientConfig;
 
     @Override
     public Collection<String> apply(Collection<String> candidates) {
         // if the supplied candidate is null, then no recipient will be allowed
         if (candidates == null) {
-            LOG.debug("No recipient to whitelist: supplied candidate email address was null.");
+            log.debug("No recipient to whitelist: supplied candidate email address was null.");
             return Collections.emptyList();
         }
 
         // an empty or null whitelist is carries the semantics "any recipient is whitelisted"
         if (recipientConfig.getWhitelist() == null || recipientConfig.getWhitelist().isEmpty()) {
-            LOG.debug("Any recipient will be whitelisted: the whitelist is empty.");
+            log.debug("Any recipient will be whitelisted: the whitelist is empty.");
             return candidates;
         }
 
         return candidates.stream()
                 .filter(candidate -> {
                     boolean isWhitelisted = isWhitelisted(candidate.toLowerCase(), recipientConfig.getWhitelist());
-                    LOG.debug("{} is whitelisted: {}", candidate, isWhitelisted);
+                    log.debug("{} is whitelisted: {}", candidate, isWhitelisted);
                     return isWhitelisted;
                 })
                 .collect(Collectors.toSet());

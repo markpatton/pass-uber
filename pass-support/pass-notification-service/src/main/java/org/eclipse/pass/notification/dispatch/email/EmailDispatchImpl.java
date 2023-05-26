@@ -19,7 +19,6 @@ import static java.lang.String.join;
 
 import java.util.Arrays;
 import java.util.Map;
-import javax.mail.Message;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +26,9 @@ import org.eclipse.pass.notification.config.NotificationConfig;
 import org.eclipse.pass.notification.dispatch.DispatchException;
 import org.eclipse.pass.notification.dispatch.DispatchService;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.model.NotificationTemplate;
-import org.eclipse.pass.notification.model.NotificationTemplateName;
+import org.eclipse.pass.notification.config.NotificationTemplate;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.eclipse.pass.notification.model.NotificationType;
-import org.simplejavamail.email.Email;
-import org.simplejavamail.mailer.Mailer;
 import org.springframework.stereotype.Service;
 
 /**
@@ -63,7 +60,6 @@ import org.springframework.stereotype.Service;
 public class EmailDispatchImpl implements DispatchService {
 
     private final Parameterizer parameterizer;
-    private final Mailer mailer;
     private final EmailComposer composer;
 
     @Override
@@ -73,21 +69,22 @@ public class EmailDispatchImpl implements DispatchService {
             Map<NotificationTemplateName, String> parameterizedTemplates = parameterizer.
                     resolveAndParameterize(notification, notificationType);
 
-            Email email = composer.compose(notification, parameterizedTemplates);
-
-            email.getRecipients().stream()
-                    .filter(r -> Message.RecipientType.TO == r.getType())
-                    .findAny()
-                    .orElseThrow(() -> new DispatchException(
-                        "Cannot dispatch email with an empty To: address for notification tuple [" +
-                        notificationTuple(notification) + "]", notification));
-
-            // send email
-            mailer.sendMail(email);
-
-            log.trace("Dispatched email with id '{}'", email.getId());
-
-            return email.getId();
+//            Email email = composer.compose(notification, parameterizedTemplates);
+//
+//            email.getRecipients().stream()
+//                    .filter(r -> Message.RecipientType.TO == r.getType())
+//                    .findAny()
+//                    .orElseThrow(() -> new DispatchException(
+//                        "Cannot dispatch email with an empty To: address for notification tuple [" +
+//                        notificationTuple(notification) + "]", notification));
+//
+//            // send email
+//            mailer.sendMail(email);
+//
+//            log.trace("Dispatched email with id '{}'", email.getId());
+//
+//            return email.getId();
+            return "";
         } catch (DispatchException e) {
             throw e;
         } catch (Exception e) {

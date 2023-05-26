@@ -31,9 +31,7 @@ import lombok.Setter;
 public class LinkValidationRule {
 
     private String requiredBaseURI;
-
     private boolean throwExceptionOnFailure;
-
     private Collection<String> rels = new HashSet<>();
 
 }

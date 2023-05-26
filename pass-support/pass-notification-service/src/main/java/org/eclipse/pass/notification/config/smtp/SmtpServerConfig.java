@@ -28,13 +28,9 @@ import lombok.Setter;
 public class SmtpServerConfig {
 
     private String host;
-
     private String port;
-
     private String smtpUser;
-
     private String smtpPassword;
-
     private String smtpTransport;
 
 }
