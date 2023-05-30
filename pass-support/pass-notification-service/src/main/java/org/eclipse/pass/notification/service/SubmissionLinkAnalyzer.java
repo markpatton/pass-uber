@@ -64,9 +64,8 @@ public class SubmissionLinkAnalyzer implements BiFunction<Submission, Submission
             case APPROVAL_REQUESTED_NEWUSER -> {
                 return required(format("Invalid submissionEvent %s", event.getId()),
                     event.getLink(),
-                    SUBMISSION_REVIEW_INVITE);
-                    // TODO come back to this once SubmissionEvent.userToken is farther along
-//                    .map(tokenGenerator.forSubmission(submission));
+                    SUBMISSION_REVIEW_INVITE)
+                    .map((link) -> new Link(event.getUserTokenLink(), SUBMISSION_REVIEW_INVITE));
             }
             case APPROVAL_REQUESTED, CHANGES_REQUESTED -> {
                 return required(

@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.eclipse.pass.notification.service;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.pass.support.client.model.EventType.APPROVAL_REQUESTED;
 import static org.eclipse.pass.support.client.model.EventType.APPROVAL_REQUESTED_NEWUSER;
 import static org.eclipse.pass.support.client.model.EventType.CANCELLED;
@@ -26,195 +24,152 @@ import static org.eclipse.pass.notification.service.LinksTest.randomUri;
 import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW;
 import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
 import static org.eclipse.pass.notification.model.Link.SUBMISSION_VIEW;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.model.Link;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author apb@jhu.edu
  */
-@ExtendWith(SpringExtension.class)
 public class SubmissionLinkAnalyzerTest {
 
-//    @Mock
-//    UserTokenGenerator userTokenGenerator;
-//
-//    private final Submission submission = new Submission();
-//
-//    private final SubmissionEvent event = new SubmissionEvent();
-//
-//    private List<Link> linksGivenToTokenGeneratorFunction;
-//
-//    private List<Link> linksTransformedByTokenGeneratorFunction;
-//
-//    private SubmissionLinkAnalyzer toTest;
-//
-//    @Before
-//    public void setUp() {
-//        toTest = new SubmissionLinkAnalyzer(userTokenGenerator);
-//
-//        submission.setId(randomUri());
-//        event.setId(randomUri());
-//        event.setLink(randomUri());
-//
-//        // Capture links given to the token generator service, and the transformed results
-//        linksGivenToTokenGeneratorFunction = new ArrayList<>();
-//        linksTransformedByTokenGeneratorFunction = new ArrayList<>();
-//
-//        when(userTokenGenerator.forSubmission(any())).thenAnswer(i -> {
-//
-//            return (UnaryOperator<Link>) link -> {
-//                linksGivenToTokenGeneratorFunction.add(link);
-//                if (SUBMISSION_REVIEW_INVITE.equals(link.getRel())) {
-//                    final Link transformed = new Link(randomUri(), SUBMISSION_REVIEW_INVITE);
-//                    linksTransformedByTokenGeneratorFunction.add(transformed);
-//                    return transformed;
-//                }
-//                return link;
-//            };
-//        });
-//    }
-//
-//    @Test
-//    public void aprovalRequestedNewUserTest() {
-//
-//        event.setEventType(APPROVAL_REQUESTED_NEWUSER);
-//
-//        final List<Link> generatedLinks = toTest.apply(submission, event).collect(toList());
-//
-//        verify(userTokenGenerator).forSubmission(eq(submission));
-//
-//        // Verify that the link generator service was at least given the expected invite link
-//        final Link originalInviteLink = new Link(event.getLink(), SUBMISSION_REVIEW_INVITE);
-//        assertTrue(linksGivenToTokenGeneratorFunction.contains(originalInviteLink));
-//
-//        // Verify that the link generator service produced a transformed link
-//        // (i.e. the event link, as transformed by token generator).
-//        assertTrue(generatedLinks.containsAll(linksTransformedByTokenGeneratorFunction));
-//
-//        assertEquals(1, generatedLinks.size());
-//        assertEquals(SUBMISSION_REVIEW_INVITE, generatedLinks.get(0).getRel());
-//    }
-//
-//    @Test
-//    public void aprovalRequestedNewUserLinkMissingTest() {
-//        event.setLink(null);
-//        event.setEventType(APPROVAL_REQUESTED_NEWUSER);
-//
-//        try {
-//            toTest.apply(submission, event);
-//            fail("Should have thrown an exception");
-//        } catch (final NullPointerException e) {
-//            // The error message should identify the offending submissionEvent
-//            assertTrue(e.getMessage().contains(event.getId().toString()));
-//        }
-//    }
-//
-//    @Test
-//    public void approvalRequestedExistingUserTest() {
-//        event.setEventType(APPROVAL_REQUESTED);
-//
-//        final List<Link> generatedLinks = toTest.apply(submission, event).collect(toList());
-//
-//        assertEquals(1, generatedLinks.size());
-//        assertEquals(event.getLink(), generatedLinks.get(0).getHref());
-//        assertEquals(SUBMISSION_REVIEW, generatedLinks.get(0).getRel());
-//    }
-//
-//    @Test
-//    public void aprovalRequestedExistingUserLinkMissingTest() {
-//        event.setLink(null);
-//        event.setEventType(APPROVAL_REQUESTED);
-//
-//        try {
-//            toTest.apply(submission, event);
-//            fail("Should have thrown an exception");
-//        } catch (final NullPointerException e) {
-//            // The error message should identify the offending submissionEvent
-//            assertTrue(e.getMessage().contains(event.getId().toString()));
-//        }
-//    }
-//
-//    @Test
-//    public void changesRequestedTest() {
-//        event.setEventType(CHANGES_REQUESTED);
-//
-//        final List<Link> generatedLinks = toTest.apply(submission, event).collect(toList());
-//
-//        assertEquals(1, generatedLinks.size());
-//        assertEquals(event.getLink(), generatedLinks.get(0).getHref());
-//        assertEquals(SUBMISSION_REVIEW, generatedLinks.get(0).getRel());
-//    }
-//
-//    @Test
-//    public void changesRequestedLinkMissingTest() {
-//        event.setEventType(CHANGES_REQUESTED);
-//        event.setLink(null);
-//
-//        try {
-//            toTest.apply(submission, event);
-//            fail("Should have thrown an exception");
-//        } catch (final NullPointerException e) {
-//            // The error message should identify the offending submissionEvent
-//            assertTrue(e.getMessage().contains(event.getId().toString()));
-//        }
-//    }
-//
-//    @Test
-//    public void submittedTest() {
-//        event.setEventType(SUBMITTED);
-//
-//        final List<Link> generatedLinks = toTest.apply(submission, event).collect(toList());
-//
-//        assertEquals(1, generatedLinks.size());
-//        assertEquals(event.getLink(), generatedLinks.get(0).getHref());
-//        assertEquals(SUBMISSION_VIEW, generatedLinks.get(0).getRel());
-//    }
-//
-//    @Test
-//    public void submitteOptionalLinkMissingTest() {
-//        event.setEventType(SUBMITTED);
-//        event.setLink(null);
-//
-//        assertTrue(toTest.apply(submission, event).collect(toList()).isEmpty());
-//    }
-//
-//    @Test
-//    public void cancelledTest() {
-//        event.setEventType(CANCELLED);
-//
-//        final List<Link> generatedLinks = toTest.apply(submission, event).collect(toList());
-//
-//        assertEquals(1, generatedLinks.size());
-//        assertEquals(event.getLink(), generatedLinks.get(0).getHref());
-//        assertEquals(SUBMISSION_VIEW, generatedLinks.get(0).getRel());
-//    }
-//
-//    @Test
-//    public void cancelledOptionalLinkMissingTest() {
-//        event.setEventType(CANCELLED);
-//        event.setLink(null);
-//
-//        assertTrue(toTest.apply(submission, event).collect(toList()).isEmpty());
-//    }
-//
-//    @Test
-//    public void nullSubmissionEventTest() {
-//        event.setEventType(null);
-//        event.setLink(null);
-//
-//        assertTrue(toTest.apply(submission, event).collect(toList()).isEmpty());
-//    }
+    private final Submission submission = new Submission();
+    private final SubmissionEvent event = new SubmissionEvent();
+
+    private SubmissionLinkAnalyzer submissionLinkAnalyzer;
+
+    @BeforeEach
+    public void setUp() {
+        submissionLinkAnalyzer = new SubmissionLinkAnalyzer();
+
+        submission.setId("test-submission");
+        event.setId("test-event");
+        event.setLink(randomUri());
+    }
+
+    @Test
+    public void testApprovalRequestedNewUser() {
+
+        event.setEventType(APPROVAL_REQUESTED_NEWUSER);
+        event.setUserTokenLink(URI.create("http://foobar"));
+
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+
+        assertEquals(1, generatedLinks.size());
+        assertEquals(event.getUserTokenLink(), generatedLinks.get(0).getHref());
+        assertEquals(SUBMISSION_REVIEW_INVITE, generatedLinks.get(0).getRel());
+    }
+
+    @Test
+    public void testApprovalRequestedNewUserLinkMissing() {
+        event.setLink(null);
+        event.setEventType(APPROVAL_REQUESTED_NEWUSER);
+
+        NullPointerException e = assertThrows(NullPointerException.class, () -> {
+            submissionLinkAnalyzer.apply(submission, event);
+        });
+
+        assertTrue(e.getMessage().contains(event.getId()));
+    }
+
+    @Test
+    public void testApprovalRequestedExistingUser() {
+        event.setEventType(APPROVAL_REQUESTED);
+
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+
+        assertEquals(1, generatedLinks.size());
+        assertEquals(event.getLink(), generatedLinks.get(0).getHref());
+        assertEquals(SUBMISSION_REVIEW, generatedLinks.get(0).getRel());
+    }
+
+    @Test
+    public void testApprovalRequestedExistingUserLinkMissing() {
+        event.setLink(null);
+        event.setEventType(APPROVAL_REQUESTED);
+
+        NullPointerException e = assertThrows(NullPointerException.class, () -> {
+            submissionLinkAnalyzer.apply(submission, event);
+        });
+
+        assertTrue(e.getMessage().contains(event.getId()));
+    }
+
+    @Test
+    public void changesRequestedTest() {
+        event.setEventType(CHANGES_REQUESTED);
+
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+
+        assertEquals(1, generatedLinks.size());
+        assertEquals(event.getLink(), generatedLinks.get(0).getHref());
+        assertEquals(SUBMISSION_REVIEW, generatedLinks.get(0).getRel());
+    }
+
+    @Test
+    public void changesRequestedLinkMissingTest() {
+        event.setEventType(CHANGES_REQUESTED);
+        event.setLink(null);
+
+        NullPointerException e = assertThrows(NullPointerException.class, () -> {
+            submissionLinkAnalyzer.apply(submission, event);
+        });
+
+        assertTrue(e.getMessage().contains(event.getId()));
+    }
+
+    @Test
+    public void submittedTest() {
+        event.setEventType(SUBMITTED);
+
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+
+        assertEquals(1, generatedLinks.size());
+        assertEquals(event.getLink(), generatedLinks.get(0).getHref());
+        assertEquals(SUBMISSION_VIEW, generatedLinks.get(0).getRel());
+    }
+
+    @Test
+    public void submitteOptionalLinkMissingTest() {
+        event.setEventType(SUBMITTED);
+        event.setLink(null);
+
+        assertEquals(0, submissionLinkAnalyzer.apply(submission, event).count());
+    }
+
+    @Test
+    public void cancelledTest() {
+        event.setEventType(CANCELLED);
+
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+
+        assertEquals(1, generatedLinks.size());
+        assertEquals(event.getLink(), generatedLinks.get(0).getHref());
+        assertEquals(SUBMISSION_VIEW, generatedLinks.get(0).getRel());
+    }
+
+    @Test
+    public void cancelledOptionalLinkMissingTest() {
+        event.setEventType(CANCELLED);
+        event.setLink(null);
+
+        assertEquals(0, submissionLinkAnalyzer.apply(submission, event).count());
+    }
+
+    @Test
+    public void nullSubmissionEventTest() {
+        event.setEventType(null);
+        event.setLink(null);
+
+        assertEquals(0, submissionLinkAnalyzer.apply(submission, event).count());
+    }
 }

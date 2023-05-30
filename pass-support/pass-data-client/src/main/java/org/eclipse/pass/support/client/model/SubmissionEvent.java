@@ -80,7 +80,7 @@ public class SubmissionEvent implements PassEntity {
      */
     private URI link;
 
-    private String userToken;
+    private URI userTokenLink;
 
     /**
      * SubmissionEvent constructor
@@ -212,12 +212,12 @@ public class SubmissionEvent implements PassEntity {
         this.link = link;
     }
 
-    public String getUserToken() {
-        return userToken;
+    public URI getUserTokenLink() {
+        return userTokenLink;
     }
 
-    public void setUserToken(String userToken) {
-        this.userToken = userToken;
+    public void setUserTokenLink(URI userTokenLink) {
+        this.userTokenLink = userTokenLink;
     }
 
     @Override
