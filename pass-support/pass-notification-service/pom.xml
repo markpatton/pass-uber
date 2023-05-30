@@ -84,22 +84,6 @@
         <mail.waitms>30000</mail.waitms>
 <!--        <jms.host>${docker.host.address}</jms.host>-->
         <http.agent>notification-services/x.y.x</http.agent>
-
-        <!-- IMAP properties for ITs -->
-<!--        <mail.imap.host>${mail.server}</mail.imap.host>-->
-        <!-- build-helper plugin defines mail.imaps.port -->
-<!--        <mail.imap.port>${mail.imaps.port}</mail.imap.port>-->
-        <mail.imap.ssl.enable>true</mail.imap.ssl.enable>
-        <mail.imap.ssl.trust>*</mail.imap.ssl.trust>
-        <mail.imap.starttls.enable>true</mail.imap.starttls.enable>
-        <mail.imap.finalizecleanclose>false</mail.imap.finalizecleanclose>
-        <mail.imap.connectiontimeout>30000</mail.imap.connectiontimeout>
-        <mail.imap.timeout>30000</mail.imap.timeout>
-
-        <!-- Default username / password when connecting to IMAP -->
-        <!-- Override by setting the desired credentials on the SimpleImapClientFactory -->
-        <mail.imap.user>staffwithnogrants@jhu.edu</mail.imap.user>
-        <mail.imap.password>moo</mail.imap.password>
     </properties>
 
     <dependencies>
@@ -207,14 +191,6 @@
             <artifactId>logging-interceptor</artifactId>
             <version>${okhttp.version}</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-dependencies</artifactId>-->
-<!--            <version>${spring-boot-maven-plugin.version}</version>-->
-<!--            <type>pom</type>-->
-<!--            <scope>import</scope>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

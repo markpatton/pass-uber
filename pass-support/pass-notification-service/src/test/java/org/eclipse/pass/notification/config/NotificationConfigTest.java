@@ -22,6 +22,8 @@ import static org.eclipse.pass.notification.config.NotificationTemplateName.FOOT
 import static org.eclipse.pass.notification.config.NotificationTemplateName.SUBJECT;
 import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_APPROVAL_INVITE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.pass.notification.model.NotificationType;
 import org.junit.Test;
@@ -46,15 +48,15 @@ public class NotificationConfigTest {
 
     static {
         System.setProperty("pass.core.url", "localhost:8080");
-        System.setProperty("pass.core.url", "localhost:8080");
-        System.setProperty("pass.core.url", "localhost:8080");
+        System.setProperty("pass.core.user", "user");
+        System.setProperty("pass.core.password", "moo");
     }
 
     @Autowired
     private NotificationConfig notificationConfig;
 
     @Test
-    public void parseJson() {
+    public void testLoadNotificationConfig() {
         assertEquals(DEMO, notificationConfig.getMode());
         assertEquals(2, notificationConfig.getRecipientConfigs().size());
         notificationConfig.getRecipientConfigs()
@@ -77,5 +79,18 @@ public class NotificationConfigTest {
         assertEquals("classpath*:pass-body-submission-approval-invite-template.vm",
             template.getTemplates().get(BODY));
         assertEquals("classpath*:pass-footer-template.vm", template.getTemplates().get(FOOTER));
+
+        RecipientConfig recipientConfigDemo = notificationConfig.getRecipientConfigs().stream()
+            .filter(recipientConfig -> DEMO == recipientConfig.getMode())
+                .findFirst().get();
+
+        assertEquals(1, recipientConfigDemo.getGlobalCc().size());
+        assertEquals(4, recipientConfigDemo.getWhitelist().size());
+        assertNull(recipientConfigDemo.getGlobalBcc());
+        assertTrue(recipientConfigDemo.getGlobalCc().contains("demo@pass.jhu.edu"));
+        assertTrue(recipientConfigDemo.getWhitelist().contains("emetsger@jhu.edu"));
+        assertTrue(recipientConfigDemo.getWhitelist().contains("hvu@jhu.edu"));
+        assertTrue(recipientConfigDemo.getWhitelist().contains("apb@jhu.edu"));
+        assertTrue(recipientConfigDemo.getWhitelist().contains("khanson@jhu.edu"));
     }
 }
