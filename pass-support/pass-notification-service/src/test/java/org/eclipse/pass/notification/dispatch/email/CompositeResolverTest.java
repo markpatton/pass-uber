@@ -15,47 +15,50 @@
  *  * limitations under the License.
  *
  */
-
 package org.eclipse.pass.notification.dispatch.email;
 
-import org.apache.commons.io.input.NullInputStream;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.pass.notification.AbstractNotificationSpringTest;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.core.io.ClassPathResource;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@TestPropertySource("classpath:test-application.properties")
-@TestPropertySource(properties = {
-    "pass.notification.configuration=classpath:test-notification.json"
-})
-public class CompositeResolverTest {
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class CompositeResolverTest extends AbstractNotificationSpringTest {
 
     @Autowired private CompositeResolver compositeResolver;
 
-//    @Test
-//    public void resolutionOrder() {
-//        TemplateResolver one = mock(TemplateResolver.class);
-//        TemplateResolver two = mock(TemplateResolver.class);
-//        TemplateResolver three = mock(TemplateResolver.class);
-//        resolvers.add(one);
-//        resolvers.add(two);
-//        resolvers.add(three);
-//
-//        String template = "a template";
-//
-//        when(three.resolve(null, template)).thenReturn(new NullInputStream(-1L));
-//
-//        underTest.resolve(null, template);
-//
-//        InOrder orderVerifier = inOrder(one, two, three);
-//
-//        orderVerifier.verify(one).resolve(null, template);
-//        orderVerifier.verify(two).resolve(null, template);
-//        orderVerifier.verify(three).resolve(null, template);
-//    }
+    @Test
+    public void testSpringResolution() throws IOException {
+        // GIVEN
+        String templatePath = "org/eclipse/pass/notification/dispatch/email/" +
+            "pass-body-submission-approval-invite-template.hbr";
+        String expectedTemplate = IOUtils.toString(new ClassPathResource(templatePath).getInputStream(),
+            StandardCharsets.UTF_8);
+
+        // WHEN
+        InputStream inputStream = compositeResolver.resolve(NotificationTemplateName.BODY,
+            "classpath:" + templatePath);
+
+        // THEN
+        assertEquals(IOUtils.toString(inputStream, StandardCharsets.UTF_8), expectedTemplate);
+    }
+
+    @Test
+    public void testInlineResolution() throws IOException {
+        // GIVEN
+        String template = "a template";
+
+        // WHEN
+        InputStream inputStream = compositeResolver.resolve(null, template);
+
+        // THEN
+        assertEquals(IOUtils.toString(inputStream, StandardCharsets.UTF_8), template);
+    }
 }

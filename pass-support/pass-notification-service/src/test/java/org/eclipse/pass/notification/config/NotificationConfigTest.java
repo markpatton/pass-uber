@@ -25,32 +25,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.eclipse.pass.notification.AbstractNotificationSpringTest;
 import org.eclipse.pass.notification.model.NotificationType;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@TestPropertySource("classpath:test-application.properties")
-@TestPropertySource(properties = {
-    "pass.notification.configuration=classpath:test-notification.json"
-})
-public class NotificationConfigTest {
-
-    static {
-        System.setProperty("pass.core.url", "localhost:8080");
-        System.setProperty("pass.core.user", "user");
-        System.setProperty("pass.core.password", "moo");
-    }
+public class NotificationConfigTest extends AbstractNotificationSpringTest {
 
     @Autowired private NotificationConfig notificationConfig;
 
@@ -75,9 +60,9 @@ public class NotificationConfigTest {
         assertEquals(3, template.getTemplates().size());
         assertEquals("PASS Submission Approval: ${RESOURCE_METADATA.title}",
             template.getTemplates().get(SUBJECT));
-        assertEquals("classpath*:pass-body-submission-approval-invite-template.vm",
+        assertEquals("classpath*:pass-body-submission-approval-invite-template.hbr",
             template.getTemplates().get(BODY));
-        assertEquals("classpath*:pass-footer-template.vm", template.getTemplates().get(FOOTER));
+        assertEquals("classpath*:pass-footer-template.hbr", template.getTemplates().get(FOOTER));
 
         RecipientConfig recipientConfigDemo = notificationConfig.getRecipientConfigs().stream()
             .filter(recipientConfig -> DEMO == recipientConfig.getMode())
