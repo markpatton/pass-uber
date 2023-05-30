@@ -33,7 +33,7 @@ import lombok.Setter;
 public class Notification {
 
     /**
-     * The primary recipients of the notification, may URIs to a PASS {@code User} or 'mailto' URIs
+     * The primary recipient email addresses of the notification
      */
     private Collection<String> recipients;
 

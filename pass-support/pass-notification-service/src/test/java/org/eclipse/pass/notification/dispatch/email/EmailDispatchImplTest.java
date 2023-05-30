@@ -15,174 +15,180 @@
  */
 package org.eclipse.pass.notification.dispatch.email;
 
+import jakarta.mail.Address;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.pass.notification.config.NotificationConfig;
+import org.eclipse.pass.notification.config.NotificationTemplate;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
+import org.eclipse.pass.notification.dispatch.DispatchException;
+import org.eclipse.pass.notification.model.Notification;
+import org.eclipse.pass.notification.model.NotificationParam;
+import org.eclipse.pass.notification.model.NotificationType;
+import org.eclipse.pass.support.client.model.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.mail.javamail.JavaMailSender;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
 public class EmailDispatchImplTest {
+    private final static Collection<String> CC = List.of("pass-prod-cc@jhu.edu", "pass-admin@jhu.edu");
+    private final static String CC_JOINED = "pass-prod-cc@jhu.edu,pass-admin@jhu.edu";
+    private final static String USER_EMAIL = "user@bar.com";
+    private final static String FROM = "pass-noreply@jhu.edu";
+    private final static String METADATA = "[\n" +
+        "  {\n" +
+        "    \"a sample metadata\": \"blob\",\n" +
+        "    \"for\": \"a Submission\"\n" +
+        "  }\n" +
+        "]";
 
-//    private Notification notification;
-//
-//    private NotificationConfig config;
-//
-//    private NotificationTemplate templateProto;
-//
-//    private CompositeResolver templateResolver;
-//
-//    private HandlebarsParameterizer templateParameterizer;
-//
-//    private Mailer mailer;
-//
-//    private PassClient passClient;
-//
-//    private String mailtoUri = "mailto:John%20Doe%3Cjohndoe%40example.org%3E";
-//
-//    private User user;
-//
-//    private String userUri = "https://pass.jhu.edu/fcrepo/users/123456";
-//
-//    private String userEmail = "user@bar.com";
-//
-//    private String from = "pass-noreply@jhu.edu";
-//
-//    private String cc = "pass-prod-cc@jhu.edu,pass-admin@jhu.edu";
-//
-//    private String metadata = "" +
-//            "[\n" +
-//            "  {\n" +
-//            "    \"a sample metadata\": \"blob\",\n" +
-//            "    \"for\": \"a Submission\"\n" +
-//            "  }\n" +
-//            "]";
-//
-//    private EmailDispatchImpl underTest;
-//
-//    @Before
-//    @SuppressWarnings("unchecked")
-//    public void setUp() throws Exception {
-//        notification = mock(Notification.class);
-//        config = mock(NotificationConfig.class);
-//        templateProto = mock(NotificationTemplate.class);
-//        templateResolver = mock(CompositeResolver.class);
-//        passClient = mock(PassClient.class);
-//        user = mock(User.class);
-//        mailer = mock(Mailer.class);
-//        templateParameterizer = mock(HandlebarsParameterizer.class);
-//
-//        when(config.getTemplates()).thenReturn(Collections.singletonList(templateProto));
-//        when(templateProto.getTemplates()).thenReturn(new HashMap<NotificationParam, String>() {
-//            {
-//                put(NotificationParam.SUBJECT, "A Subject");
-//                put(Name.BODY, "A Body");
-//                put(Name.FOOTER, "A Footer");
-//            }
-//        });
-//        when(user.getId()).thenReturn(URI.create(userUri));
-//        when(user.getEmail()).thenReturn(userEmail);
-//        when(passClient.readResource(URI.create(userUri), User.class)).thenReturn(user);
-//
-//        Parameterizer parameterizer = new Parameterizer(config, templateResolver, templateParameterizer);
-//
-//        // mock a whitelist that accepts all recipients by simply returning the collection of recipients it was provided
-//        Function<Collection<String>, Collection<String>> whitelist = mock(Function.class);
-//        when(whitelist.apply(any())).thenAnswer(inv -> inv.getArgument(0));
-//        EmailComposer composer = new EmailComposer(passClient, whitelist);
-//
-//        underTest = new EmailDispatchImpl(parameterizer, mailer, composer);
-//    }
-//
-//    @Test
-//    public void simpleSuccess() throws IOException {
-//        when(notification.getType()).thenReturn(Notification.Type.SUBMISSION_APPROVAL_INVITE);
-//        when(notification.getParameters()).thenReturn(
-//                new HashMap<NotificationParam, String>() {
-//                    {
-//                        put(NotificationParam.FROM, from);
-//                        put(NotificationParam.TO, userUri);
-//                        put(NotificationParam.CC, cc);
-//                        put(NotificationParam.RESOURCE_METADATA, metadata);
-//                    }
-//                });
-//        when(notification.getRecipients()).thenReturn(Collections.singleton(userUri));
-//        when(notification.getSender()).thenReturn(from);
-//        when(notification.getCc()).thenReturn(Collections.singleton(cc));
-//
-//        when(templateProto.getNotificationType()).thenReturn(Notification.Type.SUBMISSION_APPROVAL_INVITE);
-//        when(templateResolver.resolve(any(), any())).thenAnswer(inv ->
-//                IOUtils.toInputStream(inv.getArgument(1), "UTF-8"));
-//
-//        when(templateParameterizer.parameterize(any(), any(), any())).thenAnswer(inv -> {
-//            NotificationTemplateName name = inv.getArgument(0);
-//            switch (name) {
-//                case SUBJECT:
-//                    return "A Subject";
-//                case FOOTER:
-//                    return "A Footer";
-//                case BODY:
-//                    return "A Body";
-//                default:
-//            }
-//
-//            throw new RuntimeException("Unknown template name '" + name + "'");
-//        });
-//
-//        underTest.dispatch(notification);
-//
-//        ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
-//
-//        verify(mailer).sendMail(emailCaptor.capture());
-//
-//        Email email = emailCaptor.getValue();
-//
-//        // Verify the email was composed properly
-//        assertEquals(from, email.getFromRecipient().getAddress());
-//
-//        assertTrue(email.getRecipients()
-//                .stream()
-//                .filter(recipient -> recipient.getType() == RecipientType.TO)
-//                .anyMatch(recipient -> recipient.getAddress().equals(userEmail)));
-//
-//        email.getRecipients()
-//            .stream()
-//            .filter(recipient -> recipient.getType() == RecipientType.CC)
-//            .map(Recipient::getAddress)
-//            .forEach(address ->
-//                    assertTrue("Missing expected CC address '" + address + "' from CC recipients",
-//                            cc.contains(address)));
-//
-//        assertEquals("A Subject", email.getSubject());
-//        assertEquals(String.join("\n\n", "A Body", "A Footer"), email.getPlainText());
-//    }
-//
-//    /**
-//     * A nice DispatchException should be thrown if the To field of the email is missing or empty
-//     */
-//    @Test
-//    public void emptyToAddress() {
-//        Notification notification = mock(Notification.class);
-//        Parameterizer p = mock(Parameterizer.class);
-//        EmailComposer c = mock(EmailComposer.class);
-//        Email e = mock(Email.class);
-//
-//        when(notification.getResourceUri()).thenReturn(URI.create(UUID.randomUUID().toString()));
-//        when(notification.getEventUri()).thenReturn(URI.create(UUID.randomUUID().toString()));
-//
-//        when(p.resolveAndParameterize(any(), any())).thenReturn(Collections.emptyMap());
-//        when(c.compose(any(), any())).thenReturn(e);
-//        when(e.getRecipients()).thenReturn(Collections.emptyList());
-//
-//        try {
-//            underTest = new EmailDispatchImpl(p, mailer, c);
-//            underTest.dispatch(notification);
-//            fail("Expected Dispatch Exception");
-//        } catch (DispatchException expected) {
-//            assertTrue(expected.getMessage().contains("dispatch email with an empty To: address"));
-//        }
-//
-//        verifyZeroInteractions(mailer);
-//    }
+    private Notification notification;
+    private NotificationTemplate templateProto;
+    private CompositeResolver templateResolver;
+    private HandlebarsParameterizer templateParameterizer;
+    private JavaMailSender mailer;
+
+    private EmailDispatchImpl emailDispatch;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        notification = mock(Notification.class);
+        NotificationConfig config = mock(NotificationConfig.class);
+        templateProto = mock(NotificationTemplate.class);
+        templateResolver = mock(CompositeResolver.class);
+        User user = mock(User.class);
+        mailer = mock(JavaMailSender.class);
+        templateParameterizer = mock(HandlebarsParameterizer.class);
+
+        when(config.getTemplates()).thenReturn(Collections.singletonList(templateProto));
+        when(templateProto.getTemplates()).thenReturn(new HashMap<>() {
+            {
+                put(NotificationTemplateName.SUBJECT, "A Subject");
+                put(NotificationTemplateName.BODY, "A Body");
+                put(NotificationTemplateName.FOOTER, "A Footer");
+            }
+        });
+        when(user.getId()).thenReturn("test-user");
+        when(user.getEmail()).thenReturn(USER_EMAIL);
+
+        Parameterizer parameterizer = new Parameterizer(config, templateResolver, templateParameterizer);
+
+        // mock a whitelist that accepts all recipients by simply returning the collection of recipients it was provided
+        SimpleWhitelist whitelist = mock(SimpleWhitelist.class);
+        when(whitelist.apply(any())).thenAnswer(inv -> inv.getArgument(0));
+        EmailComposer composer = new EmailComposer(whitelist, mailer);
+
+        emailDispatch = new EmailDispatchImpl(parameterizer, composer, mailer);
+    }
+
+    @Test
+    public void simpleSuccess() throws IOException, MessagingException {
+        when(notification.getType()).thenReturn(NotificationType.SUBMISSION_APPROVAL_INVITE);
+        when(notification.getParameters()).thenReturn(
+                new HashMap<>() {
+                    {
+                        put(NotificationParam.FROM, FROM);
+                        put(NotificationParam.TO, USER_EMAIL);
+                        put(NotificationParam.CC, CC_JOINED);
+                        put(NotificationParam.RESOURCE_METADATA, METADATA);
+                    }
+                });
+        when(notification.getRecipients()).thenReturn(Collections.singleton(USER_EMAIL));
+        when(notification.getSender()).thenReturn(FROM);
+        when(notification.getCc()).thenReturn(CC);
+
+        when(templateProto.getNotificationType()).thenReturn(NotificationType.SUBMISSION_APPROVAL_INVITE);
+        when(templateResolver.resolve(any(), any())).thenAnswer(inv ->
+                IOUtils.toInputStream(inv.getArgument(1), "UTF-8"));
+
+        when(templateParameterizer.parameterize(any(), any(), any())).thenAnswer(inv -> {
+            NotificationTemplateName name = inv.getArgument(0);
+            switch (name) {
+                case SUBJECT -> {
+                    return "A Subject";
+                }
+                case FOOTER -> {
+                    return "A Footer";
+                }
+                case BODY -> {
+                    return "A Body";
+                }
+                default -> {
+                }
+            }
+
+            throw new RuntimeException("Unknown template name '" + name + "'");
+        });
+        MimeMessage mimeMessage = new MimeMessage((Session) null);
+        when(mailer.createMimeMessage()).thenReturn(mimeMessage);
+
+        emailDispatch.dispatch(notification);
+
+        ArgumentCaptor<MimeMessage> emailCaptor = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(mailer).send(emailCaptor.capture());
+        MimeMessage email = emailCaptor.getValue();
+
+        // Verify the email was composed properly
+        assertEquals(FROM, email.getFrom()[0].toString());
+
+        assertTrue(Arrays.stream(email.getRecipients(MimeMessage.RecipientType.TO))
+            .anyMatch(recipient -> recipient.toString().equals(USER_EMAIL)));
+
+        Arrays.stream(email.getRecipients(MimeMessage.RecipientType.CC))
+            .forEach(address ->
+                    assertTrue(CC.contains(address.toString())));
+
+        assertEquals("A Subject", email.getSubject());
+        assertEquals(String.join("\n\n", "A Body", "A Footer"), email.getContent());
+    }
+
+    /**
+     * A nice DispatchException should be thrown if the To field of the email is missing or empty
+     */
+    @Test
+    public void emptyToAddress() throws MessagingException {
+        Notification notification = mock(Notification.class);
+        Parameterizer parameterizer = mock(Parameterizer.class);
+        EmailComposer composer = mock(EmailComposer.class);
+        MimeMessage emailMessage = mock(MimeMessage.class);
+
+        when(notification.getResourceId()).thenReturn(UUID.randomUUID().toString());
+        when(notification.getEventId()).thenReturn(UUID.randomUUID().toString());
+
+        when(parameterizer.resolveAndParameterize(any(), any())).thenReturn(Collections.emptyMap());
+        when(composer.compose(any(), any())).thenReturn(emailMessage);
+        when(emailMessage.getRecipients(any())).thenReturn(new Address[0]);
+
+        DispatchException ex = assertThrows(DispatchException.class, () -> {
+            emailDispatch = new EmailDispatchImpl(parameterizer, composer, mailer);
+            emailDispatch.dispatch(notification);
+        });
+
+        assertTrue(ex.getMessage().contains("dispatch email with an empty To: address"));
+        verifyNoInteractions(mailer);
+    }
 
 }
