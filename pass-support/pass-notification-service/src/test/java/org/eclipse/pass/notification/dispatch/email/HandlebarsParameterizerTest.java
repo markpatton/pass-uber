@@ -18,8 +18,8 @@
 
 package org.eclipse.pass.notification.dispatch.email;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,8 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.pass.notification.model.NotificationParam;
 import org.eclipse.pass.notification.config.NotificationTemplateName;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class HandlebarsParameterizerTest {
 
@@ -79,7 +79,7 @@ public class HandlebarsParameterizerTest {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         paramMap = new HashMap<>();
         paramMap.put(NotificationParam.TO, TO);

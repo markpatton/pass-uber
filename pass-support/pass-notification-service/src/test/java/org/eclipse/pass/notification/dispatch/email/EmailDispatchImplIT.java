@@ -15,25 +15,16 @@
  */
 package org.eclipse.pass.notification.dispatch.email;
 
-import static org.apache.commons.io.IOUtils.resourceToString;
-import static org.eclipse.pass.notification.util.PathUtil.packageAsPath;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.eclipse.pass.notification.NotificationApp;
 import org.eclipse.pass.notification.SpringBootIntegrationConfig;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { NotificationApp.class, SpringBootIntegrationConfig.class })
 public class EmailDispatchImplIT {
 

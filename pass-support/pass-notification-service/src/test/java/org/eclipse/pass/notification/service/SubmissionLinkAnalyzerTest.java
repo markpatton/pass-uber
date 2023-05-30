@@ -26,9 +26,6 @@ import static org.eclipse.pass.notification.service.LinksTest.randomUri;
 import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW;
 import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
 import static org.eclipse.pass.notification.model.Link.SUBMISSION_VIEW;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -41,16 +38,14 @@ import java.util.function.UnaryOperator;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.model.Link;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author apb@jhu.edu
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(SpringExtension.class)
 public class SubmissionLinkAnalyzerTest {
 
 //    @Mock

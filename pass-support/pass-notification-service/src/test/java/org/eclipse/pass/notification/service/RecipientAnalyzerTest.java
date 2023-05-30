@@ -20,8 +20,6 @@ package org.eclipse.pass.notification.service;
 
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -35,8 +33,6 @@ import java.util.Collections;
 
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
-import org.junit.Before;
-import org.junit.Test;
 
 public class RecipientAnalyzerTest {
 

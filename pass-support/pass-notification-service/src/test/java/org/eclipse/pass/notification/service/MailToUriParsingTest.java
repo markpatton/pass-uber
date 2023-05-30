@@ -15,12 +15,13 @@
  */
 package org.eclipse.pass.notification.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
@@ -68,16 +69,18 @@ public class MailToUriParsingTest {
         assertNull(uri.getPath());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void parseMailtoWithTrailingWhitespace() {
-        String mailto = "mailto:chris@example.com ";
-        URI uri = URI.create(mailto);
+        assertThrows(IllegalArgumentException.class, () -> {
+            URI.create("mailto:chris@example.com ");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void parseMailtoWithPreceedingWhitespace() {
-        String mailto = " mailto:chris@example.com";
-        URI uri = URI.create(mailto);
+        assertThrows(IllegalArgumentException.class, () -> {
+            URI.create(" mailto:chris@example.com");
+        });
     }
 
     @Test

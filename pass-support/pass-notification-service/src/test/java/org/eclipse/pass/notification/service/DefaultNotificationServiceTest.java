@@ -21,10 +21,8 @@ package org.eclipse.pass.notification.service;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static java.util.UUID.randomUUID;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -36,8 +34,6 @@ import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.notification.dispatch.DispatchService;
 import org.eclipse.pass.notification.model.Notification;
-import org.junit.Before;
-import org.junit.Test;
 
 public class DefaultNotificationServiceTest {
 

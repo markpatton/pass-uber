@@ -15,14 +15,6 @@
  */
 package org.eclipse.pass.notification.model;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collection;
-
-import org.junit.Test;
-
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */

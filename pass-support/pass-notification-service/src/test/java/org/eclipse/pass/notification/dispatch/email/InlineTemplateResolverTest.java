@@ -18,21 +18,20 @@
 
 package org.eclipse.pass.notification.dispatch.email;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InlineTemplateResolverTest {
 
     private InlineTemplateResolver underTest;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         underTest = new InlineTemplateResolver();
     }

@@ -21,24 +21,24 @@ import static org.eclipse.pass.notification.config.NotificationTemplateName.BODY
 import static org.eclipse.pass.notification.config.NotificationTemplateName.FOOTER;
 import static org.eclipse.pass.notification.config.NotificationTemplateName.SUBJECT;
 import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_APPROVAL_INVITE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.pass.notification.model.NotificationType;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @TestPropertySource("classpath:test-application.properties")
 @TestPropertySource(properties = {

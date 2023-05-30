@@ -24,9 +24,9 @@ import static org.eclipse.pass.notification.service.LinksUtil.deserialize;
 import static org.eclipse.pass.notification.service.LinksUtil.optional;
 import static org.eclipse.pass.notification.service.LinksUtil.required;
 import static org.eclipse.pass.notification.service.LinksUtil.serialized;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.util.Collection;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.pass.notification.model.Link;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author apb@jhu.edu
@@ -96,30 +96,19 @@ public class LinksTest {
 
     @Test
     public void requiredLinkNotPresentTest() {
-
-        final String REL = "abc123";
-
-        try {
-            required(null, REL);
-            fail("Should have thrown an exception");
-        } catch (final NullPointerException e) {
-            assertTrue("Exception should mention the relation name.  Message was " + e.getMessage(), e.getMessage()
-                    .contains(REL));
-        }
+        NullPointerException ex = assertThrows(NullPointerException.class, () -> {
+            required(null, "abc123");
+        });
+        assertTrue(ex.getMessage().contains("abc123"));
     }
 
     @Test
     public void requiredLinkRelNotPresentTest() {
-
         final URI uri = randomUri();
-
-        try {
+        NullPointerException ex = assertThrows(NullPointerException.class, () -> {
             required(uri, null);
-            fail("Should have thrown an exception");
-        } catch (final NullPointerException e) {
-            assertTrue("Exception should mention the link uri.  Message was " + e.getMessage(), e.getMessage()
-                    .contains(uri.toString()));
-        }
+        });
+        assertTrue(ex.getMessage().contains(uri.toString()));
     }
 
     @Test

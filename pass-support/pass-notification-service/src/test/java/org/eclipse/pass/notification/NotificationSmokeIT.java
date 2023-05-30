@@ -19,10 +19,6 @@ import static java.nio.charset.Charset.forName;
 import static org.apache.commons.io.IOUtils.resourceToString;
 import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW;
 import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URI;
@@ -44,9 +40,6 @@ import org.eclipse.pass.notification.service.ComposerIT;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.util.PathUtil;
 import org.eclipse.pass.notification.util.mail.SimpleImapClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

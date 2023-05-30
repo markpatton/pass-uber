@@ -18,22 +18,21 @@
 
 package org.eclipse.pass.notification.dispatch.email;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SpringUriTemplateResolverTest {
 
     private SpringUriTemplateResolver underTest;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         underTest = new SpringUriTemplateResolver();
     }
@@ -52,12 +51,6 @@ public class SpringUriTemplateResolverTest {
     @Test
     public void resolveHttpsUrl() {
         assertNotNull(underTest.resolve(null, "https://example.org"));
-    }
-
-    @Test
-    @Ignore("TODO")
-    public void resolveAuthenticatedUrl() {
-
     }
 
     @Test

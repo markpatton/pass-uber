@@ -17,9 +17,9 @@
 package org.eclipse.pass.notification.service;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.config.LinkValidationRule;
 import org.eclipse.pass.notification.config.NotificationConfig;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author apb@jhu.edu
@@ -38,23 +38,17 @@ import org.junit.Test;
 public class LinkValidatorTest {
 
     String REL = "myRel";
-
     String EXPECTED_BASEURI = "http://example.org";
-
     URI GOOD_URI = URI.create("http://example.org/whatever");
-
     URI BAD_URI = URI.create("http://ruminant.moo/whatever");
-
     Link GOOD_LINK;
-
     Link BAD_LINK;
-
     LinkValidationRule RULE;
 
     private NotificationConfig config;
     private Set<LinkValidationRule> rules;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         GOOD_LINK = new Link(GOOD_URI, REL);
         BAD_LINK = new Link(BAD_URI, REL);
@@ -84,22 +78,16 @@ public class LinkValidatorTest {
     // If the config says to throw an exception on on invalid links, verify an exception is thrown.
     @Test
     public void throwExceptionIfRequestedTest() {
-
         RULE.setThrowExceptionOnFailure(true);
         rules.add(RULE);
-
         final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertTrue(toTest.test(GOOD_LINK));
 
-        try {
+        Exception ex = assertThrows(Exception.class, () -> {
             toTest.test(BAD_LINK);
-            fail("Should have thrown an exception");
-        } catch (final Exception e) {
-            assertTrue("Exception should have mentioned the bad link ", e.getMessage().contains(BAD_LINK.toString()));
-            assertTrue("Exception should have mentioned the expected baseuri ", e.getMessage().contains(
-                    EXPECTED_BASEURI));
-        }
-
+        });
+        assertTrue(ex.getMessage().contains(BAD_LINK.toString()));
+        assertTrue(ex.getMessage().contains(EXPECTED_BASEURI));
     }
 
     // If there are no rules defined at all, all links shall pass.
