@@ -15,18 +15,12 @@
  */
 package org.eclipse.pass.notification.util;
 
-import org.eclipse.pass.notification.dispatch.email.EmailDispatchImplIT;
-
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
 public class PathUtil {
 
     private PathUtil() {
-    }
-
-    public static String packageAsPath() {
-        return packageAsPath(EmailDispatchImplIT.class);
     }
 
     public static String packageAsPath(Class<?> clazz) {
