@@ -18,11 +18,17 @@ package org.eclipse.pass.notification.config;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.jms.ConnectionFactory;
+import org.eclipse.pass.notification.service.NotificationServiceErrorHandler;
 import org.eclipse.pass.support.client.PassClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+
+import javax.jms.Session;
 
 /**
  * Primary Spring Boot configuration class for Notification Services
@@ -55,6 +61,24 @@ public class SpringBootNotificationConfig {
             .filter(rc -> config.getMode() == rc.getMode()).findAny()
             .orElseThrow(() ->
                 new RuntimeException("Missing recipient configuration for Mode '" + config.getMode() + "'"));
+    }
+
+    @Bean
+    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(
+        @Value("${spring.jms.listener.concurrency}")
+        String concurrency,
+        @Value("${spring.jms.listener.auto-startup}")
+        boolean autoStart,
+        ConnectionFactory connectionFactory,
+        DefaultJmsListenerContainerFactoryConfigurer configurer,
+        NotificationServiceErrorHandler errorHandler) {
+        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
+        factory.setErrorHandler(errorHandler);
+        factory.setConcurrency(concurrency);
+        factory.setAutoStartup(autoStart);
+        return factory;
     }
 
 }
