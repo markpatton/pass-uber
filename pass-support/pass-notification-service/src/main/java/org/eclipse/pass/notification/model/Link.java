@@ -56,6 +56,8 @@ public class Link {
     private String rel;
     private URI href;
 
+    public Link() {}
+
     public Link(URI href, String rel) {
         Objects.requireNonNull(href, "Link must not be null.");
         Objects.requireNonNull(rel, "Rel must not be null.");

@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-public class LoggingAspectIT  extends AbstractNotificationSpringTest {
+public class LoggingAspectTest extends AbstractNotificationSpringTest {
 
     @Autowired
     private DispatchService dispatchService;

@@ -15,10 +15,20 @@
  */
 package org.eclipse.pass.notification.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.pass.notification.AbstractNotificationSpringTest;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
+import java.net.URI;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-public class LinkTest {
+public class LinkTest extends AbstractNotificationSpringTest {
 
     private static final String LINK_JSON = "" +
             "{\n" +
@@ -46,21 +56,20 @@ public class LinkTest {
             "  }\n" +
             "]";
 
-//    @Test
-//    public void parseLinkFromJson() throws IOException {
-//        Link link = mapper.readValue(LINK_JSON, Link.class);
-//
-//        assertEquals("submissionResource", link.getRel());
-//        assertEquals(URI.create("https://pass.jhu.edu/fcrepo/rest/submissions/abc123"), link.getHref());
-//        assertRoundTrip(link, Link.class);
-//    }
-//
-//    @Test
-//    @SuppressWarnings("unchecked")
-//    public void parseLinksFromJson() throws IOException {
-//        Collection<Link> links = mapper.readValue(LINKS_JSON, Collection.class);
-//        assertEquals(4, links.size());
-//        assertRoundTrip(links, Collection.class);
-//    }
+    @Autowired private ObjectMapper objectMapper;
+
+    @Test
+    public void parseLinkFromJson() throws IOException {
+        Link link = objectMapper.readValue(LINK_JSON, Link.class);
+
+        assertEquals("submissionResource", link.getRel());
+        assertEquals(URI.create("https://pass.jhu.edu/fcrepo/rest/submissions/abc123"), link.getHref());
+    }
+
+    @Test
+    public void parseLinksFromJson() throws IOException {
+        Link[] links = objectMapper.readValue(LINKS_JSON, Link[].class);
+        assertEquals(4, links.length);
+    }
 
 }
