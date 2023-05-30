@@ -20,6 +20,8 @@ package org.eclipse.pass.notification.service;
 
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -31,152 +33,153 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.eclipse.pass.support.client.model.EventType;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
+import org.eclipse.pass.support.client.model.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RecipientAnalyzerTest {
 
-//    private String preparer1 = "preparer_one@example.org";
-//
-//    private String preparer2 = "preparer_two@example.org";
-//
-//    private String submitter = "submitter@example.org";
-//
-//    private Collection<String> preparers;
-//
-//    private Submission submission;
-//
-//    private SubmissionEvent event;
-//
-//    private RecipientAnalyzer underTest;
-//
-//    @Before
-//    @SuppressWarnings("unchecked")
-//    public void setUp() throws Exception {
-//        submission = mock(Submission.class);
-//
-//        event = mock(SubmissionEvent.class);
-//
-//        underTest = new RecipientAnalyzer();
-//
-//        preparers = Arrays.asList(preparer1, preparer2);
-//
-//        when(submission.getSubmitter()).thenReturn(URI.create(submitter));
-//        when(submission.getPreparers()).thenReturn(preparers.stream().map(URI::create).collect(toList()));
-//    }
-//
-//    @Test
-//    public void analyzeApprovalRequested() {
-//        perform(singleton(submitter), SubmissionEvent.EventType.APPROVAL_REQUESTED);
-//    }
-//
-//    @Test
-//    public void analyzeApprovalRequestedNewUser() {
-//        perform(singleton(submitter), SubmissionEvent.EventType.APPROVAL_REQUESTED_NEWUSER);
-//    }
-//
-//    @Test
-//    public void analyzeChangesRequested() {
-//        perform(preparers, SubmissionEvent.EventType.CHANGES_REQUESTED);
-//    }
-//
-//    @Test
-//    public void analyzeCancelledBySubmitter() {
-//        when(event.getPerformedBy()).thenReturn(URI.create(submitter));
-//        perform(preparers, SubmissionEvent.EventType.CANCELLED);
-//    }
-//
-//    @Test
-//    public void analyzeCancelledByPreparer() {
-//        when(event.getPerformedBy()).thenReturn(URI.create(preparer1));
-//        // fixme: other preparers should get a notification to
-//        perform(singleton(submitter), SubmissionEvent.EventType.CANCELLED);
-//    }
-//
-//    @Test
-//    public void analyzeSubmitted() {
-//        perform(preparers, SubmissionEvent.EventType.SUBMITTED);
-//    }
-//
-//    /**
-//     * Insure a null submitter and null submitter email is reported as a thrown runtime exception
-//     * (model version 3.2 allows the submitter to be null)
-//     */
-//    @Test
-//    public void testNullSubmitterAndNullEmail() {
-//        submission = mock(Submission.class);
-//        when(submission.getId()).thenReturn(URI.create("http://example.org/submission/1"));
-//        when(submission.getSubmitter()).thenReturn(null);
-//        when(submission.getSubmitterEmail()).thenReturn(null);
-//
-//        try {
-//            perform(Collections.emptyList(), SubmissionEvent.EventType.APPROVAL_REQUESTED_NEWUSER);
-//            fail("Expected a RuntimeException to be thrown.");
-//        } catch (Exception expected) {
-//            assertTrue(expected instanceof RuntimeException);
-//        }
-//
-//        verify(submission).getSubmitter();
-//        verify(submission).getSubmitterEmail();
-//    }
-//
-//    /**
-//     * Insure a null submitter results in the submitter email address being used
-//     * (model version 3.2 allows the submitter to be null)
-//     */
-//    @Test
-//    public void testNullSubmitter() {
-//        submission = mock(Submission.class);
-//        when(submission.getId()).thenReturn(URI.create("http://example.org/submission/1"));
-//        when(submission.getSubmitter()).thenReturn(null);
-//        URI expectedRecipient = URI.create("mailto:ex@ample.org");
-//        when(submission.getSubmitterEmail()).thenReturn(expectedRecipient);
-//
-//        perform(singleton(expectedRecipient.toString()), SubmissionEvent.EventType.APPROVAL_REQUESTED_NEWUSER);
-//
-//        verify(submission).getSubmitter();
-//        verify(submission).getSubmitterEmail();
-//    }
-//
-//    /**
-//     * insure a null submitter email results in the submitter user uri being used
-//     */
-//    @Test
-//    public void testNullSubmitterEmail() {
-//        when(submission.getId()).thenReturn(URI.create("http://example.org/submission/1"));
-//        URI expectedRecipient = URI.create("http://example.org/users/1");
-//        when(submission.getSubmitter()).thenReturn(expectedRecipient);
-//
-//        perform(singleton(expectedRecipient.toString()), SubmissionEvent.EventType.APPROVAL_REQUESTED_NEWUSER);
-//
-//        verify(submission).getSubmitter();
-//        verify(submission, times(0)).getSubmitterEmail();
-//    }
-//
-//    /**
-//     * insure the User URI has precedence over the submission submitter email
-//     */
-//    @Test
-//    public void testNonNullSubmitterUserUriAndNonNullSubmitterEmail() {
-//        when(submission.getId()).thenReturn(URI.create("http://example.org/submission/1"));
-//        URI expectedRecipient = URI.create("http://example.org/users/1");
-//        when(submission.getSubmitter()).thenReturn(expectedRecipient);
-//        when(submission.getSubmitterEmail()).thenReturn(URI.create("mailto:ex@ample.org"));
-//
-//        perform(singleton(expectedRecipient.toString()), SubmissionEvent.EventType.APPROVAL_REQUESTED_NEWUSER);
-//
-//        verify(submission).getSubmitter();
-//        verify(submission, times(0)).getSubmitterEmail();
-//    }
-//
-//    private void perform(Collection<String> expectedRecipients, SubmissionEvent.EventType type) {
-//        when(event.getEventType()).thenReturn(type);
-//
-//        Collection<String> actualRecipients = underTest.apply(submission, event);
-//
-//        actualRecipients.forEach(actualRecipient -> assertTrue(expectedRecipients.contains(actualRecipient)));
-//        expectedRecipients.forEach(expectedRecipient -> assertTrue(actualRecipients.contains(expectedRecipient)));
-//
-//        verify(event, atLeastOnce()).getEventType();
-//    }
+    private final static String PREPARER_1 = "preparer_one@example.org";
+    private final static String PREPARER_2 = "preparer_two@example.org";
+    private final static String SUBMITTER = "submitter@example.org";
+
+    private Collection<String> preparers;
+    private Submission submission;
+    private SubmissionEvent event;
+    private RecipientAnalyzer recipientAnalyzer;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        submission = mock(Submission.class);
+        event = mock(SubmissionEvent.class);
+        recipientAnalyzer = new RecipientAnalyzer();
+        preparers = Arrays.asList(PREPARER_1, PREPARER_2);
+        User submitterUser = new User("test-submitter");
+        submitterUser.setEmail(SUBMITTER);
+        when(submission.getSubmitter()).thenReturn(submitterUser);
+        when(submission.getPreparers()).thenReturn(preparers.stream().map(email -> {
+            User preparer = new User("test-" + email);
+            preparer.setEmail(email);
+            return preparer;
+        }).collect(toList()));
+    }
+
+    @Test
+    public void analyzeApprovalRequested() {
+        perform(singleton(SUBMITTER), EventType.APPROVAL_REQUESTED);
+    }
+
+    @Test
+    public void analyzeApprovalRequestedNewUser() {
+        perform(singleton(SUBMITTER), EventType.APPROVAL_REQUESTED_NEWUSER);
+    }
+
+    @Test
+    public void analyzeChangesRequested() {
+        perform(preparers, EventType.CHANGES_REQUESTED);
+    }
+
+    @Test
+    public void analyzeCancelledBySubmitter() {
+        User submitterUser = new User("test-submitter");
+        submitterUser.setEmail(SUBMITTER);
+        when(event.getPerformedBy()).thenReturn(submitterUser);
+        perform(preparers, EventType.CANCELLED);
+    }
+
+    @Test
+    public void analyzeCancelledByPreparer() {
+        User preparerUser = new User("test-preparer-1");
+        preparerUser.setEmail(PREPARER_1);
+        when(event.getPerformedBy()).thenReturn(preparerUser);
+        // fixme: other preparers should get a notification to
+        perform(singleton(SUBMITTER), EventType.CANCELLED);
+    }
+
+    @Test
+    public void analyzeSubmitted() {
+        perform(preparers, EventType.SUBMITTED);
+    }
+
+    /**
+     * Insure a null submitter and null submitter email is reported as a thrown runtime exception
+     * (model version 3.2 allows the submitter to be null)
+     */
+    @Test
+    public void testNullSubmitterAndNullEmail() {
+        when(submission.getId()).thenReturn("1");
+        when(submission.getSubmitter()).thenReturn(null);
+        when(submission.getSubmitterEmail()).thenReturn(null);
+
+        assertThrows(RuntimeException.class, () -> {
+            perform(Collections.emptyList(), EventType.APPROVAL_REQUESTED_NEWUSER);
+        });
+
+        verify(submission).getSubmitter();
+        verify(submission).getSubmitterEmail();
+    }
+
+    /**
+     * Insure a null submitter results in the submitter email address being used
+     * (model version 3.2 allows the submitter to be null)
+     */
+    @Test
+    public void testNullSubmitter() {
+        when(submission.getId()).thenReturn("1");
+        when(submission.getSubmitter()).thenReturn(null);
+        URI expectedRecipient = URI.create("mailto:ex@ample.org");
+        when(submission.getSubmitterEmail()).thenReturn(expectedRecipient);
+
+        perform(singleton(expectedRecipient.toString()), EventType.APPROVAL_REQUESTED_NEWUSER);
+
+        verify(submission).getSubmitter();
+        verify(submission).getSubmitterEmail();
+    }
+
+    /**
+     * insure a null submitter email results in the submitter user uri being used
+     */
+    @Test
+    public void testNullSubmitterEmail() {
+        when(submission.getId()).thenReturn("1");
+        User expectedRecipient = new User("2");
+        expectedRecipient.setEmail("ex@ample.org");
+        when(submission.getSubmitter()).thenReturn(expectedRecipient);
+
+        perform(singleton(expectedRecipient.getEmail()), EventType.APPROVAL_REQUESTED_NEWUSER);
+
+        verify(submission).getSubmitter();
+        verify(submission, times(0)).getSubmitterEmail();
+    }
+
+    /**
+     * insure the User URI has precedence over the submission submitter email
+     */
+    @Test
+    public void testNonNullSubmitterUserUriAndNonNullSubmitterEmail() {
+        when(submission.getId()).thenReturn("1");
+        User expectedRecipient = new User("2");
+        expectedRecipient.setEmail("ex@ample.org");
+        when(submission.getSubmitter()).thenReturn(expectedRecipient);
+        when(submission.getSubmitterEmail()).thenReturn(URI.create("mailto:ex@ample.org"));
+
+        perform(singleton(expectedRecipient.getEmail()), EventType.APPROVAL_REQUESTED_NEWUSER);
+
+        verify(submission).getSubmitter();
+        verify(submission, times(0)).getSubmitterEmail();
+    }
+
+    private void perform(Collection<String> expectedRecipients, EventType type) {
+        when(event.getEventType()).thenReturn(type);
+
+        Collection<String> actualRecipients = recipientAnalyzer.apply(submission, event);
+
+        actualRecipients.forEach(actualRecipient -> assertTrue(expectedRecipients.contains(actualRecipient)));
+        expectedRecipients.forEach(expectedRecipient -> assertTrue(actualRecipients.contains(expectedRecipient)));
+
+        verify(event, atLeastOnce()).getEventType();
+    }
 }

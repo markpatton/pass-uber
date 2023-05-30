@@ -29,16 +29,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InlineTemplateResolverTest {
 
-    private InlineTemplateResolver underTest;
+    private InlineTemplateResolver inlineTemplateResolver;
 
     @BeforeEach
     public void setUp() throws Exception {
-        underTest = new InlineTemplateResolver();
+        inlineTemplateResolver = new InlineTemplateResolver();
     }
 
     @Test
     public void testResolve() throws IOException {
         String template = "Hello world!";
-        assertEquals(template, IOUtils.toString(underTest.resolve(null, template), StandardCharsets.UTF_8));
+        assertEquals(template, IOUtils.toString(inlineTemplateResolver
+            .resolve(null, template), StandardCharsets.UTF_8));
     }
 }

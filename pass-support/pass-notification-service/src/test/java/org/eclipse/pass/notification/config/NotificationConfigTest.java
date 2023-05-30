@@ -52,8 +52,7 @@ public class NotificationConfigTest {
         System.setProperty("pass.core.password", "moo");
     }
 
-    @Autowired
-    private NotificationConfig notificationConfig;
+    @Autowired private NotificationConfig notificationConfig;
 
     @Test
     public void testLoadNotificationConfig() {

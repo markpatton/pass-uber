@@ -44,25 +44,26 @@ public class RecipientAnalyzer implements BiFunction<Submission, SubmissionEvent
         switch (event.getEventType()) {
             case APPROVAL_REQUESTED_NEWUSER, APPROVAL_REQUESTED -> {
                 // to: authorized submitter
-                String submitterUriOrEmail = submitterEmail(submission)
-                    .orElseThrow(() ->
-                        new RuntimeException(
-                            "Submitter URI and email are null for " + submission.getId()));
-                return singleton(submitterUriOrEmail);
+                String submitterOrSubmitterEmail = submitter(submission)
+                    .orElseGet(() -> submitterEmail(submission)
+                        .orElseThrow(() ->
+                            new RuntimeException(
+                                "Submitter and email are null for " + submission.getId())));
+                return singleton(submitterOrSubmitterEmail);
             }
             case CHANGES_REQUESTED, SUBMITTED -> {
                 // to: submission.preparers
                 return submission.getPreparers().stream().map(User::getEmail).collect(toSet());
             }
             case CANCELLED -> {
-                String performedBy = event.getPerformedBy().toString();
+                String performedBy = event.getPerformedBy().getEmail();
                 Collection<String> recipients;
-                if (submission.getSubmitter().toString().equals(performedBy)) {
+                if (submission.getSubmitter().getEmail().equals(performedBy)) {
                     recipients =
                         submission.getPreparers().stream().map(User::getEmail).collect(toSet());
                 } else {
                     recipients =
-                        singleton(submission.getSubmitter().toString());
+                        singleton(submission.getSubmitter().getEmail());
                 }
 
                 return recipients;
@@ -73,7 +74,11 @@ public class RecipientAnalyzer implements BiFunction<Submission, SubmissionEvent
         }
     }
 
-    private static Optional<String> submitterEmail(Submission s) {
+    private Optional<String> submitter(Submission s) {
+        return Optional.ofNullable(s.getSubmitter()).map(User::getEmail);
+    }
+
+    private Optional<String> submitterEmail(Submission s) {
         return Optional.ofNullable(s.getSubmitterEmail()).map(URI::toString);
     }
 

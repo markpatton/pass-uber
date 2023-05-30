@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  */
 public class SimpleWhitelistTest {
 
-    private SimpleWhitelist underTest;
+    private SimpleWhitelist simpleWhitelist;
 
     private Collection<String> whitelist;
 
@@ -44,7 +44,7 @@ public class SimpleWhitelistTest {
         whitelist = new ArrayList<>();
         RecipientConfig recipientConfig = mock(RecipientConfig.class);
         when(recipientConfig.getWhitelist()).thenReturn(whitelist);
-        underTest = new SimpleWhitelist(recipientConfig);
+        simpleWhitelist = new SimpleWhitelist(recipientConfig);
     }
 
     /**
@@ -52,7 +52,7 @@ public class SimpleWhitelistTest {
      */
     @Test
     public void testEmptyWhitelist() {
-        assertEquals("foo@bar.baz", underTest.apply(singletonList("foo@bar.baz")).iterator().next());
+        assertEquals("foo@bar.baz", simpleWhitelist.apply(singletonList("foo@bar.baz")).iterator().next());
     }
 
     /**
@@ -63,7 +63,7 @@ public class SimpleWhitelistTest {
         String candidate1 = "foo@bar.baz";
         String whitelist1 = "joyof@physics.com";
         whitelist.add(whitelist1);
-        Collection<String> result = underTest.apply(singletonList(candidate1));
+        Collection<String> result = simpleWhitelist.apply(singletonList(candidate1));
         assertEquals(0, result.size());
     }
 
@@ -75,7 +75,7 @@ public class SimpleWhitelistTest {
         String candidate1 = "FOO@bar.baz";
         String whitelist1 = "foo@bar.baz";
         whitelist.add(whitelist1);
-        Collection<String> result = underTest.apply(singletonList(candidate1));
+        Collection<String> result = simpleWhitelist.apply(singletonList(candidate1));
         assertEquals(1, result.size());
         assertEquals(candidate1, result.iterator().next());
     }
@@ -88,7 +88,7 @@ public class SimpleWhitelistTest {
         String candidate1 = "foo@bar.baz";
         String whitelist1 = "FOO@bar.baz";
         whitelist.add(whitelist1);
-        Collection<String> result = underTest.apply(singletonList(candidate1));
+        Collection<String> result = simpleWhitelist.apply(singletonList(candidate1));
         assertEquals(1, result.size());
         assertEquals(candidate1, result.iterator().next());
     }
@@ -100,7 +100,7 @@ public class SimpleWhitelistTest {
     public void testWhiteListWithOneAddress() {
         String candidate = "foo@bar.baz";
         whitelist.add(candidate);
-        Collection<String> result = underTest.apply(singletonList(candidate));
+        Collection<String> result = simpleWhitelist.apply(singletonList(candidate));
         assertEquals(1, result.size());
         assertEquals(candidate, result.iterator().next());
     }
@@ -115,7 +115,7 @@ public class SimpleWhitelistTest {
         whitelist.add(candidate1);
         whitelist.add(candidate2);
 
-        Collection<String> result = underTest.apply(singletonList(candidate1));
+        Collection<String> result = simpleWhitelist.apply(singletonList(candidate1));
         assertEquals(1, result.size());
         assertEquals(candidate1, result.iterator().next());
     }
@@ -134,7 +134,7 @@ public class SimpleWhitelistTest {
         whitelist.add(whitelist3);
         whitelist.add(whitelist4);
 
-        Collection<String> result = underTest.apply(Arrays.asList(candidate1, candidate2));
+        Collection<String> result = simpleWhitelist.apply(Arrays.asList(candidate1, candidate2));
         assertEquals(2, result.size());
         assertTrue(result.contains(candidate1));
         assertTrue(result.contains(candidate2));
@@ -142,11 +142,11 @@ public class SimpleWhitelistTest {
 
     @Test
     public void testNullCandidate() {
-        assertTrue(underTest.apply(null).isEmpty());
+        assertTrue(simpleWhitelist.apply(null).isEmpty());
     }
 
     @Test
     public void testEmptyCandidate() {
-        assertTrue(underTest.apply(Collections.emptyList()).isEmpty());
+        assertTrue(simpleWhitelist.apply(Collections.emptyList()).isEmpty());
     }
 }

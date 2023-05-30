@@ -75,7 +75,7 @@ public class HandlebarsParameterizerTest {
 
     private Map<NotificationParam, String> paramMap;
 
-    private HandlebarsParameterizer underTest;
+    private HandlebarsParameterizer handlebarsParameterizer;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -87,12 +87,12 @@ public class HandlebarsParameterizerTest {
         paramMap.put(NotificationParam.RESOURCE_METADATA, RESOURCE_METADATA);
         paramMap.put(NotificationParam.EVENT_METADATA, EVENT_METADATA);
         paramMap.put(NotificationParam.LINKS, LINK_METADATA);
-        underTest = new HandlebarsParameterizer(mapper);
+        handlebarsParameterizer = new HandlebarsParameterizer(mapper);
     }
 
     @Test
     public void simpleParameterization() {
-        String parameterized = underTest.parameterize(NotificationTemplateName.BODY, paramMap,
+        String parameterized = handlebarsParameterizer.parameterize(NotificationTemplateName.BODY, paramMap,
                                                       new ByteArrayInputStream(BODY_TEMPLATE.getBytes()));
 
         assertTrue(parameterized.contains(TO));
@@ -105,10 +105,10 @@ public class HandlebarsParameterizerTest {
     @Test
     public void urlEncoding() throws IOException {
         String href = "http://example.org?queryParam=value";
-        HashMap<NotificationParam, String> paramMap = new HashMap<NotificationParam, String>() {{
+        HashMap<NotificationParam, String> paramMap = new HashMap<>() {{
                     put(NotificationParam.TO, href);
                 }};
-        String parameterized = underTest.parameterize(NotificationTemplateName.BODY, paramMap,
+        String parameterized = handlebarsParameterizer.parameterize(NotificationTemplateName.BODY, paramMap,
                                                       IOUtils.toInputStream("{{to}}", "UTF-8"));
 
         assertEquals(href, parameterized);

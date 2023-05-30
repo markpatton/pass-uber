@@ -30,46 +30,46 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SpringUriTemplateResolverTest {
 
-    private SpringUriTemplateResolver underTest;
+    private SpringUriTemplateResolver springUriTemplateResolver;
 
     @BeforeEach
     public void setUp() throws Exception {
-        underTest = new SpringUriTemplateResolver();
+        springUriTemplateResolver = new SpringUriTemplateResolver();
     }
 
     @Test
     public void resolveClasspathUrl() {
         String packageName = this.getClass().getPackage().getName().replace('.', '/');
-        assertNotNull(underTest.resolve(null, "classpath:" + packageName + "/" + "templateToResolve"));
+        assertNotNull(springUriTemplateResolver.resolve(null, "classpath:" + packageName + "/" + "templateToResolve"));
     }
 
     @Test
     public void resolveHttpUrl() {
-        assertNotNull(underTest.resolve(null, "http://example.org"));
+        assertNotNull(springUriTemplateResolver.resolve(null, "http://example.org"));
     }
 
     @Test
     public void resolveHttpsUrl() {
-        assertNotNull(underTest.resolve(null, "https://example.org"));
+        assertNotNull(springUriTemplateResolver.resolve(null, "https://example.org"));
     }
 
     @Test
     public void resolveFileUrl() {
         URL u = this.getClass().getResource("templateToResolve");
         assertEquals("file", u.getProtocol());
-        assertNotNull(underTest.resolve(null, u.toString()));
+        assertNotNull(springUriTemplateResolver.resolve(null, u.toString()));
     }
 
     @Test
     public void resolveLocalFile() {
         URL u = this.getClass().getResource("templateToResolve");
         assertEquals("file", u.getProtocol());
-        assertNotNull(underTest.resolve(null, u.getPath()));
+        assertNotNull(springUriTemplateResolver.resolve(null, u.getPath()));
     }
 
     @Test
     public void resolveUnsupportedProtocol() throws MalformedURLException {
-        assertNull(underTest.resolve(null,
+        assertNull(springUriTemplateResolver.resolve(null,
                 new URL("jar:file:/path/to/file.jar!/path/to/resource").toString()));
     }
 }

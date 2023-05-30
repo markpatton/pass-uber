@@ -18,27 +18,25 @@
 
 package org.eclipse.pass.notification.dispatch.email;
 
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-
 import org.apache.commons.io.input.NullInputStream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@TestPropertySource("classpath:test-application.properties")
+@TestPropertySource(properties = {
+    "pass.notification.configuration=classpath:test-notification.json"
+})
 public class CompositeResolverTest {
 
-//    private CompositeResolver underTest;
-//
-//    @Before
-//    public void setUp() throws Exception {
-//        // TODO use spring to autowire
-//        SpringUriTemplateResolver springUriTemplateResolver = new SpringUriTemplateResolver();
-//        InlineTemplateResolver inlineTemplateResolver = new InlineTemplateResolver();
-//        underTest = new CompositeResolver(springUriTemplateResolver, inlineTemplateResolver);
-//    }
-//
+    @Autowired private CompositeResolver compositeResolver;
+
 //    @Test
 //    public void resolutionOrder() {
 //        TemplateResolver one = mock(TemplateResolver.class);

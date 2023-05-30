@@ -29,28 +29,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HandlebarsTest {
 
-    private Handlebars underTest;
+    private Handlebars handlebars;
 
     @BeforeEach
     public void setUp() throws Exception {
-        underTest = new Handlebars();
+        handlebars = new Handlebars();
     }
 
     @Test
     public void simpleThis() throws IOException {
-        Template t = underTest.compileInline("Hello {{this}}");
+        Template t = handlebars.compileInline("Hello {{this}}");
         assertEquals("Hello world", t.apply("world"));
     }
 
     @Test
     public void simpleJson() throws IOException {
-        HashMap<String, String> model = new HashMap<String, String>() {
+        HashMap<String, String> model = new HashMap<>() {
             {
                 put("world", "foo");
             }
         };
 
-        Template t = underTest.compileInline("Hello {{world}}");
+        Template t = handlebars.compileInline("Hello {{world}}");
         assertEquals("Hello foo", t.apply(model));
     }
 }
