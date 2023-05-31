@@ -46,7 +46,6 @@ public class SpringBootNotificationConfig {
 
     @Bean
     public PassClient passClient() {
-        // TODO will need pass client env vars
         return PassClient.newInstance();
     }
 

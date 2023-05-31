@@ -43,7 +43,6 @@ public class DefaultNotificationService implements NotificationService {
     @Override
     public void notify(SubmissionEvent submissionEvent) {
 
-        // Retrieve Submission
         SubmissionEvent passSubmissionEvent;
         try {
             passSubmissionEvent = passClient.getObject(SubmissionEvent.class, submissionEvent.getId(),
