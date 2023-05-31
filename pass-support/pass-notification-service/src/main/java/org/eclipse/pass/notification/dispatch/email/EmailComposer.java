@@ -100,7 +100,7 @@ public class EmailComposer {
 
     private void setBccIfNeeded(MimeMessageHelper mimeMessageHelper,
                                Notification notification) throws MessagingException {
-        if (notification.getCc() != null && notification.getCc().size() > 0) {
+        if (notification.getBcc() != null && notification.getBcc().size() > 0) {
             String[] bccs = notification.getBcc().toArray(new String[0]);
             mimeMessageHelper.setBcc(bccs);
         }

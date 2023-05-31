@@ -1,5 +1,4 @@
 {
-  "mode": "${pass.notification.mode}",
   "recipient-config": [
     {
       "mode": "DEMO",

@@ -38,8 +38,8 @@ import javax.jms.Session;
 @Configuration
 public class SpringBootNotificationConfig {
 
-    @Value("${pass.notification.mailer.debug}")
-    private boolean mailerDebug;
+    @Value("${pass.notification.mode}")
+    private Mode notificationMode;
 
     @Value("${pass.notification.configuration}")
     private Resource notificationConfigResource;
@@ -51,7 +51,10 @@ public class SpringBootNotificationConfig {
 
     @Bean
     public NotificationConfig notificationConfiguration(ObjectMapper objectMapper) throws IOException {
-        return objectMapper.readValue(notificationConfigResource.getInputStream(), NotificationConfig.class);
+        NotificationConfig notificationConfig = objectMapper.readValue(notificationConfigResource.getInputStream(),
+            NotificationConfig.class);
+        notificationConfig.setMode(notificationMode);
+        return notificationConfig;
     }
 
     @Bean

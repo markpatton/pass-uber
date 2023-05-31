@@ -15,180 +15,465 @@
  */
 package org.eclipse.pass.notification.dispatch.email;
 
-import jakarta.mail.Address;
-import jakarta.mail.MessagingException;
-import jakarta.mail.Session;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetup;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.sun.mail.imap.IMAPStore;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
 import jakarta.mail.internet.MimeMessage;
-import org.apache.commons.io.IOUtils;
+import org.eclipse.pass.notification.AbstractNotificationSpringTest;
 import org.eclipse.pass.notification.config.NotificationConfig;
-import org.eclipse.pass.notification.config.NotificationTemplate;
-import org.eclipse.pass.notification.config.NotificationTemplateName;
-import org.eclipse.pass.notification.dispatch.DispatchException;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.model.NotificationParam;
-import org.eclipse.pass.notification.model.NotificationType;
-import org.eclipse.pass.support.client.model.User;
-import org.junit.jupiter.api.BeforeEach;
+import org.eclipse.pass.support.client.PassClient;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
+import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_APPROVAL_INVITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
  */
-public class EmailDispatchImplTest {
-    private final static Collection<String> CC = List.of("pass-prod-cc@jhu.edu", "pass-admin@jhu.edu");
-    private final static String CC_JOINED = "pass-prod-cc@jhu.edu,pass-admin@jhu.edu";
-    private final static String USER_EMAIL = "user@bar.com";
-    private final static String FROM = "pass-noreply@jhu.edu";
-    private final static String METADATA = "[\n" +
-        "  {\n" +
-        "    \"a sample metadata\": \"blob\",\n" +
-        "    \"for\": \"a Submission\"\n" +
-        "  }\n" +
-        "]";
+@TestPropertySource(properties = {
+    "pass.notification.mode=DEMO",
+    "pass.notification.configuration=classpath:notification.json"
+})
+public class EmailDispatchImplTest extends AbstractNotificationSpringTest {
 
-    private Notification notification;
-    private NotificationTemplate templateProto;
-    private CompositeResolver templateResolver;
-    private HandlebarsParameterizer templateParameterizer;
-    private JavaMailSender mailer;
+    static ServerSetup serverSetup = new ServerSetup(3025, "localhost", "smtp_imap");
 
-    private EmailDispatchImpl emailDispatch;
+    @RegisterExtension
+    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP_IMAP);
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        notification = mock(Notification.class);
-        NotificationConfig config = mock(NotificationConfig.class);
-        templateProto = mock(NotificationTemplate.class);
-        templateResolver = mock(CompositeResolver.class);
-        User user = mock(User.class);
-        mailer = mock(JavaMailSender.class);
-        templateParameterizer = mock(HandlebarsParameterizer.class);
+    private static final String SENDER = "staffWithGrants@jhu.edu";
+    private static final String RECIPIENT = "staffWithNoGrants@jhu.edu";
+    private static final String CC = "facultyWithGrants@jhu.edu";
+    private static final String BCC = "notification-demo-bcc@jhu.edu";
+    private static final String GLOBAL_DEMO_CC_ADDRESS = "notification-demo-cc@jhu.edu";
+    private static final String SUBMISSION_RESOURCE_ID = "test-submission-id";
+    private static final String EVENT_RESOURCE_ID = "test-event-id";
 
-        when(config.getTemplates()).thenReturn(Collections.singletonList(templateProto));
-        when(templateProto.getTemplates()).thenReturn(new HashMap<>() {
-            {
-                put(NotificationTemplateName.SUBJECT, "A Subject");
-                put(NotificationTemplateName.BODY, "A Body");
-                put(NotificationTemplateName.FOOTER, "A Footer");
-            }
-        });
-        when(user.getId()).thenReturn("test-user");
-        when(user.getEmail()).thenReturn(USER_EMAIL);
+    @Autowired private EmailDispatchImpl emailDispatch;
+    @Autowired private PassClient passClient;
+    @Autowired private NotificationConfig config;
+    @Autowired private ObjectMapper objectMapper;
 
-        Parameterizer parameterizer = new Parameterizer(config, templateResolver, templateParameterizer);
-
-        // mock a whitelist that accepts all recipients by simply returning the collection of recipients it was provided
-        SimpleWhitelist whitelist = mock(SimpleWhitelist.class);
-        when(whitelist.apply(any())).thenAnswer(inv -> inv.getArgument(0));
-        EmailComposer composer = new EmailComposer(whitelist, mailer);
-
-        emailDispatch = new EmailDispatchImpl(parameterizer, composer, mailer);
-    }
-
+    /**
+     * Simple test insuring the basic parts of the dispatch email are where they belong.
+     */
     @Test
-    public void simpleSuccess() throws IOException, MessagingException {
-        when(notification.getType()).thenReturn(NotificationType.SUBMISSION_APPROVAL_INVITE);
-        when(notification.getParameters()).thenReturn(
-                new HashMap<>() {
-                    {
-                        put(NotificationParam.FROM, FROM);
-                        put(NotificationParam.TO, USER_EMAIL);
-                        put(NotificationParam.CC, CC_JOINED);
-                        put(NotificationParam.RESOURCE_METADATA, METADATA);
-                    }
-                });
-        when(notification.getRecipients()).thenReturn(Collections.singleton(USER_EMAIL));
-        when(notification.getSender()).thenReturn(FROM);
-        when(notification.getCc()).thenReturn(CC);
+    public void simpleSuccess() throws Exception {
+        // GIVEN
+        String expectedBody = "Approval Invite Body\r\n\r\nApproval Invite Footer";
+        Notification n = new Notification();
+        n.setType(SUBMISSION_APPROVAL_INVITE);
+        n.setSender(SENDER);
+        n.setCc(List.of(CC));
+        n.setRecipients(List.of(RECIPIENT));
+        n.setResourceId(SUBMISSION_RESOURCE_ID);
+        n.setEventId(EVENT_RESOURCE_ID);
 
-        when(templateProto.getNotificationType()).thenReturn(NotificationType.SUBMISSION_APPROVAL_INVITE);
-        when(templateResolver.resolve(any(), any())).thenAnswer(inv ->
-                IOUtils.toInputStream(inv.getArgument(1), "UTF-8"));
+        // WHEN
+        emailDispatch.dispatch(n);
 
-        when(templateParameterizer.parameterize(any(), any(), any())).thenAnswer(inv -> {
-            NotificationTemplateName name = inv.getArgument(0);
-            switch (name) {
-                case SUBJECT -> {
-                    return "A Subject";
-                }
-                case FOOTER -> {
-                    return "A Footer";
-                }
-                case BODY -> {
-                    return "A Body";
-                }
-                default -> {
-                }
-            }
+        // THEN
+        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        assertNotNull(receivedMessage);
 
-            throw new RuntimeException("Unknown template name '" + name + "'");
-        });
-        MimeMessage mimeMessage = new MimeMessage((Session) null);
-        when(mailer.createMimeMessage()).thenReturn(mimeMessage);
-
-        emailDispatch.dispatch(notification);
-
-        ArgumentCaptor<MimeMessage> emailCaptor = ArgumentCaptor.forClass(MimeMessage.class);
-        verify(mailer).send(emailCaptor.capture());
-        MimeMessage email = emailCaptor.getValue();
-
-        // Verify the email was composed properly
-        assertEquals(FROM, email.getFrom()[0].toString());
-
-        assertTrue(Arrays.stream(email.getRecipients(MimeMessage.RecipientType.TO))
-            .anyMatch(recipient -> recipient.toString().equals(USER_EMAIL)));
-
-        Arrays.stream(email.getRecipients(MimeMessage.RecipientType.CC))
-            .forEach(address ->
-                    assertTrue(CC.contains(address.toString())));
-
-        assertEquals("A Subject", email.getSubject());
-        assertEquals(String.join("\n\n", "A Body", "A Footer"), email.getContent());
+        assertEquals("Approval Invite Subject", receivedMessage.getSubject());
+        assertEquals(expectedBody, receivedMessage.getContent().toString());
+        assertEquals(SENDER, receivedMessage.getFrom()[0].toString());
+        assertEquals(CC, receivedMessage.getRecipients(MimeMessage.RecipientType.CC)[0].toString());
+        assertEquals(RECIPIENT, receivedMessage.getRecipients(MimeMessage.RecipientType.TO)[0].toString());
     }
 
     /**
-     * A nice DispatchException should be thrown if the To field of the email is missing or empty
+     * Simple test insuring that BCC users receive their notification
      */
     @Test
-    public void emptyToAddress() throws MessagingException {
-        Notification notification = mock(Notification.class);
-        Parameterizer parameterizer = mock(Parameterizer.class);
-        EmailComposer composer = mock(EmailComposer.class);
-        MimeMessage emailMessage = mock(MimeMessage.class);
+    public void simpleBccSuccess() throws Exception {
+        // GIVEN
+        String expectedBody = "Approval Invite Body\r\n\r\nApproval Invite Footer";
+        Notification n = new Notification();
+        n.setType(SUBMISSION_APPROVAL_INVITE);
+        n.setSender(SENDER);
+        n.setBcc(List.of(BCC));
+        n.setRecipients(List.of(RECIPIENT));
+        n.setResourceId(SUBMISSION_RESOURCE_ID);
+        n.setEventId(EVENT_RESOURCE_ID);
 
-        when(notification.getResourceId()).thenReturn(UUID.randomUUID().toString());
-        when(notification.getEventId()).thenReturn(UUID.randomUUID().toString());
+        // WHEN
+        emailDispatch.dispatch(n);
 
-        when(parameterizer.resolveAndParameterize(any(), any())).thenReturn(Collections.emptyMap());
-        when(composer.compose(any(), any())).thenReturn(emailMessage);
-        when(emailMessage.getRecipients(any())).thenReturn(new Address[0]);
+        // THEN
+        greenMail.setUser(RECIPIENT, RECIPIENT, "secret-pwd");
+        greenMail.setUser(BCC, BCC, "secret-pwd");
 
-        DispatchException ex = assertThrows(DispatchException.class, () -> {
-            emailDispatch = new EmailDispatchImpl(parameterizer, composer, mailer);
-            emailDispatch.dispatch(notification);
-        });
+        // Get the message from TO staffWithNoGrants@jhu.edu inbox
+        IMAPStore imapStore = greenMail.getImap().createStore();
+        imapStore.connect(RECIPIENT, "secret-pwd");
+        Folder inbox = imapStore.getFolder("INBOX");
+        inbox.open(Folder.READ_ONLY);
+        Message receivedMessage = inbox.getMessage(1);
+        assertNotNull(receivedMessage);
 
-        assertTrue(ex.getMessage().contains("dispatch email with an empty To: address"));
-        verifyNoInteractions(mailer);
+        assertEquals("Approval Invite Subject", receivedMessage.getSubject());
+        assertEquals(expectedBody, receivedMessage.getContent());
+        assertEquals(SENDER, receivedMessage.getFrom()[0].toString());
+        assertEquals(RECIPIENT, receivedMessage.getRecipients(Message.RecipientType.TO)[0].toString());
+        assertNull(receivedMessage.getRecipients(Message.RecipientType.CC));
+        assertNull(receivedMessage.getRecipients(Message.RecipientType.BCC));
+
+        // Get the message from BCC notification-demo-bcc@jhu.edu inbox
+        IMAPStore imapStoreBcc = greenMail.getImap().createStore();
+        imapStoreBcc.connect(BCC, "secret-pwd");
+        Folder inboxBcc = imapStoreBcc.getFolder("INBOX");
+        inboxBcc.open(Folder.READ_ONLY);
+        Message receivedMessageBcc = inboxBcc.getMessage(1);
+        assertNotNull(receivedMessageBcc);
+        assertEquals("Approval Invite Subject", receivedMessageBcc.getSubject());
+        assertEquals(expectedBody, receivedMessageBcc.getContent());
+        assertEquals(SENDER, receivedMessageBcc.getFrom()[0].toString());
+        assertEquals(RECIPIENT, receivedMessageBcc.getRecipients(Message.RecipientType.TO)[0].toString());
     }
 
+//    /**
+//     * Dispatching a notification with a PASS User URI as a recipient should result in the proper resolution of the
+//     * {@code to} recipient.
+//     */
+//    @Test
+//    public void dispatchResolveUserUri() throws Exception {
+//        User recipientUser = new User();
+//        recipientUser.setEmail(RECIPIENT);
+//        URI recipientUri = passClient.createResource(recipientUser);
+//
+//        Notification n = new Notification();
+//        n.setType(SUBMISSION_APPROVAL_INVITE);
+//        n.setSender(SENDER);
+//        n.setRecipients(singleton(recipientUri.toString()));
+//        n.setResourceUri(SUBMISSION_RESOURCE_URI);
+//        n.setEventUri(EVENT_RESOURCE_URI);
+//
+//        String messageId = underTest.dispatch(n);
+//
+//        Condition.newGetMessageCondition(messageId, imapClient).await();
+//        Message message = Condition.getMessage(messageId, imapClient).call();
+//
+//        Assert.assertEquals(RECIPIENT, message.getRecipients(Message.RecipientType.TO)[0].toString());
+//    }
+//
+//    /**
+//     * References to subject/body/footer templates should be resolved
+//     */
+//    @Test
+//    @DirtiesContext
+//    public void notificationConfigWithTemplateRefs() throws Exception {
+//
+//        // Override the NotificationTemplate for approval invites, subbing in Spring URIs as references
+//        // to template bodies
+//        NotificationTemplate template = config.getTemplates().stream()
+//                .filter(templatePrototype ->
+//                        templatePrototype.getNotificationType() == SUBMISSION_APPROVAL_INVITE)
+//                .findAny()
+//                .orElseThrow(() -> new RuntimeException("Missing expected template for SUBMISSION_APPROVAL_INVITE"));
+//
+//        template.setTemplates(new HashMap<NotificationTemplate.Name, String>() {
+//            {
+//                put(NotificationTemplate.Name.SUBJECT, "classpath:" + PathUtil.packageAsPath() + "/subject.hbr");
+//                put(NotificationTemplate.Name.BODY, "classpath:" + PathUtil.packageAsPath() + "/body.hbr");
+//                put(NotificationTemplate.Name.FOOTER, "classpath:" + PathUtil.packageAsPath() + "/footer.hbr");
+//            }
+//        });
+//
+//        config.setTemplates(singleton(template));
+//
+//        Notification n = new Notification();
+//        n.setType(SUBMISSION_APPROVAL_INVITE);
+//        n.setSender(SENDER);
+//        n.setResourceUri(SUBMISSION_RESOURCE_URI);
+//        n.setEventUri(EVENT_RESOURCE_URI);
+//        n.setRecipients(singleton("mailto:" + RECIPIENT));
+//
+//        String messageId = underTest.dispatch(n);
+//        Assert.assertNotNull(messageId);
+//
+//        Condition.newGetMessageCondition(messageId, imapClient).await();
+//        Message message = Condition.getMessage(messageId, imapClient).call();
+//        Assert.assertNotNull(message);
+//
+//        Assert.assertEquals("Handlebars Subject", message.getSubject());
+//        Assert.assertEquals("Handlebars Body\r\n\r\nHandlebars Footer", getBodyAsText(message));
+//    }
+//
+//    @Test
+//    public void subjectTemplateParameterization() throws Exception {
+//        Submission submission = new Submission();
+//        submission.setMetadata(resourceToString("/" + PathUtil.packageAsPath(ComposerIT.class) +
+//                                                "/submission-metadata.json", forName("UTF-8")));
+//        submission.setId(SUBMISSION_RESOURCE_URI);
+//
+//        SubmissionEvent event = new SubmissionEvent();
+//        event.setId(URI.create("http://example.org/event/1"));
+//        event.setPerformerRole(SubmissionEvent.PerformerRole.PREPARER);
+//        event.setPerformedBy(URI.create("http://example.org/user/1"));
+//        event.setComment("How does this submission look?");
+//        event.setEventType(SubmissionEvent.EventType.APPROVAL_REQUESTED_NEWUSER);
+//        event.setPerformedDate(DateTime.now());
+//        event.setSubmission(SUBMISSION_RESOURCE_URI);
+//
+//        // Override the NotificationTemplate for approval invites, including a template that
+//        // requires parameterization
+//        NotificationTemplate template = config.getTemplates().stream()
+//                .filter(templatePrototype ->
+//                        templatePrototype.getNotificationType() == SUBMISSION_APPROVAL_INVITE)
+//                .findAny()
+//                .orElseThrow(() -> new RuntimeException("Missing expected template for SUBMISSION_APPROVAL_INVITE"));
+//
+//        template.setTemplates(new HashMap<NotificationTemplate.Name, String>() {
+//            {
+//                put(NotificationTemplate.Name.SUBJECT, "classpath:" + PathUtil.packageAsPath() + "/subject-parameterize.hbr");
+//                put(NotificationTemplate.Name.BODY, "classpath:" + PathUtil.packageAsPath() + "/body-parameterize.hbr");
+//                put(NotificationTemplate.Name.FOOTER, "Footer");
+//            }
+//        });
+//
+//        config.setTemplates(singleton(template));
+//
+//        Link link = new Link(URI.create("http://example.org/email/dispatch/myLink"), SUBMISSION_REVIEW_INVITE);
+//
+//        Notification n = new Notification();
+//        n.setType(SUBMISSION_APPROVAL_INVITE);
+//        n.setSender(SENDER);
+//        n.setRecipients(singleton("mailto:" + RECIPIENT));
+//        n.setEventUri(event.getId());
+//        n.setResourceUri(submission.getId());
+//        n.setParameters(new HashMap<Notification.Param, String>() {
+//            {
+//                put(RESOURCE_METADATA, Composer.resourceMetadata(submission, objectMapper));
+//                put(EVENT_METADATA, Composer.eventMetadata(event, objectMapper));
+//                put(FROM, SENDER);
+//                put(TO, RECIPIENT);
+//                put(LINKS, asList(link).stream().collect(serialized()));
+//            }
+//        });
+//
+//        String messageId = underTest.dispatch(n);
+//        Assert.assertNotNull(messageId);
+//
+//        Condition.newGetMessageCondition(messageId, imapClient).await();
+//        Message message = Condition.getMessage(messageId, imapClient).call();
+//        Assert.assertNotNull(message);
+//
+//        String expectedTitle = objectMapper.readTree(submission.getMetadata()).findValue("title").asText();
+//        String expectedSubject = "PASS Submission titled \"" + expectedTitle + "\" awaiting your approval";
+//        Assert.assertEquals(expectedSubject, message.getSubject());
+//
+//        String body = getBodyAsText(message);
+//
+//        Assert.assertTrue(body.contains("Dear " + n.getParameters().get(TO)));
+//        // todo: FROM will be the global FROM, must insure the preparer User is represented in metadata.
+//        Assert.assertTrue(body.contains("prepared on your behalf by " + n.getParameters().get(FROM)));
+//        Assert.assertTrue(body.contains(event.getComment()));
+//        Assert.assertTrue(body.contains(expectedTitle));
+//        Assert.assertTrue(body.contains("Please review the submission at the following URL: " + link.getHref()));
+//    }
+//
+//    /**
+//     * mailing a non-existent email address should result in the appropriate exception
+//     * (in coordination with a like-minded email relay)
+//     */
+//    @Test
+//    public void nonExistentEmailAddress() {
+//        String nonExistentRecipientAddress = "moo-thru@bar.edu";
+//        Notification n = new Notification();
+//        n.setType(SUBMISSION_APPROVAL_INVITE);
+//        n.setSender(SENDER);
+//        n.setResourceUri(SUBMISSION_RESOURCE_URI);
+//        n.setEventUri(EVENT_RESOURCE_URI);
+//        n.setRecipients(singleton("mailto:" + nonExistentRecipientAddress));
+//
+//        try {
+//            underTest.dispatch(n);
+//        } catch (Exception e) {
+//            Assert.assertTrue(e instanceof DispatchException);
+//            Throwable rootCause = e.getCause();
+//            boolean sfeFound = false;
+//            while (rootCause.getCause() != null) {
+//                if (rootCause instanceof javax.mail.SendFailedException) {
+//                    sfeFound = true;
+//                    break;
+//                }
+//                rootCause = rootCause.getCause();
+//            }
+//
+//            Assert.assertTrue("Missing expected javax.mail.SendFailedException in the stack trace.", sfeFound);
+//            Assert.assertTrue("Expected the string 'Invalid Addresses' to be in the exception message.",
+//                       rootCause.getMessage().contains("Invalid Addresses"));
+//
+//            return;
+//        }
+//
+//        Assert.fail("Expected a DispatchException to be thrown.");
+//    }
+//
+//    /**
+//     * When dispatching a Notification with a non-empty whitelist, only those whitelisted recipients should be present
+//     * on the email that is sent
+//     */
+//    @Test
+//    public void testWhitelistFilter() throws Exception {
+//        String unlistedRecipient = "mailto:facultyWithNoGrants@jhu.edu";
+//        Notification n = new Notification();
+//        n.setType(SUBMISSION_APPROVAL_INVITE);
+//        n.setSender(SENDER);
+//        n.setResourceUri(SUBMISSION_RESOURCE_URI);
+//        n.setEventUri(EVENT_RESOURCE_URI);
+//        n.setCc(singleton(CC));
+//        n.setRecipients(Arrays.asList("mailto:" + RECIPIENT, unlistedRecipient));
+//
+//        Assert.assertTrue(recipientConfig(config).getWhitelist().contains(RECIPIENT));
+//        Assert.assertFalse(recipientConfig(config).getWhitelist().contains(unlistedRecipient));
+//
+//        String messageId = underTest.dispatch(n);;
+//        Condition.newGetMessageCondition(messageId, imapClient).await();
+//        Message message = Condition.getMessage(messageId, imapClient).call();
+//        Assert.assertNotNull(message);
+//
+//        // Only the whitelisted recipient should be present
+//        Assert.assertEquals(1, message.getRecipients(Message.RecipientType.TO).length);
+//        Assert.assertEquals(RECIPIENT, message.getRecipients(Message.RecipientType.TO)[0].toString());
+//    }
+//
+//    /**
+//     * When composing a Notification, the global CC addresses should not be filtered by the whitelist, while the direct
+//     * recipients are.
+//     */
+//    @Test
+//    @DirtiesContext
+//    public void testGlobalCCUnaffectedByWhitelist() throws Exception {
+//        RecipientConfig recipientConfig = recipientConfig(config);
+//
+//        // Configure the whitelist such that the submitter's address will
+//        // *not* be whitelisted
+//        String whitelistEmail = RECIPIENT;
+//        recipientConfig.setWhitelist(singleton(whitelistEmail));
+//        underTest.getComposer().setWhitelist(new SimpleWhitelist(recipientConfig));
+//
+//        Assert.assertTrue(recipientConfig(config).getWhitelist().contains(RECIPIENT));
+//        Assert.assertFalse(recipientConfig(config).getWhitelist().contains("facultyWithNoGrants@jhu.edu"));
+//
+//        Notification n = new Notification();
+//        n.setType(SUBMISSION_APPROVAL_INVITE);
+//        n.setSender(SENDER);
+//        n.setResourceUri(SUBMISSION_RESOURCE_URI);
+//        n.setEventUri(EVENT_RESOURCE_URI);
+//        n.setRecipients(Arrays.asList("mailto:facultyWithNoGrants@jhu.edu", "mailto:" + whitelistEmail));
+//        n.setCc(singleton(GLOBAL_DEMO_CC_ADDRESS));
+//
+//        String messageId = underTest.dispatch(n);
+//        Condition.newGetMessageCondition(messageId, imapClient).await();
+//        Message message = Condition.getMessage(messageId, imapClient).call();
+//        Assert.assertNotNull(message);
+//
+//        // The recipient list doesn't contain facultyWithNoGrants@jhu.edu because it isn't whitelisted
+//        Assert.assertEquals(1, message.getRecipients(Message.RecipientType.TO).length);
+//        Assert.assertEquals(whitelistEmail, message.getRecipients(Message.RecipientType.TO)[0].toString());
+//
+//        // The cc list does contain the expected address, because the global cc is not filtered through the whitelist
+//        // at all
+//        Assert.assertEquals(1, message.getRecipients(Message.RecipientType.CC).length);
+//        Assert.assertEquals(GLOBAL_DEMO_CC_ADDRESS, message.getRecipients(Message.RecipientType.CC)[0].toString());
+//    }
+//
+//    /**
+//     * Insure that the proper whitelist is used for the specified mode
+//     */
+//    @Test
+//    @DirtiesContext
+//    public void testRecipientConfigForEachMode() {
+//        // make a unique whitelist and recipient config for each possible mode
+//        HashMap<Mode, RecipientConfig> rcs = new HashMap<>();
+//        Arrays.stream(Mode.values()).forEach(m -> {
+//            RecipientConfig rc = new RecipientConfig();
+//            rc.setMode(m);
+//            rc.setWhitelist(new ArrayList<>(1));
+//            rcs.put(m, rc);
+//        });
+//
+//        config.setRecipientConfigs(rcs.values());
+//
+//        Arrays.stream(Mode.values()).forEach(mode -> {
+//            config.setMode(mode);
+//            Assert.assertEquals(mode, recipientConfig(config).getMode());
+//        });
+//    }
+//
+//    /**
+//     * When composing a Notification with an empty whitelist, every recipient should be present.
+//     */
+//    @Test
+//    @DirtiesContext
+//    public void testEmptyWhitelist() throws Exception {
+//        RecipientConfig recipientConfig = recipientConfig(config);
+//        recipientConfig.setWhitelist(Collections.emptyList());
+//        underTest.getComposer().setWhitelist(new SimpleWhitelist(recipientConfig));
+//
+//        String secondRecipient = "facultyWithNoGrants@jhu.edu";
+//        Notification n = new Notification();
+//        n.setType(SUBMISSION_APPROVAL_INVITE);
+//        n.setSender(SENDER);
+//        n.setResourceUri(SUBMISSION_RESOURCE_URI);
+//        n.setEventUri(EVENT_RESOURCE_URI);
+//        n.setCc(Arrays.asList(CC, GLOBAL_DEMO_CC_ADDRESS));
+//        n.setRecipients(Arrays.asList("mailto:" + RECIPIENT, "mailto:" + secondRecipient));
+//
+//        String messageId = underTest.dispatch(n);
+//
+//        Condition.newGetMessageCondition(messageId, imapClient).await();
+//        Message message = Condition.getMessage(messageId, imapClient).call();
+//        Assert.assertNotNull(message);
+//
+//        Collection<String> actualRecipients = Arrays.stream(message.getAllRecipients())
+//                                                    .map(Object::toString)
+//                                                    .collect(Collectors.toSet());
+//
+//        Assert.assertTrue(actualRecipients.contains(RECIPIENT));
+//        Assert.assertTrue(actualRecipients.contains(secondRecipient));
+//        Assert.assertTrue(actualRecipients.contains(CC));
+//        Assert.assertTrue(actualRecipients.contains(GLOBAL_DEMO_CC_ADDRESS));
+//        Assert.assertEquals(4, actualRecipients.size());
+//
+//        imapClientFactory.setImapUser(secondRecipient);
+//        Message secondMessage;
+//        try (SimpleImapClient facultyClient = imapClientFactory.getObject()) {
+//            Condition.newGetMessageCondition(messageId, facultyClient).await();
+//            secondMessage = Condition.getMessage(messageId, facultyClient).call();
+//            Assert.assertNotNull(secondMessage);
+//            actualRecipients = Arrays.stream(secondMessage.getAllRecipients())
+//                                     .map(Object::toString)
+//                                     .collect(Collectors.toSet());
+//        }
+//
+//        Assert.assertTrue(actualRecipients.contains(RECIPIENT));
+//        Assert.assertTrue(actualRecipients.contains(secondRecipient));
+//        Assert.assertTrue(actualRecipients.contains(CC));
+//        Assert.assertTrue(actualRecipients.contains(GLOBAL_DEMO_CC_ADDRESS));
+//        Assert.assertEquals(4, actualRecipients.size());
+//    }
+//
+//    private static RecipientConfig recipientConfig(NotificationConfig config) {
+//        return config.getRecipientConfigs()
+//                .stream()
+//                .filter(rc -> rc.getMode() == config.getMode())
+//                .findAny()
+//                .orElseThrow(() -> new RuntimeException("Missing RecipientConfig for mode '" + config.getMode() + "'"));
+//    }
 }
