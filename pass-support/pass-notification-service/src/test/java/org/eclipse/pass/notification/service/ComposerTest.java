@@ -17,6 +17,7 @@ package org.eclipse.pass.notification.service;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
 import static org.eclipse.pass.notification.service.LinksTest.randomUri;
 import static org.eclipse.pass.notification.service.LinksUtil.deserialize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,11 +30,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.pass.notification.config.Mode;
@@ -67,48 +69,35 @@ public class ComposerTest {
         "{\\\"author\\\":\\\"Raymond J. Playford\\\",\\\"orcid\\\":\\\"http://orcid.org/0000-0003-1235-8504\\\"}]\"}";
 
     private static final String NOTIFICATION_FROM_ADDRESS = "pass-production-noreply@jhu.edu";
-
     private static final List<String> NOTIFICATION_GLOBAL_CC_ADDRESS =
         Arrays.asList("pass@jhu.edu", "pass-prod-cc@jhu.edu");
-
     private static final List<String> NOTIFICATION_GLOBAL_BCC_ADDRESS = singletonList("pass-prod-bcc@jhu.edu");
+    private static final List<Link> generatedSubmissionLinks = asList(
+        new Link(randomUri(), "rel1"),
+        new Link(randomUri(), "rel2"));
 
     private Composer composer;
-
+    private RecipientConfig recipientConfig;
     private SubmissionLinkAnalyzer submissionLinkAnalyzer;
-
-    private static final List<Link> generatedSubmissionLinks = asList(
-            new Link(randomUri(), "rel1"),
-            new Link(randomUri(), "rel2"));
+    private LinkValidator linkValidator;
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
-        Function<Collection<String>, Collection<String>> whitelister = mock(Function.class);
-        NotificationConfig notificationConfig = mock(NotificationConfig.class);
 
-        Mode runtimeMode = Mode.PRODUCTION;
-        RecipientConfig recipientConfig = new RecipientConfig();
-        recipientConfig.setMode(runtimeMode);
+        recipientConfig = new RecipientConfig();
+        recipientConfig.setMode(Mode.PRODUCTION);
         recipientConfig.setFromAddress(NOTIFICATION_FROM_ADDRESS);
         recipientConfig.setGlobalCc(NOTIFICATION_GLOBAL_CC_ADDRESS);
         recipientConfig.setGlobalBcc(NOTIFICATION_GLOBAL_BCC_ADDRESS);
 
-        // all recipients are whitelisted
-        when(whitelister.apply(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(notificationConfig.getMode()).thenReturn(runtimeMode);
-        when(notificationConfig.getRecipientConfigs()).thenReturn(singletonList(recipientConfig));
-
-        ObjectMapper mapper = new ObjectMapper();
-
         submissionLinkAnalyzer = mock(SubmissionLinkAnalyzer.class);
         when(submissionLinkAnalyzer.apply(any(), any())).thenReturn(generatedSubmissionLinks.stream());
 
-        LinkValidator linkValidator = mock(LinkValidator.class);
+        linkValidator = mock(LinkValidator.class);
         when(linkValidator.test(any())).thenReturn(true);
 
         composer = new Composer(recipientConfig,
-            new RecipientAnalyzer(), submissionLinkAnalyzer, linkValidator, mapper);
+            new RecipientAnalyzer(), submissionLinkAnalyzer, linkValidator, new ObjectMapper());
     }
 
     /**
@@ -120,6 +109,10 @@ public class ComposerTest {
         SubmissionEvent event = new SubmissionEvent();
         event.setEventType(EventType.APPROVAL_REQUESTED_NEWUSER);
         event.setId("test-sub-event-id");
+        URI eventLink = randomUri();
+        event.setLink(eventLink);
+        URI userTokenLink = randomUri();
+        event.setUserTokenLink(userTokenLink);
 
         Submission submission = new Submission();
         submission.setMetadata(RESOURCE_METADATA);
@@ -129,10 +122,18 @@ public class ComposerTest {
         submission.setSubmitter(submitter);
         event.setSubmission(submission);
 
+        composer = new Composer(recipientConfig,
+            new RecipientAnalyzer(), new SubmissionLinkAnalyzer(), linkValidator, new ObjectMapper());
+
         Notification notification = composer.apply(submission, event);
 
         verifyNotification(notification, submitter.getEmail(), NotificationType.SUBMISSION_APPROVAL_INVITE);
-        assertLinksPresent(notification, submission, event);
+
+        String serializedLinks = notification.getParameters().get(NotificationParam.LINKS);
+        List<Link> deserializedLinks = new ArrayList<>(deserialize(serializedLinks));
+        assertEquals(1, deserializedLinks.size());
+        assertEquals(userTokenLink, deserializedLinks.get(0).getHref());
+        assertEquals(SUBMISSION_REVIEW_INVITE, deserializedLinks.get(0).getRel());
     }
 
     @Test
