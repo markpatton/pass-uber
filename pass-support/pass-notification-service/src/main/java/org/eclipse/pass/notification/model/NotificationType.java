@@ -14,14 +14,14 @@ public enum NotificationType {
     /**
      * Preparer has requested approval of a Submission by an Authorized Submitter
      */
-    SUBMISSION_APPROVAL_REQUESTED(APPROVAL_REQUESTED_NEWUSER),
+    SUBMISSION_APPROVAL_REQUESTED(APPROVAL_REQUESTED),
 
     /**
      * Preparer has requested approval of a Submission by an Authorized Submitter who does not have a {@code User}
      * in PASS.  The notification will include an invitation to join PASS (and upon login, a {@code User} created
      * for the Authorized Submitter)
      */
-    SUBMISSION_APPROVAL_INVITE(APPROVAL_REQUESTED),
+    SUBMISSION_APPROVAL_INVITE(APPROVAL_REQUESTED_NEWUSER),
 
     /**
      * Authorized Submitter has requested changes to the Submission by the Preparer.
