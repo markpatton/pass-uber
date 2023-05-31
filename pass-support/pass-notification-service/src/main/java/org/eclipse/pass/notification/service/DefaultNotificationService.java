@@ -43,6 +43,8 @@ public class DefaultNotificationService implements NotificationService {
     @Override
     public void notify(SubmissionEvent submissionEvent) {
 
+        // TODO Need to retrieve SubmissionEvent from PASS, include Submission with this
+
         // Retrieve Submission
         Submission submission;
         try {
