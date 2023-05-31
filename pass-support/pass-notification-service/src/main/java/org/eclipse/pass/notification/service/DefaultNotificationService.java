@@ -43,17 +43,16 @@ public class DefaultNotificationService implements NotificationService {
     @Override
     public void notify(SubmissionEvent submissionEvent) {
 
-        // TODO Need to retrieve SubmissionEvent from PASS, include Submission with this
-
         // Retrieve Submission
-        Submission submission;
+        SubmissionEvent passSubmissionEvent;
         try {
-            submission = passClient.getObject(Submission.class, submissionEvent.getSubmission().getId());
+            passSubmissionEvent = passClient.getObject(SubmissionEvent.class, submissionEvent.getId(),
+                "submission", "performedBy");
         } catch (Exception e) {
-            log.error("Unable to retrieve Submission '{}' for SubmissionEvent '{}'",
-                    submissionEvent.getSubmission(), submissionEvent.getId(), e);
+            log.error("Unable to retrieve SubmissionEvent '{}'", submissionEvent.getId(), e);
             return;
         }
+        Submission submission = passSubmissionEvent.getSubmission();
 
         // todo: abstract into a policy of some kind
         if ((submission.getPreparers() == null || submission.getPreparers().isEmpty()) ||
@@ -69,11 +68,10 @@ public class DefaultNotificationService implements NotificationService {
         }
 
         // Compose Notification
-        Notification notification = composer.apply(submission, submissionEvent);
+        Notification notification = composer.apply(submission, passSubmissionEvent);
 
         // Invoke Dispatch
         dispatchService.dispatch(notification);
-
     }
 
 }
