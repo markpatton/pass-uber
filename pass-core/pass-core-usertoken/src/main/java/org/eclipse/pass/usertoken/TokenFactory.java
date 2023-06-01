@@ -129,7 +129,7 @@ public class TokenFactory {
      * @return true if the query has a token parameter in it
      */
     public boolean hasToken(String query) {
-        return userTokenPattern.matcher(query).matches();
+        return query != null && userTokenPattern.matcher(query).matches();
     }
 
     Codec getCodec() {
