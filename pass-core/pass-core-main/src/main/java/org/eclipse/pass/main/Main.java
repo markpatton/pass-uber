@@ -19,13 +19,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Main Spring Boot application.
  */
-@SpringBootApplication
+@SpringBootApplication()
 @EnableScheduling
+@EnableJms
 @ComponentScan(basePackages = {"org.eclipse.pass", "org.eclipse.pass.doi.service",
     "org.eclipse.pass.file.service", "org.eclipse.pass.user", "org.eclipse.pass.metadataschema.service",
     "org.eclipse.pass.policy.service"})
