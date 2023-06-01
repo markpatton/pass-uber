@@ -9,10 +9,6 @@
     </parent>
 
     <artifactId>pass-core-file-service</artifactId>
-<<<<<<< Updated upstream
-    <version>0.7.0-SNAPSHOT</version>
-=======
->>>>>>> Stashed changes
 
     <dependencyManagement>
         <dependencies>
