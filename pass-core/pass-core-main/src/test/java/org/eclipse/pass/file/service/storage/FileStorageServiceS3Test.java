@@ -41,6 +41,10 @@ class FileStorageServiceS3Test {
         properties.setS3RepoPrefix("s3-repo-prefix");
         StorageConfiguration storageConfiguration = new StorageConfiguration(properties);
 
+        // Set properties to make the credentials provider happy
+        System.setProperty("aws.accessKeyId", "A B C");
+        System.setProperty("aws.secretAccessKey", "D E F");
+
         try {
             fileStorageService = new FileStorageService(storageConfiguration, "us-east-1");
         } catch (IOException e) {
