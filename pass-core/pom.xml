@@ -76,13 +76,14 @@
     <rest-assured.version>2.9.0</rest-assured.version>
     <ocfl.java.core.version>1.5.0</ocfl.java.core.version>
     <ocfl.java.aws.version>1.5.0</ocfl.java.aws.version>
-    <springframework.spring.web.version>5.3.12</springframework.spring.web.version>
     <apache.commons.io.version>2.8.0</apache.commons.io.version>
     <apache.commons-lang.version>2.4</apache.commons-lang.version>
     <s3mock.version>0.2.6</s3mock.version>
     <jsoup.version>1.15.3</jsoup.version>
     <mockito.core.version>4.8.1</mockito.core.version>
     <commons.codec.version>1.13</commons.codec.version>
+    <spring.boot.version>2.7.5</spring.boot.version>
+    <amazon.sqs.version>1.0.4</amazon.sqs.version>
   </properties>
 
   <dependencyManagement>
