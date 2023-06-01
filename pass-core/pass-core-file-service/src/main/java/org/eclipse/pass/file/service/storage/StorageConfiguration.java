@@ -31,9 +31,6 @@ import org.springframework.context.annotation.Configuration;
 public class StorageConfiguration {
     private StorageProperties storageProperties;
 
-    private StorageConfiguration() {
-    }
-
     /**
      * StorageConfiguration constructor that initializes the StorageProperties.
      *

@@ -5,8 +5,8 @@ The pass-core-file-service is a RESTful service that provides the ability to upl
 configured persistence store. The service is currently designed to persist to a filesystem or S3 compatible storage.
 
 ## Configuration
-The service is configured via environment variables in the .env file in the pass-core-main module. The service by 
-default will use a filesystem based persistence store and does not require any additional configuration. If the variable
+The service is configured via environment variables.
+The service by default will use a filesystem based persistence store and does not require any additional configuration. If the variable
 PASS_CORE_FILE_SERVICE_ROOT_DIR does not have any value, the File Service will default to the system temp folder and 
 create a temporary root folder of a random value in the system temp. The following environment variables are available 
 for configuring the service:
@@ -18,8 +18,6 @@ for configuring the service:
   - Default: system_tmp/17318424270250529523
 - PASS_CORE_S3_BUCKET_NAME=`bucket-test-name`
 - PASS_CORE_S3_REPO_PREFIX=`s3-repo-prefix`
-- PASS_CORE_S3_REGION=`us-east-1`
-  - This value should be one of the values listed in the [AWS Regions and Endpoints](https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region) documentation.
 - PASS_CORE_S3_ENDPOINT=`http://localhost:9090`
   - If using a custom endpoint for S3, this value should be set to the endpoint URL.
 

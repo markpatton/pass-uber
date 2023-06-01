@@ -19,7 +19,6 @@ package org.eclipse.pass.file.service.storage;
 import java.util.Optional;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import software.amazon.awssdk.regions.Region;
 
 /**
  * StorageProperties are the File Service configuration properties indicating where and what type of storage is used
@@ -29,7 +28,7 @@ import software.amazon.awssdk.regions.Region;
  * @author Tim Sanders
  * @see StorageConfiguration
  */
-@ConfigurationProperties(prefix = "spring.file-service")
+@ConfigurationProperties(prefix = "pass.file-service")
 public class StorageProperties {
     private final static String OCFL_DIR = "ocfl";
     private final static String OCFL_WORK_DIR = "ocfl-work";
@@ -37,7 +36,6 @@ public class StorageProperties {
     private String rootDir;
     private StorageServiceType storageType;
     private String s3BucketName;
-    private String s3Region;
     private String s3Endpoint;
     private String s3RepoPrefix;
 
@@ -107,20 +105,6 @@ public class StorageProperties {
     }
 
     /**
-     * Get the S3 region that is configured for the File Service
-     *
-     * @return The S3 region of the File Service
-     */
-    public Optional<Region> getRegion() {
-        for (Region r : Region.regions()) {
-            if (r.toString().toLowerCase().equals(s3Region)) {
-                return Optional.of(r);
-            }
-        }
-        return null;
-    }
-
-    /**
      * Get the S3 endpoint that is configured for the File Service
      *
      * @return The S3 endpoint of the File Service
@@ -167,15 +151,6 @@ public class StorageProperties {
     }
 
     /**
-     * Set the S3 region that is configured for the File Service
-     *
-     * @param region The S3 region of the File Service
-     */
-    public void setS3Region(String region) {
-        this.s3Region = region;
-    }
-
-    /**
      * Set the S3 endpoint that is configured for the File Service
      *
      * @param endpoint The S3 endpoint of the File Service
@@ -183,5 +158,4 @@ public class StorageProperties {
     public void setS3Endpoint(String endpoint) {
         this.s3Endpoint = endpoint;
     }
-
 }

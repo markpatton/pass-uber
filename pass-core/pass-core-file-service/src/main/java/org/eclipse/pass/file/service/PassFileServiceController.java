@@ -51,6 +51,7 @@ public class PassFileServiceController {
 
     /**
      *   Class constructor.
+     *   @param fileStorageService the FileStorageService
      */
     public PassFileServiceController(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
@@ -129,10 +130,6 @@ public class PassFileServiceController {
     @DeleteMapping("/file/{uuid:.+}/{origFileName:.+}")
     public ResponseEntity<?> deleteFileById(@PathVariable String uuid, @PathVariable String origFileName) {
         String fileId = uuid + "/" + origFileName;
-        if (fileId == null) {
-            LOG.error("File ID not provided to delete file.");
-            return ResponseEntity.notFound().build();
-        }
         fileStorageService.deleteFile(fileId);
         return ResponseEntity.ok().body("Deleted");
     }

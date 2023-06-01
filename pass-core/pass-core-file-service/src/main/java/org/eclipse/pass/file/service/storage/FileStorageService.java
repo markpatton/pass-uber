@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLConnection;
-import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,12 +43,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
@@ -85,9 +85,9 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 public class FileStorageService {
     private static final Logger LOG = LoggerFactory.getLogger(FileStorageService.class);
 
-    private final Path tempLoc;
-    private final StorageServiceType storageType;
-    private final OcflRepository ocflRepository;
+    private Path tempLoc;
+    private StorageServiceType storageType;
+    private OcflRepository ocflRepository;
     private Path ocflLoc;
     private S3Client cloudS3Client;
     private String bucketName;
@@ -95,12 +95,11 @@ public class FileStorageService {
 
     /**
      *  FileStorageService Class constructor.
-     * @param storageConfiguration A set of configuration properties of the File Service. These properties are
-     * set in the .env file in the pass-core-main module.
-     * @throws FileSystemException If the File Service directories cannot be created and readable/writeble a
-     * FileSystemException will be thrown
+     * @param storageConfiguration A set of configuration properties of the File Service.
+     * @throws IOException
      */
-    public FileStorageService(StorageConfiguration storageConfiguration) throws IOException {
+    public FileStorageService(StorageConfiguration storageConfiguration,
+            @Value("${aws.region}") String awsRegion) throws IOException {
         StorageProperties storageProperties = storageConfiguration.getStorageProperties();
         storageType = storageProperties.getStorageType();
 
@@ -163,31 +162,29 @@ public class FileStorageService {
                 throw new IOException("File Service: S3 bucket name is not set");
             }
 
-            Region region;
-            if (storageProperties.getRegion().isPresent()) {
-                region = storageProperties.getRegion().get();
-            } else {
-                throw new IOException("File Service: S3 region is not set");
-            }
-
             //repoPrefix is not required
             if (storageProperties.getS3RepoPrefix().isPresent()) {
                 repoPrefix = storageProperties.getS3RepoPrefix().get();
             }
 
+            if (awsRegion == null) {
+                throw new IOException("AWS region not set");
+            }
+
+            Region region = Region.of(awsRegion);
+
             //endpoint is not required, but if one is supplied then S3 client is built with endpoint override
             if (storageProperties.getS3Endpoint().isPresent()) {
                 String endpoint = storageProperties.getS3Endpoint().get();
                 cloudS3Client = S3Client.builder()
-                        .credentialsProvider(AnonymousCredentialsProvider.create())
+                        .credentialsProvider(DefaultCredentialsProvider.create())
                         .region(region)
                         .endpointOverride(URI.create(endpoint))
                         .build();
                 LOG.info("File Service: S3 client built with endpoint override");
-            } else if (!storageProperties.getS3Endpoint().isPresent() && storageProperties.getRegion().isPresent()) {
-                //TODO credentials will need to be setup for S3
+            } else {
                 cloudS3Client = S3Client.builder()
-                        .credentialsProvider(AnonymousCredentialsProvider.create())
+                        .credentialsProvider(DefaultCredentialsProvider.create())
                         .region(region)
                         .build();
                 LOG.info("File Service: S3 client built");
