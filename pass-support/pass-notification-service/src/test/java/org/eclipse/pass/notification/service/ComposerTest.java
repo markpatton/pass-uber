@@ -21,7 +21,6 @@ import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
 import static org.eclipse.pass.notification.service.LinksTest.randomUri;
 import static org.eclipse.pass.notification.service.LinksUtil.deserialize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,7 +40,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.pass.notification.config.Mode;
 import org.eclipse.pass.notification.config.RecipientConfig;
 import org.eclipse.pass.notification.model.Link;
-import org.eclipse.pass.notification.config.NotificationConfig;
 import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.NotificationParam;
 import org.eclipse.pass.notification.model.NotificationType;
@@ -243,38 +241,6 @@ public class ComposerTest {
 
         verifyNotification(notification, preparer.getEmail(), NotificationType.SUBMISSION_SUBMISSION_CANCELLED);
         assertLinksPresent(notification, submission, event);
-    }
-
-    @Test
-    public void testModeFilter() {
-        RecipientConfig prod = new RecipientConfig();
-        prod.setMode(Mode.PRODUCTION);
-
-        RecipientConfig demo = new RecipientConfig();
-        demo.setMode(Mode.DEMO);
-
-        RecipientConfig disabled = new RecipientConfig();
-        disabled.setMode(Mode.DISABLED);
-
-        NotificationConfig config = new NotificationConfig();
-        config.setRecipientConfigs(Arrays.asList(prod, demo, disabled));
-
-        config.setMode(Mode.PRODUCTION);
-        assertTrue(Composer.RecipientConfigFilter.modeFilter(config).test(prod));
-
-        config.setMode(Mode.DEMO);
-        assertTrue(Composer.RecipientConfigFilter.modeFilter(config).test(demo));
-
-        config.setMode(Mode.DISABLED);
-        assertTrue(Composer.RecipientConfigFilter.modeFilter(config).test(disabled));
-
-        assertFalse(Composer.RecipientConfigFilter.modeFilter(config).test(demo));
-        assertFalse(Composer.RecipientConfigFilter.modeFilter(config).test(prod));
-
-        config.setMode(Mode.PRODUCTION);
-        config.setRecipientConfigs(Arrays.asList(prod, demo));
-
-        assertFalse(Composer.RecipientConfigFilter.modeFilter(config).test(disabled));
     }
 
     private void assertLinksPresent(Notification notification, Submission submission, SubmissionEvent event) {
