@@ -106,10 +106,4 @@ public class EmailComposer {
         }
     }
 
-    private static String csvString(Stream<String> values) {
-        return values
-            .filter(v -> v.length() > 0)
-            .collect(Collectors.joining(","));
-    }
-
 }

@@ -38,7 +38,6 @@ import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.notification.dispatch.email.EmailComposer;
 import org.eclipse.pass.notification.service.ComposerIT;
 import org.eclipse.pass.notification.model.Link;
-import org.eclipse.pass.notification.util.PathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -38,10 +38,12 @@ import java.util.ArrayList;
 public class NotificationConfigTest extends AbstractNotificationSpringTest {
 
     @Autowired private NotificationConfig notificationConfig;
+    @Autowired private RecipientConfig recipientConfig;
 
     @Test
-    public void testLoadNotificationConfig() {
+    void testLoadNotificationConfig() {
         assertEquals(DEMO, notificationConfig.getMode());
+        assertEquals(DEMO, recipientConfig.getMode());
         assertEquals(2, notificationConfig.getRecipientConfigs().size());
         notificationConfig.getRecipientConfigs()
                 .stream().filter(rc -> rc.getMode() == PRODUCTION).findAny()
@@ -77,4 +79,5 @@ public class NotificationConfigTest extends AbstractNotificationSpringTest {
         assertTrue(recipientConfigDemo.getWhitelist().contains("apb@jhu.edu"));
         assertTrue(recipientConfigDemo.getWhitelist().contains("khanson@jhu.edu"));
     }
+
 }

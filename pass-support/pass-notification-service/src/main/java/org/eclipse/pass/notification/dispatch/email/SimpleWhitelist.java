@@ -74,10 +74,6 @@ public class SimpleWhitelist implements Function<Collection<String>, Collection<
     }
 
     private static boolean isWhitelisted(String candidate, Collection<String> whitelist) {
-        // an empty or null whitelist is carries the semantics "any recipient is whitelisted"
-        if (whitelist == null || whitelist.isEmpty()) {
-            return true;
-        }
 
         return whitelist.stream().map(String::toLowerCase).anyMatch(candidate::equals);
     }

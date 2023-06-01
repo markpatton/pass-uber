@@ -79,7 +79,7 @@ public class RecipientAnalyzer implements BiFunction<Submission, SubmissionEvent
     }
 
     private Optional<String> submitterEmail(Submission s) {
-        return Optional.ofNullable(s.getSubmitterEmail()).map(URI::toString);
+        return Optional.ofNullable(s.getSubmitterEmail()).map(URI::getSchemeSpecificPart);
     }
 
 }
