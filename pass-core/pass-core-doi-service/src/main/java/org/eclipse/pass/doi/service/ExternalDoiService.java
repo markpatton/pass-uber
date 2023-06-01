@@ -26,9 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.json.JsonObject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * ExternalDoiService classes provide configuration needed for specific implementations'
  * connections, as well as a method to process the raw JSON object returned by the external service to
@@ -37,8 +34,6 @@ import org.slf4j.LoggerFactory;
  * @author jrm
  */
 public abstract class ExternalDoiService {
-    private static final Logger LOG = LoggerFactory.getLogger(ExternalDoiService.class);
-
     private final Set<String> activeJobSet = new HashSet<>();
     private final Set<String> syncActiveJobSet = Collections.synchronizedSet(activeJobSet);
 
@@ -81,7 +76,6 @@ public abstract class ExternalDoiService {
      * @return the valid suffix, or null if invalid
      */
     String verify(String doi) {
-        LOG.debug("Verifying doi format for " + doi );
         if (doi == null) {
             return null;
         }
@@ -105,7 +99,7 @@ public abstract class ExternalDoiService {
     boolean isAlreadyActive(String doi) {
         //check cache map for existence of doi
         //put doi on map if absent
-        LOG.debug("Checking to see if doi " + doi + " is already in process");
+
         if (syncActiveJobSet.contains(doi)) {
             return true;
         } else {
@@ -142,6 +136,7 @@ public abstract class ExternalDoiService {
             this.duration = duration;
         }
 
+        @Override
         public void run() {
             try {
                 sleep(duration);

@@ -43,6 +43,9 @@ public class PassDoiServiceController {
     private final ExternalDoiService xrefDoiService;
     private final ExternalDoiService unpaywallDoiService;
 
+    /**
+     * @param refreshableElide the RefreshableElide
+     */
     public PassDoiServiceController(RefreshableElide refreshableElide) {
         this.elideConnector = new ElideConnector(refreshableElide);
         this.externalDoiServiceConnector = new ExternalDoiServiceConnector();
@@ -65,9 +68,6 @@ public class PassDoiServiceController {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
-
-        LOG.info("Servicing new " + externalService.name() + " request ... ");
-        LOG.debug("Context path: " + request.getContextPath() + "; query string " + request.getQueryString());
 
         //we will call out to crossref and collect the work JSON object
         //the value of this parameter is expected to be already URIencoded
@@ -96,7 +96,7 @@ public class PassDoiServiceController {
                                             .build();
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(429);
-                LOG.info(message);
+                LOG.warn(message);
             }
         }
 
@@ -111,7 +111,7 @@ public class PassDoiServiceController {
                                             .build();
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(500);
-                LOG.info(message);
+                LOG.warn(message);
             }
         } else if (xrefJsonObject.getJsonString("error") != null) {
             int responseCode;
@@ -130,7 +130,7 @@ public class PassDoiServiceController {
                                             .build();
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(responseCode);
-                LOG.info(message);
+                LOG.warn(message);
             }
         } else {
             // have a non-empty string to process
@@ -145,7 +145,6 @@ public class PassDoiServiceController {
 
                     out.write(jsonObject.toString().getBytes());
                     response.setStatus(200);
-                    LOG.info("Returning result for DOI " + doi);
                 }
 
             } else {
@@ -158,7 +157,7 @@ public class PassDoiServiceController {
                                                 .build();
                     out.write(jsonObject.toString().getBytes());
                     response.setStatus(422);
-                    LOG.info(message);
+                    LOG.warn(message);
                 }
             }
         }
@@ -180,9 +179,6 @@ public class PassDoiServiceController {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
-
-        LOG.info("Servicing new " + externalService.name() + " request ... ");
-        LOG.debug("Context path: " + request.getContextPath() + "; query string " + request.getQueryString());
 
         //we will call out to unpaywall and collect the JSON object
         //the value of this parameter is expected to be already URIencoded
@@ -211,7 +207,7 @@ public class PassDoiServiceController {
                                             .build();
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(429);
-                LOG.info(message);
+                LOG.warn(message);
             }
         }
 
@@ -226,13 +222,12 @@ public class PassDoiServiceController {
                                             .build();
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(500);
-                LOG.info(message);
+                LOG.warn(message);
             }
         } else if (
             unpaywallJsonObject.containsKey("error") &&
             unpaywallJsonObject.getValue("/error").toString().equals("true")
         ) {
-            LOG.debug(unpaywallJsonObject.toString());
             int responseCode;
             String message;
 
@@ -253,7 +248,7 @@ public class PassDoiServiceController {
                                             .build();
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(responseCode);
-                LOG.info(message);
+                LOG.warn(message);
             }
         } else {
             // have a non-empty JSON string to process
@@ -261,7 +256,6 @@ public class PassDoiServiceController {
                 JsonObject jsonObject = externalService.processObject(unpaywallJsonObject);
                 out.write(jsonObject.toString().getBytes());
                 response.setStatus(200);
-                LOG.info("Returning " + externalService.name() + " result for DOI " + doi);
             }
         }
     }

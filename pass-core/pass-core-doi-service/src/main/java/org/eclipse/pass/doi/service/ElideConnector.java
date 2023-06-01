@@ -29,7 +29,6 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 
 import com.yahoo.elide.RefreshableElide;
-import org.eclipse.pass.object.ElideDataStorePassClient;
 import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.PassClientSelector;
@@ -62,15 +61,6 @@ public class ElideConnector {
     }
 
     /**
-     * This method gets the PassClient to perform data model operations
-     *
-     * @return a new PassClient
-     */
-    protected PassClient getNewClient() {
-        return new ElideDataStorePassClient(refreshableElide);
-    }
-
-    /**
      * This is the only method interfacing with the repo that the Servlet calls -
      * it orchestrates the process of building a Journal object from the supplied JSON object,
      * seeing if the Journal is present in PASS, creating or updating that Journal if needed,
@@ -83,25 +73,20 @@ public class ElideConnector {
 
         String journalId = null;
 
-        try (PassClient passClient = getNewClient()) {
-
+        try (PassClient passClient = PassClient.newInstance(refreshableElide)) {
             // we have something JSONy, let's build a journal object from it
-            LOG.debug("Building pass journal");
             Journal journal = buildPassJournal(xrefJsonObject);
 
             // and compare it with what we already have in PASS, updating PASS if necessary
-            LOG.debug("Comparing journal object with possible PASS version");
             Journal updatedJournal = updateJournalInPass(journal, passClient);
 
             //we return the journal id if we have one
 
             if (updatedJournal != null) {
                 journalId = updatedJournal.getId().toString();
-                LOG.debug("Journal with id " + journalId + " successfully processed");
             }
-
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error("Error resolving journal", e);
         }
         return journalId;
     }
@@ -115,9 +100,6 @@ public class ElideConnector {
      * @return the PASS journal object;s id
      */
     protected Journal buildPassJournal(JsonObject metadata) {
-
-        LOG.debug("JSON input (from Crossref): " + metadata.toString());
-
         final String XREF_MESSAGE = "message";
         final String XREF_TITLE = "container-title";
         final String XREF_ISSN_TYPE_ARRAY = "issn-type";
@@ -158,7 +140,6 @@ public class ElideConnector {
 
                 if (value.length() > 0) {
                     passJournal.getIssns().add(String.join(":", type, value));
-                    LOG.debug("Adding typed ISSN to journal object: " + String.join(":", type, value));
                 }
             }
         }
@@ -191,7 +172,6 @@ public class ElideConnector {
      * @throws IOException if the connection to Elide was unsuccessful
      */
     protected Journal updateJournalInPass(Journal journal, PassClient passClient) throws IOException {
-        LOG.debug("GETTING NAME and  ISSNS for Journal with nme " + journal.getJournalName());
         List<String> issns = journal.getIssns();
         String name = journal.getJournalName();
 
@@ -207,7 +187,7 @@ public class ElideConnector {
                 passJournal = new Journal(find(name, issns, passClient));
             } else {
                 // do not have enough to create a new journal
-                LOG.debug("Not enough info for journal " + name);
+                LOG.warn("Not enough info for journal " + name);
             }
         } else { //we have a journal, let's see if we can add anything new
             // just issns atm. we add only if not present

@@ -60,8 +60,6 @@ public class ExternalDoiServiceConnector {
      * @return a string representing the works object if successful; an empty string if not found; null if IO exception
      */
     JsonObject retrieveMetadata(String doi, ExternalDoiService service) {
-        LOG.debug("Attempting to retrieve " + service.name() + "metadata for doi " + doi);
-
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(service.baseUrl() + doi)).newBuilder();
 
         if ( service.parameterMap() != null ) {
