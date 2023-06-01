@@ -48,7 +48,7 @@ public class LinkValidator implements Predicate<Link> {
      * <p>
      * Any rules that pertain to the matching link relation will be applied. Rules that contain a "*" will match all
      * links
-     * <p>
+     * </p>
      *
      * @param link Link to test.
      */

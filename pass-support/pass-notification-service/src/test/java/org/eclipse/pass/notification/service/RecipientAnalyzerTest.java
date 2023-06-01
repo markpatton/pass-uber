@@ -133,7 +133,7 @@ public class RecipientAnalyzerTest {
         URI expectedRecipient = URI.create("mailto:ex@ample.org");
         when(submission.getSubmitterEmail()).thenReturn(expectedRecipient);
 
-        perform(singleton(expectedRecipient.toString()), EventType.APPROVAL_REQUESTED_NEWUSER);
+        perform(singleton(expectedRecipient.getSchemeSpecificPart()), EventType.APPROVAL_REQUESTED_NEWUSER);
 
         verify(submission).getSubmitter();
         verify(submission).getSubmitterEmail();

@@ -15,8 +15,9 @@
  *  * limitations under the License.
  *
  */
-
 package org.eclipse.pass.notification.dispatch.email;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -24,8 +25,6 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InlineTemplateResolverTest {
 

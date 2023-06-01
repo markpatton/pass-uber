@@ -18,7 +18,8 @@ public class SubmissionEventListener {
     private final NotificationConfig notificationConfig;
 
     // TODO there will be a queue for submissionevents
-    @JmsListener(destination = "${pass.notification.queue.event.name}", containerFactory = "jmsListenerContainerFactory")
+    @JmsListener(destination = "${pass.notification.queue.event.name}",
+        containerFactory = "jmsListenerContainerFactory")
     public void processMessage(SubmissionEvent submissionEvent) {
         log.trace("Receiving SubmissionEvent: {}", submissionEvent.getId());
         if (Mode.DISABLED == notificationConfig.getMode()) {

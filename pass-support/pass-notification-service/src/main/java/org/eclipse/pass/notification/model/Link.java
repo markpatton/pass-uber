@@ -15,12 +15,12 @@
  */
 package org.eclipse.pass.notification.model;
 
+import java.net.URI;
+import java.util.Objects;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.net.URI;
-import java.util.Objects;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)

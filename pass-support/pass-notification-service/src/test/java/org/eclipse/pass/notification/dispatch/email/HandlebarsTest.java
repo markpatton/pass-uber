@@ -17,6 +17,8 @@
  */
 package org.eclipse.pass.notification.dispatch.email;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -24,8 +26,6 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HandlebarsTest {
 

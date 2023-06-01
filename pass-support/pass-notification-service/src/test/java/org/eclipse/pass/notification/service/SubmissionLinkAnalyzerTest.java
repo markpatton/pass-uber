@@ -15,15 +15,15 @@
  */
 package org.eclipse.pass.notification.service;
 
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_VIEW;
+import static org.eclipse.pass.notification.service.LinksTest.randomUri;
 import static org.eclipse.pass.support.client.model.EventType.APPROVAL_REQUESTED;
 import static org.eclipse.pass.support.client.model.EventType.APPROVAL_REQUESTED_NEWUSER;
 import static org.eclipse.pass.support.client.model.EventType.CANCELLED;
 import static org.eclipse.pass.support.client.model.EventType.CHANGES_REQUESTED;
 import static org.eclipse.pass.support.client.model.EventType.SUBMITTED;
-import static org.eclipse.pass.notification.service.LinksTest.randomUri;
-import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW;
-import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
-import static org.eclipse.pass.notification.model.Link.SUBMISSION_VIEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,9 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.net.URI;
 import java.util.List;
 
+import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
-import org.eclipse.pass.notification.model.Link;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

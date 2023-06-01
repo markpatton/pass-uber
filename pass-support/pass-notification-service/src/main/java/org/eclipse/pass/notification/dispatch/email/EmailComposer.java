@@ -20,16 +20,14 @@ import static java.lang.String.join;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.eclipse.pass.notification.dispatch.DispatchException;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;

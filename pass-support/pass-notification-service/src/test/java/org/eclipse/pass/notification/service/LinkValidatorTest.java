@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.config.LinkValidationRule;
 import org.eclipse.pass.notification.config.NotificationConfig;
+import org.eclipse.pass.notification.model.Link;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -15,13 +15,13 @@
  */
 package org.eclipse.pass.notification.service;
 
-import org.junit.jupiter.api.Test;
-
-import java.net.URI;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.net.URI;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)

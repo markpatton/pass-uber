@@ -17,18 +17,18 @@
  */
 package org.eclipse.pass.notification.dispatch.email;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 import org.eclipse.pass.notification.AbstractNotificationSpringTest;
 import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CompositeResolverTest extends AbstractNotificationSpringTest {
 

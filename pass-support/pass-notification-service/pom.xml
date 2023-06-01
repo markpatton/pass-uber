@@ -55,6 +55,10 @@
         <handlebars.version>4.1.0</handlebars.version>
         <javamail.version>1.6.2</javamail.version>
         <aspectjrt.version>1.9.1</aspectjrt.version>
+        <pass.core.port>8080</pass.core.port>
+        <pass.core.url>http://localhost:8080</pass.core.url>
+        <pass.core.user>backend</pass.core.user>
+        <pass.core.password>backend</pass.core.password>
     </properties>
 
     <dependencies>
@@ -219,300 +223,117 @@
             <plugins>
 
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                </plugin>
-
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-failsafe-plugin</artifactId>-->
-<!--                    <version>${maven-failsafe-plugin.version}</version>-->
-<!--                    <configuration>-->
-<!--                        <systemProperties>-->
-<!--                            <pass.fedora.user>${pass.fedora.user}</pass.fedora.user>-->
-<!--                            <pass.fedora.password>${pass.fedora.password}</pass.fedora.password>-->
-<!--                            <pass.fedora.baseurl>${pass.fedora.baseurl}</pass.fedora.baseurl>-->
-<!--                            <pass.elasticsearch.url>${pass.elasticsearch.url}</pass.elasticsearch.url>-->
-<!--                            <pass.elasticsearch.limit>${pass.elasticsearch.limit}</pass.elasticsearch.limit>-->
-<!--                            <fcrepo.host>${fcrepo.server}</fcrepo.host>-->
-<!--                            <jms.host>${jms.host}</jms.host>-->
-<!--                            <jms.port>${jms.port}</jms.port>-->
-<!--                            <es.host>${es.server}</es.host>-->
-<!--                            <es.port>${es.http.port}</es.port>-->
-<!--                            <pass.notification.smtp.host>${mail.server}</pass.notification.smtp.host>-->
-<!--                            <pass.notification.smtp.port>${mail.msp.port}</pass.notification.smtp.port>-->
-<!--                            <pass.notification.smtp.transport>SMTP</pass.notification.smtp.transport>-->
-<!--                            <http.agent>${http.agent}</http.agent>-->
-
-<!--                            &lt;!&ndash; Used by some ITs &ndash;&gt;-->
-<!--                            <pass.jsonld.context>${pass.jsonld.context}</pass.jsonld.context>-->
-
-<!--                            &lt;!&ndash; IMAP properties for ITs &ndash;&gt;-->
-<!--                            <mail.imap.host>${mail.imap.host}</mail.imap.host>-->
-<!--                            <mail.imap.port>${mail.imap.port}</mail.imap.port>-->
-<!--                            <mail.imap.ssl.enable>${mail.imap.ssl.enable}</mail.imap.ssl.enable>-->
-<!--                            <mail.imap.ssl.trust>${mail.imap.ssl.trust}</mail.imap.ssl.trust>-->
-<!--                            <mail.imap.starttls.enable>${mail.imap.starttls.enable}</mail.imap.starttls.enable>-->
-<!--                            <mail.imap.finalizecleanclose>${mail.imap.finalizecleanclose}</mail.imap.finalizecleanclose>-->
-<!--                            <mail.imap.connectiontimeout>${mail.imap.connectiontimeout}</mail.imap.connectiontimeout>-->
-<!--                            <mail.imap.timeout>${mail.imap.timeout}</mail.imap.timeout>-->
-
-<!--                            &lt;!&ndash; Default username / password when connecting to IMAP &ndash;&gt;-->
-<!--                            &lt;!&ndash; Override by setting the desired credentials on the SimpleImapClientFactory &ndash;&gt;-->
-<!--                            <mail.imap.user>${mail.imap.user}</mail.imap.user>-->
-<!--                            <mail.imap.password>${mail.imap.password}</mail.imap.password>-->
-<!--                        </systemProperties>-->
-<!--                    </configuration>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <goals>-->
-<!--                                <goal>integration-test</goal>-->
-<!--                                <goal>verify</goal>-->
-<!--                            </goals>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
-
-<!--                <plugin>-->
-<!--                    <groupId>org.codehaus.mojo</groupId>-->
-<!--                    <artifactId>build-helper-maven-plugin</artifactId>-->
-<!--                    <version>${build-helper-maven-plugin.version}</version>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <id>reserve-network-port</id>-->
-<!--                            <goals>-->
-<!--                                <goal>reserve-network-port</goal>-->
-<!--                            </goals>-->
-<!--                            <phase>process-resources</phase>-->
-<!--                            <configuration>-->
-<!--                                <portNames>-->
-<!--                                    <portName>mail.smtp.port</portName>-->
-<!--                                    <portName>mail.imap.port</portName>-->
-<!--                                    <portName>mail.imaps.port</portName>-->
-<!--                                    <portName>mail.msp.port</portName>-->
-<!--                                    <portName>fcrepo.http.port</portName>-->
-<!--                                    <portName>jms.port</portName>-->
-<!--                                    <portName>es.http.port</portName>-->
-<!--                                </portNames>-->
-<!--                            </configuration>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
-
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-jar-plugin</artifactId>-->
-<!--                    <version>${maven-jar-plugin.version}</version>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <goals>-->
-<!--                                <goal>test-jar</goal>-->
-<!--                            </goals>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>${maven-shade-plugin.version}</version>
-                </plugin>
-
-<!--                <plugin>-->
-<!--                    <groupId>io.fabric8</groupId>-->
-<!--                    <artifactId>docker-maven-plugin</artifactId>-->
-<!--                    <version>${docker-maven-plugin.version}</version>-->
-<!--                    <configuration>-->
-
-<!--                        <images>-->
-
-<!--                            <image>-->
-<!--                                <alias>mail</alias>-->
-<!--                                <name>${it.image.mail.name}</name>-->
-<!--                                <run>-->
-<!--                                    <wait>-->
-<!--                                        <time>${mail.waitms}</time>-->
-<!--                                    </wait>-->
-<!--                                    <skip>${mail.skip}</skip>-->
-<!--                                    <hostname>mail</hostname>-->
-<!--                                    <domainname>local.domain</domainname>-->
-<!--                                    <ports>-->
-<!--                                        <port>${mail.imaps.port}:993</port>-->
-<!--                                        <port>${mail.msp.port}:587</port>-->
-<!--                                    </ports>-->
-<!--                                    <volumes>-->
-<!--                                        <bind>-->
-<!--                                            <volume>maildata:/var/mail</volume>-->
-<!--                                            <volume>mailstate:/var/mail-state</volume>-->
-<!--                                        </bind>-->
-<!--                                    </volumes>-->
-<!--                                    <links>-->
-<!--                                        <link>ldap</link>-->
-<!--                                    </links>-->
-<!--                                    <env>-->
-<!--                                        <HOSTNAME>mail</HOSTNAME>-->
-<!--                                        <DOMAINNAME>jhu.edu</DOMAINNAME>-->
-<!--                                        <DMS_DEBUG>0</DMS_DEBUG>-->
-<!--                                        <ONE_DIR>1</ONE_DIR>-->
-<!--                                        <SMTP_ONLY>0</SMTP_ONLY>-->
-<!--                                        <PERMIT_DOCKER>network</PERMIT_DOCKER>-->
-<!--                                        <OVERRIDE_HOSTNAME>mail.jhu.edu</OVERRIDE_HOSTNAME>-->
-<!--                                        <TLS_LEVEL>intermediate</TLS_LEVEL>-->
-<!--                                        <ENABLE_SPAMASSASSIN>0</ENABLE_SPAMASSASSIN>-->
-<!--                                        <ENABLE_CLAMAV>0</ENABLE_CLAMAV>-->
-<!--                                        <ENABLE_FAIL2BAN>0</ENABLE_FAIL2BAN>-->
-<!--                                        <ENABLE_POSTGREY>0</ENABLE_POSTGREY>-->
-<!--                                        <ENABLE_SASLAUTHD>0</ENABLE_SASLAUTHD>-->
-<!--                                        <POSTMASTER_ADDRESS>root</POSTMASTER_ADDRESS>-->
-<!--                                        <ENABLE_LDAP>1</ENABLE_LDAP>-->
-<!--                                        <LDAP_SERVER_HOST>ldap</LDAP_SERVER_HOST>-->
-<!--                                        <LDAP_SEARCH_BASE>ou=People,dc=pass</LDAP_SEARCH_BASE>-->
-<!--                                        <LDAP_BIND_DN>cn=admin,dc=pass</LDAP_BIND_DN>-->
-<!--                                        <LDAP_BIND_PW>password</LDAP_BIND_PW>-->
-<!--                                        <LDAP_QUERY_FILTER_USER>(&amp;(objectClass=posixAccount)(mail=%s))</LDAP_QUERY_FILTER_USER>-->
-<!--                                        <LDAP_QUERY_FILTER_GROUP>(&amp;(objectClass=posixAccount)(mailGroupMember=%s))</LDAP_QUERY_FILTER_GROUP>-->
-<!--                                        <LDAP_QUERY_FILTER_ALIAS>(&amp;(objectClass=posixAccount)(mailAlias=%s))</LDAP_QUERY_FILTER_ALIAS>-->
-<!--                                        <LDAP_QUERY_FILTER_DOMAIN>(|(mail=*@%s)(mailalias=*@%s)(mailGroupMember=*@%s))</LDAP_QUERY_FILTER_DOMAIN>-->
-<!--                                        <SSL_TYPE>manual</SSL_TYPE>-->
-<!--                                        <SSL_CERT_PATH>/tmp/docker-mailserver/cert.pem</SSL_CERT_PATH>-->
-<!--                                        <SSL_KEY_PATH>/tmp/docker-mailserver/key.rsa</SSL_KEY_PATH>-->
-<!--                                    </env>-->
-<!--                                </run>-->
-<!--                            </image>-->
-
-<!--                            <image>-->
-<!--                                <alias>fcrepo</alias>-->
-<!--                                <name>${it.image.fcrepo.name}</name>-->
-<!--                                <run>-->
-<!--                                    <skip>${fcrepo.skip}</skip>-->
-<!--                                    <wait>-->
-<!--                                        &lt;!&ndash; Should use ${pass.fedora.baseurl}, but need to add authentication params to the URL &ndash;&gt;-->
-<!--                                        <url>-->
-<!--                                            http://${pass.fedora.user}:${pass.fedora.password}@${fcrepo.server}:${fcrepo.http.port}/fcrepo/rest/-->
-<!--                                        </url>-->
-<!--                                        <time>180000</time>-->
-<!--                                    </wait>-->
-<!--                                    <ports>-->
-<!--                                        <port>${fcrepo.http.port}:${fcrepo.http.port}</port>-->
-<!--                                        <port>${jms.port}:${jms.port}</port>-->
-<!--                                    </ports>-->
-<!--                                    <env>-->
-<!--                                        <FCREPO_HOST>fcrepo</FCREPO_HOST>-->
-<!--                                        <FCREPO_PORT>${fcrepo.http.port}</FCREPO_PORT>-->
-<!--                                        <FCREPO_JMS_PORT>${jms.port}</FCREPO_JMS_PORT>-->
-<!--                                        <FCREPO_ACTIVEMQ_CONFIGURATION>classpath:/activemq-queue.xml</FCREPO_ACTIVEMQ_CONFIGURATION>-->
-<!--                                        <FCREPO_LOG_LEVEL>DEBUG</FCREPO_LOG_LEVEL>-->
-<!--                                        <FCREPO_JMS_BASEURL>http://${fcrepo.server}:${fcrepo.http.port}/fcrepo/rest/</FCREPO_JMS_BASEURL>-->
-<!--                                    </env>-->
-<!--                                </run>-->
-<!--                            </image>-->
-
-<!--                            <image>-->
-<!--                                <alias>ldap</alias>-->
-<!--                                <name>${it.image.ldap.name}</name>-->
-<!--                                <run>-->
-<!--                                    <skip>${ldap.skip}</skip>-->
-<!--                                    <wait>-->
-<!--                                        <time>${ldap.waitms}</time>-->
-<!--                                    </wait>-->
-<!--                                </run>-->
-<!--                            </image>-->
-
-<!--                        </images>-->
-
-<!--                    </configuration>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <id>start-docker-its</id>-->
-<!--                            <phase>pre-integration-test</phase>-->
-<!--                            <goals>-->
-<!--                                <goal>start</goal>-->
-<!--                            </goals>-->
-<!--                        </execution>-->
-<!--                        <execution>-->
-<!--                            <id>stop-docker-its</id>-->
-<!--                            <phase>post-integration-test</phase>-->
-<!--                            <goals>-->
-<!--                                <goal>stop</goal>-->
-<!--                            </goals>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
-
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-resources-plugin</artifactId>-->
-<!--                    <version>${maven-resources-plugin.version}</version>-->
-<!--                </plugin>-->
-
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-remote-resources-plugin</artifactId>-->
-<!--                    <version>${maven-remote-resources-plugin.version}</version>-->
-<!--                </plugin>-->
-
-                <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot-maven-plugin.version}</version>
                 </plugin>
 
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-release-plugin</artifactId>-->
-<!--                    <configuration>-->
-<!--                        <autoVersionSubmodules>true</autoVersionSubmodules>-->
-<!--                        <pushChanges>false</pushChanges>-->
-<!--                        <localCheckout>true</localCheckout>-->
-<!--                        <goals>deploy</goals>-->
-<!--                        <releaseProfiles>release,external</releaseProfiles>-->
-<!--                    </configuration>-->
-<!--                </plugin>-->
-
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-javadoc-plugin</artifactId>-->
-<!--                    <version>${maven-javadoc-plugin.version}</version>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <id>attach-javadocs</id>-->
-<!--                            <goals>-->
-<!--                                <goal>jar</goal>-->
-<!--                            </goals>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
-
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-gpg-plugin</artifactId>-->
-<!--                    <version>${maven-gpg-plugin.version}</version>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <id>sign-artifacts</id>-->
-<!--                            <phase>verify</phase>-->
-<!--                            <goals>-->
-<!--                                <goal>sign</goal>-->
-<!--                            </goals>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                    <configuration>-->
-<!--                        <useAgent>true</useAgent>-->
-<!--                    </configuration>-->
-<!--                </plugin>-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.0.0</version>
                     <executions>
                         <execution>
                             <goals>
-                                <goal>jar</goal>
+                                <goal>shade</goal>
+                            </goals>
+                            <configuration>
+                                <shadedArtifactAttached>true</shadedArtifactAttached>
+                                <finalName>notification-service-${project.parent.version}</finalName>
+                                <shadedClassifierName>jhu</shadedClassifierName>
+                                <transformers>
+                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                        <mainClass>org.eclipse.pass.notification.NotificationApp</mainClass>
+                                    </transformer>
+                                </transformers>
+                                <filters>
+                                    <filter>
+                                        <artifact>*:*</artifact>
+                                        <excludes>
+                                            <exclude>META-INF/*.SF</exclude>
+                                            <exclude>META-INF/*.DSA</exclude>
+                                            <exclude>META-INF/*.RSA</exclude>
+                                        </excludes>
+                                    </filter>
+                                </filters>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <pass.core.url>${pass.core.url}</pass.core.url>
+                            <pass.core.user>${pass.core.user}</pass.core.user>
+                            <pass.core.password>${pass.core.password}</pass.core.password>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>start</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>start</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>stop</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <images>
+                            <image>
+                                <name>ghcr.io/eclipse-pass/pass-core-main:%v</name>
+                                <run>
+                                    <env>
+                                        <PASS_CORE_BASE_URL>${pass.core.url}</PASS_CORE_BASE_URL>
+                                        <PASS_CORE_BACKEND_USER>${pass.core.user}</PASS_CORE_BACKEND_USER>
+                                        <PASS_CORE_BACKEND_PASSWORD>${pass.core.password}</PASS_CORE_BACKEND_PASSWORD>
+                                    </env>
+                                    <wait>
+                                        <http>
+                                            <url>
+                                                ${pass.core.url}/data/grant
+                                            </url>
+                                            <status>401</status>
+                                        </http>
+                                        <time>60000</time>
+                                    </wait>
+                                    <ports>
+                                        <port>${pass.core.port}:${pass.core.port}</port>
+                                    </ports>
+                                </run>
+                            </image>
+                        </images>
+                    </configuration>
                 </plugin>
 
             </plugins>

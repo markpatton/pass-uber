@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import org.eclipse.pass.notification.config.NotificationConfig;
-import org.eclipse.pass.notification.dispatch.DispatchException;
-import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.config.NotificationTemplate;
 import org.eclipse.pass.notification.config.NotificationTemplateName;
+import org.eclipse.pass.notification.dispatch.DispatchException;
+import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.NotificationType;
 import org.springframework.stereotype.Component;
 

@@ -28,6 +28,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication
 @ComponentScan("org.eclipse.pass")
 @EnableAspectJAutoProxy
+@SuppressWarnings({"checkstyle:hideutilityclassconstructor"})
 public class NotificationApp {
 
     /**

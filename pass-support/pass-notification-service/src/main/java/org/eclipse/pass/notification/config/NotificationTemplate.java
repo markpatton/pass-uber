@@ -26,8 +26,7 @@ import org.eclipse.pass.notification.model.NotificationType;
 
 /**
  * Allows for the customization of notification subject, body, and footer for each notification type.  Each notification
- * type has exactly one {@code NotificationTemplate}, retrieved from the {@link NotificationConfig runtime
- * configuration} using {@link NotificationConfig#getTemplates()}.
+ * type has exactly one {@code NotificationTemplate}.
  * <p>
  * Importantly, templates may be specified inline, or as references to a template body.  For example:
  * </p>

@@ -1,13 +1,5 @@
 package org.eclipse.pass.notification.model;
 
-import org.eclipse.pass.support.client.model.EventType;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
-
 import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_APPROVAL_INVITE;
 import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_APPROVAL_REQUESTED;
 import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_CHANGES_REQUESTED;
@@ -20,6 +12,14 @@ import static org.eclipse.pass.support.client.model.EventType.CHANGES_REQUESTED;
 import static org.eclipse.pass.support.client.model.EventType.SUBMITTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.stream.Stream;
+
+import org.eclipse.pass.support.client.model.EventType;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class NotificationTypeTest {
 

@@ -16,6 +16,7 @@
 package org.eclipse.pass.notification.config;
 
 import java.io.IOException;
+import javax.jms.Session;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.jms.ConnectionFactory;
@@ -27,8 +28,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-
-import javax.jms.Session;
 
 /**
  * Primary Spring Boot configuration class for Notification Services

@@ -15,6 +15,33 @@
  */
 package org.eclipse.pass.notification.dispatch.email;
 
+import static org.apache.commons.io.IOUtils.resourceToString;
+import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
+import static org.eclipse.pass.notification.model.NotificationParam.EVENT_METADATA;
+import static org.eclipse.pass.notification.model.NotificationParam.FROM;
+import static org.eclipse.pass.notification.model.NotificationParam.LINKS;
+import static org.eclipse.pass.notification.model.NotificationParam.RESOURCE_METADATA;
+import static org.eclipse.pass.notification.model.NotificationParam.TO;
+import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_APPROVAL_INVITE;
+import static org.eclipse.pass.notification.service.LinksUtil.serialized;
+import static org.eclipse.pass.notification.util.PathUtil.packageAsPath;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
@@ -42,33 +69,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.apache.commons.io.IOUtils.resourceToString;
-import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
-import static org.eclipse.pass.notification.model.NotificationParam.EVENT_METADATA;
-import static org.eclipse.pass.notification.model.NotificationParam.FROM;
-import static org.eclipse.pass.notification.model.NotificationParam.LINKS;
-import static org.eclipse.pass.notification.model.NotificationParam.RESOURCE_METADATA;
-import static org.eclipse.pass.notification.model.NotificationParam.TO;
-import static org.eclipse.pass.notification.model.NotificationType.SUBMISSION_APPROVAL_INVITE;
-import static org.eclipse.pass.notification.service.LinksUtil.serialized;
-import static org.eclipse.pass.notification.util.PathUtil.packageAsPath;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)

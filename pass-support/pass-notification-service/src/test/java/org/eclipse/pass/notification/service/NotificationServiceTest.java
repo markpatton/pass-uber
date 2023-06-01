@@ -28,11 +28,11 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.SneakyThrows;
+import org.eclipse.pass.notification.dispatch.DispatchService;
+import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
-import org.eclipse.pass.notification.dispatch.DispatchService;
-import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.support.client.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

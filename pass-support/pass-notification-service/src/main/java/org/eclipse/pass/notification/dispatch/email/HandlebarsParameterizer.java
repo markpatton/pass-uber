@@ -28,8 +28,8 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.pass.notification.model.NotificationParam;
 import org.eclipse.pass.notification.config.NotificationTemplateName;
+import org.eclipse.pass.notification.model.NotificationParam;
 import org.springframework.stereotype.Component;
 
 /**

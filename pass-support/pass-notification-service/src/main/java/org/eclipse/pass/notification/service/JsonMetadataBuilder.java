@@ -1,16 +1,16 @@
 package org.eclipse.pass.notification.service;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Objects;
+import java.util.Optional;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.springframework.util.ReflectionUtils;
-
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Objects;
-import java.util.Optional;
 
 public class JsonMetadataBuilder {
 

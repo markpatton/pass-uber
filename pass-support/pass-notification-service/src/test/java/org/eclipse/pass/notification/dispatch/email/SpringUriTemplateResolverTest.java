@@ -15,19 +15,21 @@
  *  * limitations under the License.
  *
  */
-
 package org.eclipse.pass.notification.dispatch.email;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/**
+ * @author rpoetke1@jh.edu
+ */
 public class SpringUriTemplateResolverTest {
 
     private SpringUriTemplateResolver springUriTemplateResolver;
