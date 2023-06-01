@@ -51,7 +51,7 @@ spring:
       jdbc:
         use_scrollable_resultset: true
   datasource:
-    url: 'jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1'
+    url: 'jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE'
     username: 'sa'
     password: ''
     driver-class-name: 'org.h2.Driver'
@@ -61,8 +61,6 @@ spring:
   activemq:
     broker-url: 'vm://embedded?broker.persistent=false,useShutdownHook=false'
     in-memory: true
-  file-service:
-    storage-type: 'FILE_SYSTEM'
   security:
     user:
       name: ${PASS_CORE_BACKEND_USER:backend}
@@ -71,14 +69,26 @@ spring:
 
 server:
   port: 8080
+  shutdown: graceful
 
 logging:
   path: ${PASS_CORE_LOG_DIR:${java.io.tmpdir}/pass-core}
+
+aws:
+  region: us-east-1
 
 pass:
   auth:
     max-cache-size: 100
     cache-duration: 30
+  file-service:
+    storage-type: 'FILE_SYSTEM'
+  jms:
+    queue:
+      submission: ${PASS_CORE_SUBMISSION_QUEUE:pass-submission}
+      deposit: ${PASS_CORE_DEPOSIT_QUEUE:pass-deposit}
+      submission-event: ${PASS_CORE_SUBMISSION_EVENT_QUEUE:pass-submission-event}
+    sqs: ${PASS_CORE_USE_SQS:false}
   policy:
     institution: ${PASS_CORE_POLICY_INSTITUTION:johnshopkins.edu}
     institutional_policy_title: ${PASS_CORE_POLICY_INSTITUTIONAL_POLICY_TITLE:Johns Hopkins University (JHU) Open Access Policy}
@@ -92,7 +102,9 @@ elide:
     default-dialect: Postgres
 
 spring:
-  profiles: production
+  config:
+    activate:
+      on-profile: "production"
   jpa:
     hibernate:
       show_sql: true
@@ -108,13 +120,6 @@ spring:
     driver-class-name: 'org.postgresql.Driver'
   liquibase:
     enabled: false
-  file-service:
-    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE:FILE_SYSTEM}
-    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR}
-    s3-bucket-name: ${PASS_CORE_S3_BUCKET_NAME:pass-core-s3-bucket}
-    s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX:pass-core-s3-repo-prefix}
-    s3-region: ${PASS_CORE_S3_REGION:us-east-1}
-    s3-endpoint: ${PASS_CORE_S3_ENDPOINT:http://localhost:9090}
   security:
     user:
       name: ${PASS_CORE_BACKEND_USER}
@@ -123,3 +128,14 @@ spring:
 
 server:
   port: ${PASS_CORE_PORT}
+
+pass:
+  jms:
+    sqs: ${PASS_CORE_USE_SQS:true}
+  file-service:
+    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE:FILE_SYSTEM}
+    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR}
+    s3-bucket-name: ${PASS_CORE_S3_BUCKET_NAME:pass-core-file}
+    s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX:pass-core-file}
+    s3-endpoint: ${PASS_CORE_S3_ENDPOINT:#{null}}
+ 
