@@ -19,18 +19,17 @@ import com.jayway.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
 /**
  * Run Elide with in memory database.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class,
-    properties = {"PASS_CORE_BACKEND_PASSWORD=test", "PASS_CORE_USERTOKEN_KEY=MRLDGRJUZ7DPVZEHLNXD7ACMC4"})
+    properties = {"PASS_CORE_BACKEND_PASSWORD=test"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class IntegrationTest {
     public static final String BACKEND_USER = "backend";
     public static final String BACKEND_PASSWORD = "test";
-    public static final String USERTOKEN_KEY = "MRLDGRJUZ7DPVZEHLNXD7ACMC4";
 
     @LocalServerPort
     private int port;

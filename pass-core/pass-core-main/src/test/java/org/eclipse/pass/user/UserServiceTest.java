@@ -17,9 +17,11 @@ import org.eclipse.pass.usertoken.TokenFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class UserServiceTest extends ShibIntegrationTest {
-    private final TokenFactory token_factory = new TokenFactory(USERTOKEN_KEY);
+    @Autowired
+    private TokenFactory userTokenFactory;
 
     @Test
     public void testHandleRequest() throws IOException, JSONException {
@@ -59,7 +61,7 @@ public class UserServiceTest extends ShibIntegrationTest {
     public void testHandleRequestWithUserTokenMissingSubmission() throws IOException, JSONException {
         // Create a user token which references a submission that does not exist
         URI mailto = URI.create("mailto:bob@example.com");
-        Token token = token_factory.forPassResource("submission", 34, mailto);
+        Token token = userTokenFactory.forPassResource("submission", 34, mailto);
 
         HttpUrl url = HttpUrl.parse(getBaseUrl() + "user/whoami").newBuilder()
                 .addQueryParameter(Token.USER_TOKEN_PARAM, token.toString()).build();
@@ -87,7 +89,7 @@ public class UserServiceTest extends ShibIntegrationTest {
             client.createObject(submission);
         }
 
-        Token token = token_factory.forPassResource("submission", submission.getId(), mailto);
+        Token token = userTokenFactory.forPassResource("submission", submission.getId(), mailto);
 
         HttpUrl url = HttpUrl.parse(getBaseUrl() + "user/whoami").newBuilder()
                 .addQueryParameter(Token.USER_TOKEN_PARAM, token.toString()).build();
