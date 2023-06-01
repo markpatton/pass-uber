@@ -106,7 +106,7 @@ class PassSchemaServiceControllerTest {
 
         String repositories = "1,2";
 
-        ResponseEntity response = schemaServiceController.getSchema(repositories, "true");
+        ResponseEntity<?> response = schemaServiceController.getSchema(repositories, "true");
         assertEquals(response.getBody().toString(),response.getBody().toString());
         InputStream expected_schema_json = SchemaServiceTest.class
                 .getResourceAsStream("/schemas/jhu/example_merged_dereferenced.json");
@@ -132,7 +132,7 @@ class PassSchemaServiceControllerTest {
 
         String repositories = "1";
 
-        ResponseEntity response = schemaServiceController.getSchema(repositories, "true");
+        ResponseEntity<?> response = schemaServiceController.getSchema(repositories, "true");
         assertEquals(response.getBody().toString(),response.getBody().toString());
         InputStream expected_schema_json = SchemaServiceTest.class
                 .getResourceAsStream("/schemas/jhu/expected_jscholarship_common_merge.json");
@@ -161,7 +161,7 @@ class PassSchemaServiceControllerTest {
 
         String repositories = "1,2";
 
-        ResponseEntity response = schemaServiceController.getSchema(repositories, "false");
+        ResponseEntity<?> response = schemaServiceController.getSchema(repositories, "false");
         assertEquals(response.getBody().toString(),response.getBody().toString());
         InputStream expected_schema_json1 = SchemaServiceTest.class
                 .getResourceAsStream("/schemas/jhu/schema1.json");

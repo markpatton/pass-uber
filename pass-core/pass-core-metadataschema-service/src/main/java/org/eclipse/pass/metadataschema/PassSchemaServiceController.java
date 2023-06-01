@@ -103,7 +103,6 @@ public class PassSchemaServiceController {
     @GetMapping("/schema")
     public ResponseEntity<?> getSchema(@RequestParam("entityIds") String entityIds,
                                        @RequestParam("merge") String mergeSchemaOpt) throws IOException {
-        LOG.debug("Received request to retrieve schema for entityIds: {}, and merge: {}", entityIds, mergeSchemaOpt);
         if (entityIds == null || entityIds.isEmpty()) {
             LOG.error("No entityIds provided");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No entityIds provided");

@@ -20,6 +20,8 @@ package org.eclipse.pass.metadataschema;
  * Custom class exception thrown when a merge fails.
  */
 public class MergeFailException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructor class for MergeFailException.
      * @param errorMessage The error message.
@@ -27,5 +29,4 @@ public class MergeFailException extends RuntimeException {
     public MergeFailException(String errorMessage) {
         super(errorMessage);
     }
-
 }

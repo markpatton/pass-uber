@@ -149,6 +149,7 @@ public class SchemaInstance implements Comparable<SchemaInstance> {
      * schema and replacing the internal and external references.
      *
      * @param node the node that is being searched for references
+     * @param schemaFetcher to load schemas
      */
     public void dereference(JsonNode node, SchemaFetcher schemaFetcher) {
         //collect all $refs in a hashmap in the schema and the xPath to the $ref
