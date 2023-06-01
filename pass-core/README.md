@@ -40,8 +40,15 @@ The application is configured by its application.yaml which in turn references a
 By default, pass-core-main, will run with an in memory database. In order to use Postgres, switch to the production profile and set the database environment variables as below.
 Note that the system property `javax.persistence.schema-generation.database.action` can be used to automatically create database tables.
 
+If `PASS_CORE_USE_SQS` is `false` and no connection to a JMS broker is specified with `SPRING_ACTIVEMQ_BROKER_URL`, an embedded ActiveMQ broker will be started.
+If `PASS_CORE_USE_SQS` is `true`, then the connection to Amazon SQS must be configured with `AWS_REGION`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`.
+The AWS credentials are also needed if the file service S3 backend is used.
+
 Environment variables:
 * spring_profiles_active=production
+* AWS_REGION=us-east-1
+* AWS_ACCESS_KEY_ID=xxx
+* AWS_SECRET_ACCESS_KEY=xxx
 * PASS_CORE_DATABASE_URL=jdbc:postgresql://postgres:5432/pass
 * PASS_CORE_DATABASE_USERNAME=pass
 * PASS_CORE_DATABASE_PASSWORD=moo
@@ -49,7 +56,14 @@ Environment variables:
 * PASS_CORE_LOG_DIR=${java.io.tmpdir}/pass-core
 * PASS_CORE_BACKEND_USER=backend
 * PASS_CORE_BACKEND_PASSWORD=moo
+* PASS_CORE_USE_SQS=false
+* PASS_CORE_SUBMISSION_QUEUE=pass-submission
+* PASS_CORE_DEPOSIT_QUEUE=pass-deposit
+* PASS_CORE_SUBMISSION_EVENT_QUEUE=pass-submission-event
+* PASS_CORE_USERTOKEN_KEY=xxx
+  * If not present, one is generated. See the [user service](pass-core-user-service/README.md) for how to create manually.
 * PASS_CORE_JAVA_OPTS="-Djavax.persistence.schema-generation.database.action=create"
+  * Used by the Docker image to pass arguments to Java
 * PASS_CORE_BASE_URL=http://localhost:8080
   * Used when services send URLs to the client such as relationship links.
 
@@ -109,7 +123,7 @@ curl -v -u backend:moo -X POST "http://localhost:8080/data/repositoryCopy" -H "a
     "type": "repositoryCopy",
     "attributes": {
       "accessUrl": "http://example.com/path",
-      "copyStatus": "accepted"
+      "copyStatus": "ACCEPTED"
     }
   }
 }
@@ -138,6 +152,40 @@ curl -u backend:moo -X PATCH "http://localhost:8080/data/journal/1" -H "accept: 
       }
     }
   }
+}
+```
+
+# Messages
+
+Messages are JSON objects emitted to a JMS broker as text messages. The different types of messages are sent to different queues specified
+by the indicatedby the environment variables `PASS_CORE_SUBMISSION_QUEUE`, `PASS_CORE_SUBMISSION_EVENT_QUEUE`, and `PASS_CORE_DEPOSIT_QUEUE`.
+
+When a Submission is created or modified and the submitted field is true, then a SubmissionReady event is emitted.
+The id of the Submission will be set in the `submission` field of the message.
+
+When a SubmissionEvent is created, then the a SubmissionEvent message will be sent.
+The id of the SubmissionEvent will be set in the `submission-event` field of the message. If the `eventType` field is `APPROVAL_REQUESTED_NEWUSER`,
+then an `approval-link` field will be set in the field of the message with a link to be sent to a user.
+
+When a Deposit is created or modified, then a DepositStatus event is emitted.
+The id of the Deposit will be set in the `deposit` field of the message.
+
+Example messages:
+```
+{
+    "type": "SubmissionReady",
+    "submission": "1"
+}
+
+{
+    "type": "DepositStatus",
+    "deposit": "1"
+}
+
+{
+    "type": "SubmissionEvent",
+    "submission-event": "1",
+    "approval-link": "http://example.com/passui?userToken=xxxx"
 }
 ```
 
