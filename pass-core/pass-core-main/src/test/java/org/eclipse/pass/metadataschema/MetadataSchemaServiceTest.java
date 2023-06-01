@@ -37,7 +37,7 @@ public class MetadataSchemaServiceTest extends IntegrationTest {
     protected RefreshableElide refreshableElide;
 
     @BeforeAll
-    public void setup() {
+    public void setupRepos() {
         repo1Id = setupRepo1();
         repo2Id = setupRepo2();
         repo3Id = setupRepo3(); //contains missing schema to test error handling
