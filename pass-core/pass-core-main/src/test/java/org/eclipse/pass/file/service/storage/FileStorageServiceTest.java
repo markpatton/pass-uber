@@ -1,4 +1,4 @@
-package org.eclipse.pass.file.service;
+package org.eclipse.pass.file.service.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,12 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
-import io.findify.s3mock.S3Mock;
-import org.eclipse.pass.file.service.storage.FileStorageService;
-import org.eclipse.pass.file.service.storage.StorageConfiguration;
-import org.eclipse.pass.file.service.storage.StorageFile;
-import org.eclipse.pass.file.service.storage.StorageProperties;
-import org.eclipse.pass.file.service.storage.StorageServiceType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,51 +19,48 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.FileSystemUtils;
 
-class FileStorageServiceS3Test {
-    private final static String ROOT_DIR = System.getProperty("java.io.tmpdir") + "/pass-s3-test";
-
+public class FileStorageServiceTest {
+    StorageConfiguration storageConfiguration;
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
-    private S3Mock s3MockApi;
+    private final String rootDir = System.getProperty("java.io.tmpdir") + "/pass-file-system-test";
 
     /**
-     * Setup the test environment. Uses custom endpoint for the in-memory S3 mock.
+     * Setup the FileStorageService for testing. Uses the system temp directory for the root directory.
      */
     @BeforeEach
     void setUp() {
-        s3MockApi = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
-        s3MockApi.start();
-        properties.setStorageType(StorageServiceType.S3);
-        properties.setRootDir(ROOT_DIR);
-        properties.setS3Endpoint("http://localhost:8001");
-        properties.setS3BucketName("bucket-test-name");
-        properties.setS3Region("us-east-1");
-        properties.setS3RepoPrefix("s3-repo-prefix");
-        StorageConfiguration storageConfiguration = new StorageConfiguration(properties);
+        properties.setStorageType(StorageServiceType.FILE_SYSTEM);
+        properties.setRootDir(rootDir);
+        storageConfiguration =  new StorageConfiguration(properties);
         try {
-            fileStorageService = new FileStorageService(storageConfiguration);
+            fileStorageService = new FileStorageService(storageConfiguration, null);
         } catch (IOException e) {
             assertEquals("Exception during setup", e.getMessage());
         }
     }
 
     /**
-     * Tear down the test environment. Deletes the temporary directory.
+     * Cleanup the FileStorageService after testing. Deletes the root directory.
      */
     @AfterEach
     void tearDown() {
-        s3MockApi.stop();
-        FileSystemUtils.deleteRecursively(Paths.get(ROOT_DIR).toFile());
+        try {
+            FileSystemUtils.deleteRecursively(Paths.get(rootDir));
+        } catch (IOException e) {
+            assertEquals("An exception was thrown during cleanup.", e.getMessage());
+        }
     }
 
     /**
-     * Test that the file is stored in the S3 mock.
+     * Test that the file is stored and the relative path is returned. If the file didn't exist then
+     * its relative path would not be found.
      */
     @Test
-    void storeFileToS3ThatExists() {
+    public void storeFileThatExists() {
         try {
             StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test S3 Pass-core".getBytes()));
+                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
             assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
         } catch (Exception e) {
             assertEquals("An exception was thrown in storeFileThatExists.", e.getMessage());
@@ -77,13 +68,13 @@ class FileStorageServiceS3Test {
     }
 
     /**
-     * Should get the file from the S3 bucket and return it.
+     * File is stored and then retrieved.
      */
     @Test
-    void getFileFromS3ShouldReturnFile() {
+    void getFileShouldReturnFile() {
         try {
             StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test S3 Pass-core".getBytes()));
+                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
             ByteArrayResource file = fileStorageService.getFile(storageFile.getId());
             assertTrue(file.contentLength() > 0);
         } catch (IOException e) {
@@ -92,12 +83,14 @@ class FileStorageServiceS3Test {
     }
 
     /**
-     * Should throw an exception because the file ID does not exist.
+     * Should throw exception because file ID does not exist
      */
     @Test
     void getFileShouldThrowException() {
         Exception exception = assertThrows(IOException.class,
-                () -> fileStorageService.getFile("12345")
+                () -> {
+                    fileStorageService.getFile("12345");
+                }
         );
         String expectedExceptionText = "File Service: The file could not be loaded";
         String actualExceptionText = exception.getMessage();
@@ -106,7 +99,6 @@ class FileStorageServiceS3Test {
 
     @Test
     void storeFileWithDifferentLangFilesNames() {
-        //generate long string of all english characters
         String engFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:\"<>?`~[]\\;',./.txt";
         String frFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝßàáâãäå" +
                 "çèéêëìíîïñòóôõöùúûüýÿœŒæÆ.txt";
@@ -126,7 +118,6 @@ class FileStorageServiceS3Test {
         allCharSets.put("ch", chFileName);
         allCharSets.put("ru", ruFileName);
 
-        //test each character set
         allCharSets.forEach((k,v) -> {
             try {
                 StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", v,
@@ -140,7 +131,7 @@ class FileStorageServiceS3Test {
     }
 
     /**
-     * Stores file, then deletes it. Should throw an exception because the file does not exist.
+     * Store file, then delete it. Should throw exception because the file was deleted.
      */
     @Test
     void deleteShouldThrowExceptionFileNotExist() {
@@ -149,11 +140,14 @@ class FileStorageServiceS3Test {
                     MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
             fileStorageService.deleteFile(storageFile.getId());
             Exception exception = assertThrows(NotFoundException.class,
-                    () -> fileStorageService.getResourceFileRelativePath(storageFile.getId()));
+                    () -> {
+                        fileStorageService.getResourceFileRelativePath(storageFile.getId());
+                    });
             String exceptionText = exception.getMessage();
             assertTrue(exceptionText.matches("(.)+(was not found){1}(.)+"));
         } catch (IOException e) {
             assertEquals("Exception during deleteShouldThrowExceptionFileNotExist", e.getMessage());
         }
     }
+
 }
