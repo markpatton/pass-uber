@@ -30,7 +30,7 @@ public class KeyGenerator {
      * Generates a key.
      * @return the key
      */
-    protected static String generateKey() {
+    public static String generateKey() {
         return Key.generate().toString().replaceAll("=", "");
     }
 
