@@ -220,7 +220,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         JSONObject grant = pass_object("grant");
         set_attribute(grant, "projectName", "This is a test");
 
-        RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, grant.toString());
+        RequestBody body = RequestBody.create(grant.toString(), JSON_API_MEDIA_TYPE);
         Request.Builder builder = new Request.Builder();
         setShibHeaders(builder);
         Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -240,7 +240,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         {
             String url = getBaseUrl() + "data/submission";
 
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, sub.toString());
+            RequestBody body = RequestBody.create(sub.toString(), JSON_API_MEDIA_TYPE);
             Request.Builder builder = new Request.Builder();
             setShibHeaders(builder);
             Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -255,7 +255,7 @@ public class AccessControlTest extends ShibIntegrationTest {
             set_attribute(sub, "submitterName", "Major Major");
 
             String url = getBaseUrl() + "data/submission/" + get_id(sub);
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, sub.toString());
+            RequestBody body = RequestBody.create(sub.toString(), JSON_API_MEDIA_TYPE);
             Request.Builder builder = new Request.Builder();
             setShibHeaders(builder);
             Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -286,7 +286,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         {
             String url = getBaseUrl() + "data/publication";
 
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, pub.toString());
+            RequestBody body = RequestBody.create(pub.toString(), JSON_API_MEDIA_TYPE);
             Request.Builder builder = new Request.Builder();
             setShibHeaders(builder);
             Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -301,7 +301,7 @@ public class AccessControlTest extends ShibIntegrationTest {
             set_attribute(pub, "title", "updated title");
 
             String url = getBaseUrl() + "data/publication/" + get_id(pub);
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, pub.toString());
+            RequestBody body = RequestBody.create(pub.toString(), JSON_API_MEDIA_TYPE);
             Request.Builder builder = new Request.Builder();
             setShibHeaders(builder);
             Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -347,7 +347,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         {
             String url = getBaseUrl() + "data/file";
 
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, file.toString());
+            RequestBody body = RequestBody.create(file.toString(), JSON_API_MEDIA_TYPE);
             Request.Builder builder = new Request.Builder();
             setShibHeaders(builder);
             Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -362,7 +362,7 @@ public class AccessControlTest extends ShibIntegrationTest {
             set_attribute(file, "name", "test2.doc");
 
             String url = getBaseUrl() + "data/file/" + get_id(file);
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, file.toString());
+            RequestBody body = RequestBody.create(file.toString(), JSON_API_MEDIA_TYPE);
             Request.Builder builder = new Request.Builder();
             setShibHeaders(builder);
             Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -408,7 +408,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         {
             String url = getBaseUrl() + "data/submissionEvent";
 
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, event.toString());
+            RequestBody body = RequestBody.create(event.toString(), JSON_API_MEDIA_TYPE);
             Request.Builder builder = new Request.Builder();
             setShibHeaders(builder);
             Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -423,7 +423,7 @@ public class AccessControlTest extends ShibIntegrationTest {
             set_attribute(event, "comment", "hmm");
 
             String url = getBaseUrl() + "data/submissionEvent/" + get_id(event);
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, event.toString());
+            RequestBody body = RequestBody.create(event.toString(), JSON_API_MEDIA_TYPE);
             Request.Builder builder = new Request.Builder();
             setShibHeaders(builder);
             Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -454,7 +454,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         // File does not point to submission user owns
         set_attribute(file, "name", "moo.xml");
 
-        RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, file.toString());
+        RequestBody body = RequestBody.create(file.toString(), JSON_API_MEDIA_TYPE);
         Request.Builder builder = new Request.Builder();
         setShibHeaders(builder);
         Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -473,7 +473,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         // File does not point to submission user owns
         set_attribute(event, "comment", "This should not work");
 
-        RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, event.toString());
+        RequestBody body = RequestBody.create(event.toString(), JSON_API_MEDIA_TYPE);
         Request.Builder builder = new Request.Builder();
         setShibHeaders(builder);
         Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -500,7 +500,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         set_attribute(grant, "projectName", "The best project");
 
         String url = getBaseUrl() + "data/grant/" + id;
-        RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, grant.toString());
+        RequestBody body = RequestBody.create(grant.toString(), JSON_API_MEDIA_TYPE);
         Request.Builder builder = new Request.Builder();
         setShibHeaders(builder);
         Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
@@ -544,7 +544,7 @@ public class AccessControlTest extends ShibIntegrationTest {
         {
             String url = getBaseUrl() + "data/grant";
 
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, grant.toString());
+            RequestBody body = RequestBody.create(grant.toString(), JSON_API_MEDIA_TYPE);
             Request request = new Request.Builder().url(url).header("Accept", JSON_API_CONTENT_TYPE)
                     .addHeader("Content-Type", JSON_API_CONTENT_TYPE).header("Authorization", credentials).post(body)
                     .build();
@@ -559,7 +559,7 @@ public class AccessControlTest extends ShibIntegrationTest {
             set_attribute(grant, "projectName", "backend update");
 
             String url = getBaseUrl() + "data/grant/" + get_id(grant);
-            RequestBody body = RequestBody.create(JSON_API_MEDIA_TYPE, grant.toString());
+            RequestBody body = RequestBody.create(grant.toString(), JSON_API_MEDIA_TYPE);
             Request request = new Request.Builder().url(url).header("Accept", JSON_API_CONTENT_TYPE)
                     .addHeader("Content-Type", JSON_API_CONTENT_TYPE).header("Authorization", credentials).patch(body)
                     .build();
