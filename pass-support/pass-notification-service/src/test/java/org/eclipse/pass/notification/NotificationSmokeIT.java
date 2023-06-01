@@ -15,31 +15,7 @@
  */
 package org.eclipse.pass.notification;
 
-import static java.nio.charset.Charset.forName;
 import static org.apache.commons.io.IOUtils.resourceToString;
-import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW;
-import static org.eclipse.pass.notification.model.Link.SUBMISSION_REVIEW_INVITE;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collection;
-import java.util.Collections;
-
-import okhttp3.Credentials;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.eclipse.pass.support.client.PassClient;
-import org.eclipse.pass.support.client.model.Submission;
-import org.eclipse.pass.support.client.model.SubmissionEvent;
-import org.eclipse.pass.support.client.model.User;
-import org.eclipse.pass.notification.dispatch.email.EmailComposer;
-import org.eclipse.pass.notification.service.ComposerIT;
-import org.eclipse.pass.notification.model.Link;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Treats Notification Services as a black box by introspecting the side affects of creating submissions that require

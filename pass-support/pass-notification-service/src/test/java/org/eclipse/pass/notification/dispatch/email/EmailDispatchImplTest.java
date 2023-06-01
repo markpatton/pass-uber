@@ -30,7 +30,7 @@ import org.eclipse.pass.notification.config.RecipientConfig;
 import org.eclipse.pass.notification.dispatch.DispatchException;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.model.Notification;
-import org.eclipse.pass.notification.service.ComposerIT;
+import org.eclipse.pass.notification.service.ComposerMockTest;
 import org.eclipse.pass.notification.service.JsonMetadataBuilder;
 import org.eclipse.pass.support.client.model.EventType;
 import org.eclipse.pass.support.client.model.PerformerRole;
@@ -224,7 +224,7 @@ public class EmailDispatchImplTest extends AbstractNotificationSpringTest {
     public void testSubjectTemplateParameterization() throws Exception {
         // GIVEN
         Submission submission = new Submission();
-        submission.setMetadata(resourceToString("/" + packageAsPath(ComposerIT.class) +
+        submission.setMetadata(resourceToString("/" + packageAsPath(ComposerMockTest.class) +
                                                 "/submission-metadata.json", StandardCharsets.UTF_8));
         submission.setId(SUBMISSION_RESOURCE_ID);
 

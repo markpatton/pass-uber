@@ -105,7 +105,8 @@ public class EmailDispatchImplMockTest {
     }
 
     @Test
-    public void simpleSuccess() throws IOException, MessagingException {
+    public void testSimpleSuccess() throws IOException, MessagingException {
+        // GIVEN
         when(notification.getType()).thenReturn(NotificationType.SUBMISSION_APPROVAL_INVITE);
         when(notification.getParameters()).thenReturn(
                 new HashMap<>() {
@@ -145,8 +146,10 @@ public class EmailDispatchImplMockTest {
         MimeMessage mimeMessage = new MimeMessage((Session) null);
         when(mailer.createMimeMessage()).thenReturn(mimeMessage);
 
+        // WHEN
         emailDispatch.dispatch(notification);
 
+        // THEN
         ArgumentCaptor<MimeMessage> emailCaptor = ArgumentCaptor.forClass(MimeMessage.class);
         verify(mailer).send(emailCaptor.capture());
         MimeMessage email = emailCaptor.getValue();
@@ -169,7 +172,8 @@ public class EmailDispatchImplMockTest {
      * A nice DispatchException should be thrown if the To field of the email is missing or empty
      */
     @Test
-    public void emptyToAddress() throws MessagingException {
+    public void testEmptyToAddress() throws MessagingException {
+        // GIVEN
         Notification notification = mock(Notification.class);
         Parameterizer parameterizer = mock(Parameterizer.class);
         EmailComposer composer = mock(EmailComposer.class);
@@ -182,6 +186,7 @@ public class EmailDispatchImplMockTest {
         when(composer.compose(any(), any())).thenReturn(emailMessage);
         when(emailMessage.getRecipients(any())).thenReturn(new Address[0]);
 
+        // WHEN/THEN
         DispatchException ex = assertThrows(DispatchException.class, () -> {
             emailDispatch = new EmailDispatchImpl(parameterizer, composer, mailer);
             emailDispatch.dispatch(notification);

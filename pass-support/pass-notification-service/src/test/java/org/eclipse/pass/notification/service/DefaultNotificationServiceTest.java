@@ -55,6 +55,7 @@ public class DefaultNotificationServiceTest {
 
     @Test
     public void testSuccess() throws IOException {
+        // GIVEN
         SubmissionPreparer sp = new SubmissionPreparer(passClient);
         Notification n = mock(Notification.class);
         when(composer.apply(sp.submission, sp.event)).thenReturn(n);
@@ -68,8 +69,10 @@ public class DefaultNotificationServiceTest {
         preparer.setEmail("test-user-prep@test");
         when(sp.submission.getPreparers()).thenReturn(List.of(preparer));
 
+        // WHEN
         defaultNotificationService.notify(sp.event);
 
+        // THEN
         verify(passClient, times(1))
             .getObject(SubmissionEvent.class, "test-event-id", "submission", "performedBy");
         verify(composer).apply(sp.submission, sp.event);
@@ -82,12 +85,15 @@ public class DefaultNotificationServiceTest {
      */
     @Test
     public void testSelfSubmissionPreparerIsNull() throws IOException {
+        // GIVEN
         // mock a self submission where Submission.preparer is null
         SubmissionPreparer sp = new SubmissionPreparer(passClient);
         when(sp.submission.getPreparers()).thenReturn(null);
 
+        // WHEN
         defaultNotificationService.notify(sp.event);
 
+        // THEN
         verify(passClient, times(1))
             .getObject(SubmissionEvent.class, "test-event-id", "submission", "performedBy");
         verifyNoInteractions(composer);
@@ -100,12 +106,15 @@ public class DefaultNotificationServiceTest {
      */
     @Test
     public void testSelfSubmissionPreparerIsEmpty() throws IOException {
+        // GIVEN
         // mock a self submission where Submission.preparer is empty
         SubmissionPreparer sp = new SubmissionPreparer(passClient);
         when(sp.submission.getPreparers()).thenReturn(Collections.emptyList());
 
+        // WHEN
         defaultNotificationService.notify(sp.event);
 
+        // THEN
         verify(passClient, times(1))
             .getObject(SubmissionEvent.class, "test-event-id", "submission", "performedBy");
         verifyNoInteractions(composer);
@@ -118,6 +127,7 @@ public class DefaultNotificationServiceTest {
      */
     @Test
     public void testSelfSubmissionPreparerIsSubmitter() throws IOException {
+        // GIVEN
         // mock a self submission where Submission.preparer contains exactly one URI, the URI of the submitter
         SubmissionPreparer sp = new SubmissionPreparer(passClient);
         User submitter = new User("test-user-id");
@@ -125,8 +135,10 @@ public class DefaultNotificationServiceTest {
         when(sp.submission.getPreparers()).thenReturn(List.of(submitter));
         when(sp.submission.getSubmitter()).thenReturn(submitter);
 
+        // WHEN
         defaultNotificationService.notify(sp.event);
 
+        // THEN
         verify(passClient, times(1))
             .getObject(SubmissionEvent.class, "test-event-id", "submission", "performedBy");
         verifyNoInteractions(composer);
@@ -142,6 +154,7 @@ public class DefaultNotificationServiceTest {
      */
     @Test
     public void testSelfSubmissionPreparerContainsSubmitter() throws IOException {
+        // GIVEN
         // mock a self submission where Submission.preparer contains multiple URIs, one of them is the URI of the
         // submitter
         SubmissionPreparer sp = new SubmissionPreparer(passClient);
@@ -155,8 +168,10 @@ public class DefaultNotificationServiceTest {
         Notification n = mock(Notification.class);
         when(composer.apply(sp.submission, sp.event)).thenReturn(n);
 
+        // WHEN
         defaultNotificationService.notify(sp.event);
 
+        // THEN
         verify(passClient, times(1))
             .getObject(SubmissionEvent.class, "test-event-id", "submission", "performedBy");
         verify(composer).apply(sp.submission, sp.event);
