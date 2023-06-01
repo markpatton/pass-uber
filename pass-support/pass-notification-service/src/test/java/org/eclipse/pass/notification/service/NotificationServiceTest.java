@@ -37,12 +37,12 @@ import org.eclipse.pass.support.client.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class DefaultNotificationServiceTest {
+public class NotificationServiceTest {
 
     private PassClient passClient;
     private DispatchService dispatchService;
     private Composer composer;
-    private DefaultNotificationService defaultNotificationService;
+    private NotificationService notificationService;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -50,7 +50,7 @@ public class DefaultNotificationServiceTest {
         dispatchService = mock(DispatchService.class);
         composer = mock(Composer.class);
 
-        defaultNotificationService = new DefaultNotificationService(passClient, dispatchService, composer);
+        notificationService = new NotificationService(passClient, dispatchService, composer);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class DefaultNotificationServiceTest {
         when(sp.submission.getPreparers()).thenReturn(List.of(preparer));
 
         // WHEN
-        defaultNotificationService.notify(sp.event);
+        notificationService.notify(sp.event);
 
         // THEN
         verify(passClient, times(1))
@@ -91,7 +91,7 @@ public class DefaultNotificationServiceTest {
         when(sp.submission.getPreparers()).thenReturn(null);
 
         // WHEN
-        defaultNotificationService.notify(sp.event);
+        notificationService.notify(sp.event);
 
         // THEN
         verify(passClient, times(1))
@@ -112,7 +112,7 @@ public class DefaultNotificationServiceTest {
         when(sp.submission.getPreparers()).thenReturn(Collections.emptyList());
 
         // WHEN
-        defaultNotificationService.notify(sp.event);
+        notificationService.notify(sp.event);
 
         // THEN
         verify(passClient, times(1))
@@ -136,7 +136,7 @@ public class DefaultNotificationServiceTest {
         when(sp.submission.getSubmitter()).thenReturn(submitter);
 
         // WHEN
-        defaultNotificationService.notify(sp.event);
+        notificationService.notify(sp.event);
 
         // THEN
         verify(passClient, times(1))
@@ -169,7 +169,7 @@ public class DefaultNotificationServiceTest {
         when(composer.apply(sp.submission, sp.event)).thenReturn(n);
 
         // WHEN
-        defaultNotificationService.notify(sp.event);
+        notificationService.notify(sp.event);
 
         // THEN
         verify(passClient, times(1))
