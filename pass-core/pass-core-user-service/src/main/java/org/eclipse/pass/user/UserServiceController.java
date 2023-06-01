@@ -20,7 +20,6 @@ import org.eclipse.pass.usertoken.Token;
 import org.eclipse.pass.usertoken.TokenFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,24 +32,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceController.class);
 
-    private final TokenFactory token_factory;
+    private final TokenFactory userTokenFactory;
     private final RefreshableElide refreshableElide;
 
     /**
      * Construct a UserServiceController.
      *
-     * @param usertoken_key or null
+     * @param userTokenFactory the TokenFactory
      * @param refreshableElide a refreshable elide instance
      */
-    public UserServiceController(@Value("${pass.usertoken.key:#{null}}") String usertoken_key,
-                                 RefreshableElide refreshableElide) {
+    public UserServiceController(TokenFactory userTokenFactory, RefreshableElide refreshableElide) {
         this.refreshableElide = refreshableElide;
-        this.token_factory = usertoken_key == null || usertoken_key.isEmpty() ? null
-                : new TokenFactory(usertoken_key);
-
-        if (token_factory == null) {
-            LOG.warn("Token support disabled.");
-        }
+        this.userTokenFactory = userTokenFactory;
     }
 
     /**
@@ -111,19 +104,16 @@ public class UserServiceController {
     }
 
     private Token get_user_token(String query) throws BadTokenException {
-        if (query == null || token_factory == null) {
-            return null;
-        }
-
-        if (token_factory.hasToken(query)) {
-            return token_factory.fromUri(query);
+        if (userTokenFactory.hasToken(query)) {
+            return userTokenFactory.fromUri(query);
         }
 
         return null;
     }
 
     // Make the user the submitter on the submission specified by the token
-    public void enact_user_token(User user, Token token, PassClient pass_client) throws IOException, BadTokenException {
+    private void enact_user_token(User user, Token token, PassClient pass_client)
+            throws IOException, BadTokenException {
         if (!token.getPassResourceType().equals("submission")) {
             throw new BadTokenException(String.format("Expected submission <%s>", token.getPassResource()));
         }
