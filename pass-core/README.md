@@ -40,9 +40,11 @@ The application is configured by its application.yaml which in turn references a
 By default, pass-core-main, will run with an in memory database. In order to use Postgres, switch to the production profile and set the database environment variables as below.
 Note that the system property `javax.persistence.schema-generation.database.action` can be used to automatically create database tables.
 
-If `PASS_CORE_USE_SQS` is `false` and no connection to a JMS broker is specified with `SPRING_ACTIVEMQ_BROKER_URL`, an embedded ActiveMQ broker will be started.
-If `PASS_CORE_USE_SQS` is `true`, then the connection to Amazon SQS must be configured with `AWS_REGION`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`.
+If `PASS_CORE_USE_SQS` is `true`, then pass-core will attempt to connect to Amazon SQS. The connection must be configured with `AWS_REGION`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`.
 The AWS credentials are also needed if the file service S3 backend is used.
+
+Otherwise a connection to an ActiveMQ broker can be configured by setting `SPRING_ACTIVEMQ_BROKER_URL`. If 'PASS_CORE_EMBED_JMS_BROKER` is true, then an embedded ActiveMQ broker will be started
+using that url. This can be useful to set tcp transport for connecting containers in a docker environment. The default is an embedded broker using vm transport.
 
 Environment variables:
 * spring_profiles_active=production
@@ -57,6 +59,7 @@ Environment variables:
 * PASS_CORE_BACKEND_USER=backend
 * PASS_CORE_BACKEND_PASSWORD=moo
 * PASS_CORE_USE_SQS=false
+* PASS_CORE_EMBED_JMS_BROKER=true
 * PASS_CORE_SUBMISSION_QUEUE=pass-submission
 * PASS_CORE_DEPOSIT_QUEUE=pass-deposit
 * PASS_CORE_SUBMISSION_EVENT_QUEUE=pass-submission-event

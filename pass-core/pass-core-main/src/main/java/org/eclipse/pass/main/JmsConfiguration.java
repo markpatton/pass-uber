@@ -23,6 +23,7 @@ import com.yahoo.elide.core.utils.ClassScanner;
 import com.yahoo.elide.core.utils.coerce.CoerceUtil;
 import com.yahoo.elide.modelconfig.DynamicConfiguration;
 import com.yahoo.elide.spring.config.ElideConfigProperties;
+import org.apache.activemq.broker.BrokerService;
 import org.eclipse.pass.object.model.Deposit;
 import org.eclipse.pass.object.model.EventType;
 import org.eclipse.pass.object.model.Submission;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -114,6 +116,24 @@ public class JmsConfiguration {
     public ConnectionFactory jmsConnectionFactory(@Value("${aws.region}") String awsRegion) {
         return new SQSConnectionFactory(new ProviderConfiguration(),
                 AmazonSQSClientBuilder.standard().withRegion(Regions.fromName(awsRegion)));
+    }
+
+    /**
+     * Optionally start a JMS
+     *
+     * @param url for the broker
+     * @return BrokerService
+     * @throws Exception on error creating broker
+     */
+    @Bean
+    @ConditionalOnExpression("#{${pass.jms.embed} and !${pass.jms.sqs}}")
+    public BrokerService brokerService(@Value("${spring.activemq.broker-url}") String url) throws Exception {
+        BrokerService brokerService = new BrokerService();
+        brokerService.setPersistent(false);
+        brokerService.setUseJmx(false);
+        brokerService.addConnector(url);
+        brokerService.setUseShutdownHook(false);
+        return brokerService;
     }
 
     /**

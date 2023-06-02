@@ -89,6 +89,7 @@ pass:
       deposit: ${PASS_CORE_DEPOSIT_QUEUE:pass-deposit}
       submission-event: ${PASS_CORE_SUBMISSION_EVENT_QUEUE:pass-submission-event}
     sqs: ${PASS_CORE_USE_SQS:false}
+    embed: ${PASS_CORE_EMBED_JMS_BROKER:true}
   policy:
     institution: ${PASS_CORE_POLICY_INSTITUTION:johnshopkins.edu}
     institutional_policy_title: ${PASS_CORE_POLICY_INSTITUTIONAL_POLICY_TITLE:Johns Hopkins University (JHU) Open Access Policy}
@@ -132,6 +133,7 @@ server:
 pass:
   jms:
     sqs: ${PASS_CORE_USE_SQS:true}
+    embed: ${PASS_CORE_EMBED_JMS_BROKER:false}
   file-service:
     storage-type: ${PASS_CORE_FILE_SERVICE_TYPE:FILE_SYSTEM}
     root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR}
