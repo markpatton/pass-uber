@@ -50,11 +50,7 @@
         <commons-io.version>2.7</commons-io.version>
         <commons-text.version>1.4</commons-text.version>
         <junit.jupiter.version>5.9.3</junit.jupiter.version>
-        <okhttp.version>3.10.0</okhttp.version>
-        <args4j.version>2.33</args4j.version>
         <handlebars.version>4.1.0</handlebars.version>
-        <javamail.version>1.6.2</javamail.version>
-        <aspectjrt.version>1.9.1</aspectjrt.version>
         <pass.core.port>8080</pass.core.port>
         <pass.core.url>http://localhost:8080</pass.core.url>
         <pass.core.user>backend</pass.core.user>
@@ -218,127 +214,121 @@
     </dependencies>
 
    <build>
-        <pluginManagement>
+        <plugins>
 
-            <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
+            </plugin>
 
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring-boot-maven-plugin.version}</version>
-                </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <finalName>notification-service-${project.parent.version}</finalName>
+                            <shadedClassifierName>jhu</shadedClassifierName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.eclipse.pass.notification.NotificationApp</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.0.0</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>shade</goal>
-                            </goals>
-                            <configuration>
-                                <shadedArtifactAttached>true</shadedArtifactAttached>
-                                <finalName>notification-service-${project.parent.version}</finalName>
-                                <shadedClassifierName>jhu</shadedClassifierName>
-                                <transformers>
-                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                        <mainClass>org.eclipse.pass.notification.NotificationApp</mainClass>
-                                    </transformer>
-                                </transformers>
-                                <filters>
-                                    <filter>
-                                        <artifact>*:*</artifact>
-                                        <excludes>
-                                            <exclude>META-INF/*.SF</exclude>
-                                            <exclude>META-INF/*.DSA</exclude>
-                                            <exclude>META-INF/*.RSA</exclude>
-                                        </excludes>
-                                    </filter>
-                                </filters>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <pass.core.url>${pass.core.url}</pass.core.url>
+                        <pass.core.user>${pass.core.user}</pass.core.user>
+                        <pass.core.password>${pass.core.password}</pass.core.password>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${maven-failsafe-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <systemPropertyVariables>
-                            <pass.core.url>${pass.core.url}</pass.core.url>
-                            <pass.core.user>${pass.core.user}</pass.core.user>
-                            <pass.core.password>${pass.core.password}</pass.core.password>
-                        </systemPropertyVariables>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>io.fabric8</groupId>
-                    <artifactId>docker-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>start</id>
-                            <phase>pre-integration-test</phase>
-                            <goals>
-                                <goal>start</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>stop</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>stop</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <images>
-                            <image>
-                                <name>ghcr.io/eclipse-pass/pass-core-main:%v</name>
-                                <run>
-                                    <env>
-                                        <PASS_CORE_BASE_URL>${pass.core.url}</PASS_CORE_BASE_URL>
-                                        <PASS_CORE_BACKEND_USER>${pass.core.user}</PASS_CORE_BACKEND_USER>
-                                        <PASS_CORE_BACKEND_PASSWORD>${pass.core.password}</PASS_CORE_BACKEND_PASSWORD>
-                                    </env>
-                                    <wait>
-                                        <http>
-                                            <url>
-                                                ${pass.core.url}/data/grant
-                                            </url>
-                                            <status>401</status>
-                                        </http>
-                                        <time>60000</time>
-                                    </wait>
-                                    <ports>
-                                        <port>${pass.core.port}:${pass.core.port}</port>
-                                    </ports>
-                                </run>
-                            </image>
-                        </images>
-                    </configuration>
-                </plugin>
-
-            </plugins>
-
-        </pluginManagement>
-
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>ghcr.io/eclipse-pass/pass-core-main:%v</name>
+                            <run>
+                                <env>
+                                    <PASS_CORE_BASE_URL>${pass.core.url}</PASS_CORE_BASE_URL>
+                                    <PASS_CORE_BACKEND_USER>${pass.core.user}</PASS_CORE_BACKEND_USER>
+                                    <PASS_CORE_BACKEND_PASSWORD>${pass.core.password}</PASS_CORE_BACKEND_PASSWORD>
+                                </env>
+                                <wait>
+                                    <http>
+                                        <url>
+                                            ${pass.core.url}/data/grant
+                                        </url>
+                                        <status>401</status>
+                                    </http>
+                                    <time>60000</time>
+                                </wait>
+                                <ports>
+                                    <port>${pass.core.port}:${pass.core.port}</port>
+                                </ports>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

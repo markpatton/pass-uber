@@ -14,7 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public abstract class AbstractNotificationSpringTest {
 
     static {
-        System.setProperty("pass.core.url", "localhost:8080");
+        System.setProperty("pass.core.url", "http://localhost:8080");
         System.setProperty("pass.core.user", "user");
         System.setProperty("pass.core.password", "moo");
     }
