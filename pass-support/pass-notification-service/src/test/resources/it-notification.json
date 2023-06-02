@@ -1,0 +1,47 @@
+{
+  "recipient-config": [
+    {
+      "mode": "DEMO",
+      "fromAddress": "demo-pass@mail.local.domain",
+      "global_cc": [
+        "notification-demo-cc@jhu.edu"
+      ],
+      "global_bcc": [
+        "notification-demo-bcc@jhu.edu"
+      ],
+      "whitelist": [
+        "emetsger@mail.local.domain",
+        "staffWithNoGrants@jhu.edu",
+        "facultyWithGrants@jhu.edu",
+        "staffWithGrants@jhu.edu",
+        "moo-thru@bar.edu"
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "notification": "SUBMISSION_APPROVAL_INVITE",
+      "templates": {
+        "SUBJECT": "PASS Submission Approval: ${RESOURCE_METADATA.title}",
+        "BODY": "classpath:/templates/pass-body-submission-approval-invite-template.hbr",
+        "FOOTER": "A test inline footer"
+      }
+    }
+  ],
+  "link-validators": [
+    {
+      "rels" : [
+        "submission-view",
+        "submission-review",
+        "submission-review-invite"
+      ],
+      "requiredBaseURI" : "http://example.org",
+      "throwExceptionWhenInvalid": true
+    }, 
+    {
+      "rels": ["*"],
+      "requiredBaseURI" : "http",
+      "throwExceptionWhenInvalid": false
+    }
+  ]
+}

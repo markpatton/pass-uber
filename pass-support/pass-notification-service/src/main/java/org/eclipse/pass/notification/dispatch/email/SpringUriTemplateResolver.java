@@ -19,7 +19,6 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.file.InvalidPathException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,16 +39,8 @@ public class SpringUriTemplateResolver implements TemplateResolver {
     public InputStream resolve(NotificationTemplateName name, String template) {
 
         try {
-            URI.create(template);
-        } catch (Exception e) {
-            // not a URI.
-            return null;
-        }
-
-        int semiColonIdx = template.indexOf(":");
-
-        try {
-            if (template.startsWith("classpath:") || template.startsWith("classpath*:")) {
+            if (template.startsWith("classpath:")) {
+                int semiColonIdx = template.indexOf(":");
                 return new ClassPathResource(template.substring(semiColonIdx + 1)).getInputStream();
             }
 

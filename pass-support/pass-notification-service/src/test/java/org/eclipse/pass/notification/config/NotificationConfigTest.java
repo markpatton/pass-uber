@@ -62,9 +62,9 @@ public class NotificationConfigTest extends AbstractNotificationSpringTest {
         assertEquals(3, template.getTemplates().size());
         assertEquals("PASS Submission Approval: ${RESOURCE_METADATA.title}",
             template.getTemplates().get(SUBJECT));
-        assertEquals("classpath*:pass-body-submission-approval-invite-template.hbr",
+        assertEquals("classpath:/templates/pass-body-submission-approval-invite-template.hbr",
             template.getTemplates().get(BODY));
-        assertEquals("classpath*:pass-footer-template.hbr", template.getTemplates().get(FOOTER));
+        assertEquals("A test inline footer", template.getTemplates().get(FOOTER));
 
         RecipientConfig recipientConfigDemo = notificationConfig.getRecipientConfigs().stream()
             .filter(recipientConfig -> DEMO == recipientConfig.getMode())

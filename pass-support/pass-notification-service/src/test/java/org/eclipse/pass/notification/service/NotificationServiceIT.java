@@ -15,7 +15,7 @@ import java.util.List;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.internet.MimeMessage;
-import org.eclipse.pass.notification.AbstractNotificationSpringTest;
+import org.eclipse.pass.notification.AbstractNotificationSpringIntegrationTest;
 import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.model.SubmissionEventMessage;
 import org.eclipse.pass.notification.util.PathUtil;
@@ -27,18 +27,15 @@ import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.eclipse.pass.support.client.model.User;
 import org.eclipse.pass.support.client.model.UserRole;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.TestPropertySource;
 
-@TestPropertySource(properties = {
-    "pass.notification.mode=DEMO",
-    "pass.notification.configuration=classpath:notification.json"
-})
-public class NotificationServiceIT extends AbstractNotificationSpringTest {
-    private static final String SENDER = "noreply@pass.jh.edu";
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
+public class NotificationServiceIT extends AbstractNotificationSpringIntegrationTest {
+    private static final String SENDER = "demo-pass@mail.local.domain";
     private static final String RECIPIENT = "staffWithNoGrants@jhu.edu";
     private static final String CC = "notification-demo-cc@jhu.edu";
 
@@ -48,37 +45,34 @@ public class NotificationServiceIT extends AbstractNotificationSpringTest {
     @Autowired private PassClient passClient;
     @Autowired private NotificationService notificationService;
 
-    @BeforeEach
-    void setUp() {
-        System.setProperty("pass.core.url", "http://localhost:8080");
-        System.setProperty("pass.core.user", "backend");
-        System.setProperty("pass.core.password", "backend");
-    }
-
     @Test
     void testNotify() throws Exception {
         // GIVEN
+        final String expectedBody = "Dear staffWithNoGrants@jhu.edu\r\n\r\nA submission titled \"Specific protein " +
+            "supplementation using soya, casein or whey differentially affects regional gut growth and luminal " +
+            "growth factor bioactivity in rats; implications for the treatment of gut injury and stimulating " +
+            "repair\" has been prepared on your behalf by demo-pass@mail.local.domain with comment \"How " +
+            "does this submission look?\"\r\n\r\n\r\nPlease review the submission at the following URL: " +
+            "http://example.org/user-token-test\r\n\r\nA test inline footer";
+
         SubmissionEvent submissionEvent = stagePassData();
 
         SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
         submissionEventMessage.setSubmissionEventId(submissionEvent.getId());
-        submissionEventMessage.setUserApprovalLink(URI.create("http://test-user-link"));
+        submissionEventMessage.setUserApprovalLink(URI.create("http://example.org/user-token-test"));
 
         notificationService.notify(submissionEventMessage);
 
         List<MimeMessage> receivedMessages = Arrays.asList(greenMail.getReceivedMessages());
-        assertEquals(1, receivedMessages.size());
+        // 3 = 1 To + 1 CC + 1 BCC
+        assertEquals(3, receivedMessages.size());
 
         MimeMessage message = receivedMessages.get(0);
-        String body = message.getContent().toString();
-        assertTrue(message.getSubject().contains("Specific protein supplementation using soya"));
-        assertTrue(message.getSubject().contains("approval"));
+        assertTrue(message.getSubject().contains("PASS Submission Approval:"));
         assertEquals(SENDER, message.getFrom()[0].toString());
         assertEquals(CC, message.getRecipients(MimeMessage.RecipientType.CC)[0].toString());
         assertEquals(RECIPIENT, message.getRecipients(MimeMessage.RecipientType.TO)[0].toString());
-        assertTrue(body.contains("http://test-user-link"));
-        assertTrue(body.contains(submissionEvent.getId()));
-        assertTrue(body.contains(submissionEvent.getComment()));
+        assertEquals(expectedBody,  message.getContent().toString());
     }
 
     private SubmissionEvent stagePassData() throws IOException {

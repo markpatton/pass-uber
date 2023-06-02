@@ -25,8 +25,8 @@
         "notification": "SUBMISSION_APPROVAL_INVITE",
         "templates": {
           "SUBJECT": "PASS Submission Approval: ${RESOURCE_METADATA.title}",
-          "BODY": "classpath*:pass-body-submission-approval-invite-template.hbr",
-          "FOOTER": "classpath*:pass-footer-template.hbr"
+          "BODY": "classpath:/templates/pass-body-submission-approval-invite-template.hbr",
+          "FOOTER": "A test inline footer"
         }
       }
     ]

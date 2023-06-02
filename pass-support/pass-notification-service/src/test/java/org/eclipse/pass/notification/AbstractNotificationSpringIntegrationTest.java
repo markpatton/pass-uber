@@ -1,9 +1,7 @@
 package org.eclipse.pass.notification;
 
-import org.eclipse.pass.support.client.PassClient;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -11,10 +9,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest
 @TestPropertySource("classpath:test-application.properties")
 @TestPropertySource(properties = {
-    "pass.notification.configuration=classpath:test-notification.json"
+    "pass.notification.mode=DEMO",
+    "pass.notification.configuration=classpath:it-notification.json"
 })
-public abstract class AbstractNotificationSpringTest {
+public abstract class AbstractNotificationSpringIntegrationTest {
 
-    @MockBean private PassClient passClient;
+    static {
+        System.setProperty("pass.core.url", "http://localhost:8080");
+        System.setProperty("pass.core.user", "backend");
+        System.setProperty("pass.core.password", "backend");
+    }
 
 }

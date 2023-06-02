@@ -33,6 +33,11 @@ public class CompositeResolver implements TemplateResolver {
 
     private final List<TemplateResolver> resolvers;
 
+    /**
+     * Constructor.
+     * @param springUriTemplateResolver spring uri template resolver
+     * @param inlineTemplateResolver inline template resolver
+     */
     public CompositeResolver(SpringUriTemplateResolver springUriTemplateResolver,
                              InlineTemplateResolver inlineTemplateResolver) {
         this.resolvers = List.of(springUriTemplateResolver, inlineTemplateResolver);
@@ -40,7 +45,7 @@ public class CompositeResolver implements TemplateResolver {
 
     @Override
     public InputStream resolve(NotificationTemplateName name, String template) {
-        InputStream in = null;
+        InputStream in;
         for (TemplateResolver resolver : resolvers) {
             try {
                 log.debug("Attempting resolution of template value '{}', for named template '{}'", template, name);
