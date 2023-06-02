@@ -74,7 +74,6 @@ public class SimpleWhitelist implements Function<Collection<String>, Collection<
     }
 
     private static boolean isWhitelisted(String candidate, Collection<String> whitelist) {
-
         return whitelist.stream().map(String::toLowerCase).anyMatch(candidate::equals);
     }
 }

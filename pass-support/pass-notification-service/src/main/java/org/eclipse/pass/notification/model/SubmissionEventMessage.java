@@ -1,10 +1,10 @@
 package org.eclipse.pass.notification.model;
 
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.net.URI;
 
 @Getter
 @Setter
