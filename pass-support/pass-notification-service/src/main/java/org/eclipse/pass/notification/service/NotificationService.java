@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.pass.notification.dispatch.DispatchService;
 import org.eclipse.pass.notification.model.Notification;
+import org.eclipse.pass.notification.model.SubmissionEventMessage;
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
@@ -40,25 +41,19 @@ public class NotificationService {
     private final DispatchService dispatchService;
     private final Composer composer;
 
-    public void notify(SubmissionEvent submissionEvent) {
+    public void notify(SubmissionEventMessage submissionEventMessage) {
 
-        SubmissionEvent passSubmissionEvent;
+        SubmissionEvent submissionEvent;
         try {
-            passSubmissionEvent = passClient.getObject(SubmissionEvent.class, submissionEvent.getId(),
+            submissionEvent = passClient.getObject(SubmissionEvent.class, submissionEventMessage.getSubmissionEventId(),
                 "submission", "performedBy");
         } catch (Exception e) {
-            log.error("Unable to retrieve SubmissionEvent '{}'", submissionEvent.getId(), e);
+            log.error("Unable to retrieve SubmissionEvent '{}'", submissionEventMessage.getSubmissionEventId(), e);
             return;
         }
-        Submission submission = passSubmissionEvent.getSubmission();
 
-        // todo: abstract into a policy of some kind
-        if ((submission.getPreparers() == null || submission.getPreparers().isEmpty()) ||
-                (submission.getPreparers().contains(
-                    submission.getSubmitter()) && submission.getPreparers().size() == 1)
-        ) {
-            // then we are not dealing with proxy submission, we're dealing with self-submission.
-            // in the case of self-submission, notifications are not produced, so short-circuit here
+        Submission submission = submissionEvent.getSubmission();
+        if (isSelfSubmission(submission)) {
             log.debug("Dropping self-submission SubmissionEvent (Event URI: {}, Resource URI: {})",
                     submissionEvent.getId(),
                     submission.getId());
@@ -66,10 +61,15 @@ public class NotificationService {
         }
 
         // Compose Notification
-        Notification notification = composer.apply(submission, passSubmissionEvent);
+        Notification notification = composer.apply(submissionEvent, submissionEventMessage);
 
         // Invoke Dispatch
         dispatchService.dispatch(notification);
+    }
+
+    private boolean isSelfSubmission(Submission submission) {
+        return (submission.getPreparers() == null || submission.getPreparers().isEmpty()) ||
+            (submission.getPreparers().contains(submission.getSubmitter()) && submission.getPreparers().size() == 1);
     }
 
 }

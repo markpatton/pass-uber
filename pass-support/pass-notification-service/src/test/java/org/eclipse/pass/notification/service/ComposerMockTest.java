@@ -52,6 +52,7 @@ import org.eclipse.pass.notification.model.Link;
 import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.NotificationParam;
 import org.eclipse.pass.notification.model.NotificationType;
+import org.eclipse.pass.notification.model.SubmissionEventMessage;
 import org.eclipse.pass.support.client.model.EventType;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
@@ -119,8 +120,6 @@ public class ComposerMockTest {
         event.setId("test-sub-event-id");
         URI eventLink = randomUri();
         event.setLink(eventLink);
-        URI userTokenLink = randomUri();
-        event.setUserTokenLink(userTokenLink);
 
         Submission submission = new Submission();
         submission.setMetadata(TEST_RESOURCE_METADATA);
@@ -130,11 +129,16 @@ public class ComposerMockTest {
         submission.setSubmitter(submitter);
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+        URI userTokenLink = randomUri();
+        submissionEventMessage.setUserApprovalLink(userTokenLink);
+
         composer = new Composer(recipientConfig,
             new RecipientAnalyzer(), new SubmissionLinkAnalyzer(), linkValidator, new ObjectMapper());
 
         // WHEN
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(event, submissionEventMessage);
 
         // THEN
         verifyNotification(notification, submitter.getEmail(), NotificationType.SUBMISSION_APPROVAL_INVITE);
@@ -161,12 +165,15 @@ public class ComposerMockTest {
         submission.setSubmitter(submitter);
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+
         // WHEN
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(event, submissionEventMessage);
 
         // THEN
         verifyNotification(notification, submitter.getEmail(), NotificationType.SUBMISSION_APPROVAL_REQUESTED);
-        assertLinksPresent(notification, submission, event);
+        assertLinksPresent(notification, event, submissionEventMessage);
     }
 
     @Test
@@ -184,12 +191,15 @@ public class ComposerMockTest {
         submission.setPreparers(List.of(preparer));
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+
         // WHEN
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(event, submissionEventMessage);
 
         // THEN
         verifyNotification(notification, preparer.getEmail(), NotificationType.SUBMISSION_CHANGES_REQUESTED);
-        assertLinksPresent(notification, submission, event);
+        assertLinksPresent(notification, event, submissionEventMessage);
     }
 
     @Test
@@ -207,12 +217,15 @@ public class ComposerMockTest {
         submission.setPreparers(List.of(preparer));
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+
         // WHEN
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(event, submissionEventMessage);
 
         // THEN
         verifyNotification(notification, preparer.getEmail(), NotificationType.SUBMISSION_SUBMISSION_SUBMITTED);
-        assertLinksPresent(notification, submission, event);
+        assertLinksPresent(notification, event, submissionEventMessage);
     }
 
     @Test
@@ -234,12 +247,15 @@ public class ComposerMockTest {
         event.setPerformedBy(preparer);
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+
         // WHEN
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(event, submissionEventMessage);
 
         // THEN
         verifyNotification(notification, submitter.getEmail(), NotificationType.SUBMISSION_SUBMISSION_CANCELLED);
-        assertLinksPresent(notification, submission, event);
+        assertLinksPresent(notification, event, submissionEventMessage);
     }
 
     @Test
@@ -261,12 +277,15 @@ public class ComposerMockTest {
         event.setPerformedBy(submitter);
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+
         // WHEN
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(event, submissionEventMessage);
 
         // THEN
         verifyNotification(notification, preparer.getEmail(), NotificationType.SUBMISSION_SUBMISSION_CANCELLED);
-        assertLinksPresent(notification, submission, event);
+        assertLinksPresent(notification, event, submissionEventMessage);
     }
 
         /**
@@ -285,8 +304,11 @@ public class ComposerMockTest {
         submission.setSubmitterEmail(URI.create("test-null-submitter@test.com"));
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+
         // WHEN
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(event, submissionEventMessage);
 
         // THEN
         assertEquals(1, notification.getRecipients().size());
@@ -313,8 +335,11 @@ public class ComposerMockTest {
         submission.setSubmitterEmail(URI.create("test-null-submitter@test.com"));
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+
         // WHEN
-        Notification notification = composer.apply(submission, event);
+        Notification notification = composer.apply(event, submissionEventMessage);
 
         // THEN
         assertEquals(1, notification.getRecipients().size());
@@ -337,9 +362,12 @@ public class ComposerMockTest {
         submission.setId("test-sub-id");
         event.setSubmission(submission);
 
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+
         // WHEN
         RuntimeException ex = assertThrows(RuntimeException.class, () -> {
-            composer.apply(submission, event);
+            composer.apply(event, submissionEventMessage);
         });
 
         assertEquals("Submitter and email are null for test-sub-id", ex.getMessage());
@@ -371,16 +399,19 @@ public class ComposerMockTest {
         event.setEventType(EventType.APPROVAL_REQUESTED_NEWUSER);
         URI eventLink = URI.create("http://example.org/eventLink");
         event.setLink(eventLink);
-        URI userTokenTestLink = URI.create("http://tesinglink");
-        event.setUserTokenLink(userTokenTestLink);
         event.setPerformedBy(preparer);
         event.setComment("Please see if this submission meets your approval.");
+
+        SubmissionEventMessage submissionEventMessage = new SubmissionEventMessage();
+        submissionEventMessage.setSubmissionEventId("test-sub-event-id");
+        URI userTokenTestLink = URI.create("http://tesinglink");
+        submissionEventMessage.setUserApprovalLink(userTokenTestLink);
 
         composer = new Composer(recipientConfig,
             new RecipientAnalyzer(), new SubmissionLinkAnalyzer(), linkValidator, new ObjectMapper());
 
         // WHEN
-        Notification n = composer.apply(submission, event);
+        Notification n = composer.apply(event, submissionEventMessage);
 
         // THEN
         Map<NotificationParam, String> params = n.getParameters();
@@ -410,10 +441,11 @@ public class ComposerMockTest {
         assertNotSame(eventLink, deserializedLinks.get(0).getHref());
     }
 
-    private void assertLinksPresent(Notification notification, Submission submission, SubmissionEvent event) {
+    private void assertLinksPresent(Notification notification, SubmissionEvent event,
+                                    SubmissionEventMessage submissionEventMessage) {
 
         // Make sure the submission link analyzer was called with the appropriate arguments
-        verify(submissionLinkAnalyzer).apply(eq(submission), eq(event));
+        verify(submissionLinkAnalyzer).apply(eq(event), eq(submissionEventMessage));
 
         // Make sure the generated links are attached.
         String serializedLinks = notification.getParameters().get(NotificationParam.LINKS);

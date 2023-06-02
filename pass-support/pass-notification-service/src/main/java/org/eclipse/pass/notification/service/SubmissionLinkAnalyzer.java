@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.pass.notification.model.Link;
+import org.eclipse.pass.notification.model.SubmissionEventMessage;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.springframework.stereotype.Component;
@@ -41,19 +42,21 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class SubmissionLinkAnalyzer implements BiFunction<Submission, SubmissionEvent, Stream<Link>> {
+public class SubmissionLinkAnalyzer implements BiFunction<SubmissionEvent, SubmissionEventMessage, Stream<Link>> {
 
     /**
      * Return all submission-related links associated with a submission+event pair.
      *
-     * @param submission The submission.
      * @param event The associated submission event.
+     * @param submissionEventMessage The associated submission event message.
      * @return a stream of links, likely containing zero or one links.
      */
     @Override
-    public Stream<Link> apply(Submission submission, SubmissionEvent event) {
-        requireNonNull(submission);
+    public Stream<Link> apply(SubmissionEvent event, SubmissionEventMessage submissionEventMessage) {
         requireNonNull(event);
+
+        Submission submission = event.getSubmission();
+        requireNonNull(submission);
 
         if (event.getEventType() == null) {
             log.warn("Submission event type was null for {}.  Ignoring.", event.getId());
@@ -65,7 +68,7 @@ public class SubmissionLinkAnalyzer implements BiFunction<Submission, Submission
                 return required(format("Invalid submissionEvent %s", event.getId()),
                     event.getLink(),
                     SUBMISSION_REVIEW_INVITE)
-                    .map((link) -> new Link(event.getUserTokenLink(), SUBMISSION_REVIEW_INVITE));
+                    .map((link) -> new Link(submissionEventMessage.getUserApprovalLink(), SUBMISSION_REVIEW_INVITE));
             }
             case APPROVAL_REQUESTED, CHANGES_REQUESTED -> {
                 return required(

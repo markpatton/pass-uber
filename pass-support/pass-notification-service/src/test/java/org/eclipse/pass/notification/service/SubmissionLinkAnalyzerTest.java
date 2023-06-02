@@ -32,6 +32,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.eclipse.pass.notification.model.Link;
+import org.eclipse.pass.notification.model.SubmissionEventMessage;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,7 @@ public class SubmissionLinkAnalyzerTest {
 
     private final Submission submission = new Submission();
     private final SubmissionEvent event = new SubmissionEvent();
+    private final SubmissionEventMessage eventMessage = new SubmissionEventMessage();
 
     private SubmissionLinkAnalyzer submissionLinkAnalyzer;
 
@@ -54,18 +56,20 @@ public class SubmissionLinkAnalyzerTest {
         submission.setId("test-submission");
         event.setId("test-event");
         event.setLink(randomUri());
+        event.setSubmission(submission);
+        eventMessage.setSubmissionEventId(event.getId());
     }
 
     @Test
     public void testApprovalRequestedNewUser() {
 
         event.setEventType(APPROVAL_REQUESTED_NEWUSER);
-        event.setUserTokenLink(URI.create("http://foobar"));
+        eventMessage.setUserApprovalLink(URI.create("http://foobar"));
 
-        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(event, eventMessage).toList();
 
         assertEquals(1, generatedLinks.size());
-        assertEquals(event.getUserTokenLink(), generatedLinks.get(0).getHref());
+        assertEquals(eventMessage.getUserApprovalLink(), generatedLinks.get(0).getHref());
         assertEquals(SUBMISSION_REVIEW_INVITE, generatedLinks.get(0).getRel());
     }
 
@@ -75,7 +79,7 @@ public class SubmissionLinkAnalyzerTest {
         event.setEventType(APPROVAL_REQUESTED_NEWUSER);
 
         NullPointerException e = assertThrows(NullPointerException.class, () -> {
-            submissionLinkAnalyzer.apply(submission, event);
+            submissionLinkAnalyzer.apply(event, eventMessage);
         });
 
         assertTrue(e.getMessage().contains(event.getId()));
@@ -85,7 +89,7 @@ public class SubmissionLinkAnalyzerTest {
     public void testApprovalRequestedExistingUser() {
         event.setEventType(APPROVAL_REQUESTED);
 
-        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(event, eventMessage).toList();
 
         assertEquals(1, generatedLinks.size());
         assertEquals(event.getLink(), generatedLinks.get(0).getHref());
@@ -98,7 +102,7 @@ public class SubmissionLinkAnalyzerTest {
         event.setEventType(APPROVAL_REQUESTED);
 
         NullPointerException e = assertThrows(NullPointerException.class, () -> {
-            submissionLinkAnalyzer.apply(submission, event);
+            submissionLinkAnalyzer.apply(event, eventMessage);
         });
 
         assertTrue(e.getMessage().contains(event.getId()));
@@ -108,7 +112,7 @@ public class SubmissionLinkAnalyzerTest {
     public void changesRequestedTest() {
         event.setEventType(CHANGES_REQUESTED);
 
-        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(event, eventMessage).toList();
 
         assertEquals(1, generatedLinks.size());
         assertEquals(event.getLink(), generatedLinks.get(0).getHref());
@@ -121,7 +125,7 @@ public class SubmissionLinkAnalyzerTest {
         event.setLink(null);
 
         NullPointerException e = assertThrows(NullPointerException.class, () -> {
-            submissionLinkAnalyzer.apply(submission, event);
+            submissionLinkAnalyzer.apply(event, eventMessage);
         });
 
         assertTrue(e.getMessage().contains(event.getId()));
@@ -131,7 +135,7 @@ public class SubmissionLinkAnalyzerTest {
     public void submittedTest() {
         event.setEventType(SUBMITTED);
 
-        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(event, eventMessage).toList();
 
         assertEquals(1, generatedLinks.size());
         assertEquals(event.getLink(), generatedLinks.get(0).getHref());
@@ -143,14 +147,14 @@ public class SubmissionLinkAnalyzerTest {
         event.setEventType(SUBMITTED);
         event.setLink(null);
 
-        assertEquals(0, submissionLinkAnalyzer.apply(submission, event).count());
+        assertEquals(0, submissionLinkAnalyzer.apply(event, eventMessage).count());
     }
 
     @Test
     public void cancelledTest() {
         event.setEventType(CANCELLED);
 
-        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(submission, event).toList();
+        final List<Link> generatedLinks = submissionLinkAnalyzer.apply(event, eventMessage).toList();
 
         assertEquals(1, generatedLinks.size());
         assertEquals(event.getLink(), generatedLinks.get(0).getHref());
@@ -162,7 +166,7 @@ public class SubmissionLinkAnalyzerTest {
         event.setEventType(CANCELLED);
         event.setLink(null);
 
-        assertEquals(0, submissionLinkAnalyzer.apply(submission, event).count());
+        assertEquals(0, submissionLinkAnalyzer.apply(event, eventMessage).count());
     }
 
     @Test
@@ -170,6 +174,6 @@ public class SubmissionLinkAnalyzerTest {
         event.setEventType(null);
         event.setLink(null);
 
-        assertEquals(0, submissionLinkAnalyzer.apply(submission, event).count());
+        assertEquals(0, submissionLinkAnalyzer.apply(event, eventMessage).count());
     }
 }

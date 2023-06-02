@@ -31,6 +31,7 @@ import org.eclipse.pass.notification.config.RecipientConfig;
 import org.eclipse.pass.notification.model.Notification;
 import org.eclipse.pass.notification.model.NotificationParam;
 import org.eclipse.pass.notification.model.NotificationType;
+import org.eclipse.pass.notification.model.SubmissionEventMessage;
 import org.eclipse.pass.support.client.model.EventType;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
@@ -57,7 +58,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Component
-public class Composer implements BiFunction<Submission, SubmissionEvent, Notification> {
+public class Composer implements BiFunction<SubmissionEvent, SubmissionEventMessage, Notification> {
 
     private final RecipientConfig recipientConfig;
     private final RecipientAnalyzer recipientAnalyzer;
@@ -68,14 +69,16 @@ public class Composer implements BiFunction<Submission, SubmissionEvent, Notific
     /**
      * Composes a {@code Notification} from a {@code Submission} and {@code SubmissionEvent}.
      *
-     * @param submission
-     * @param event
-     * @return
+     * @param event the submission event
+     * @param submissionEventMessage the submission event message
+     * @return the composed Notification
      */
     @Override
-    public Notification apply(Submission submission, SubmissionEvent event) {
-        Objects.requireNonNull(submission, "Submission must not be null.");
+    public Notification apply(SubmissionEvent event, SubmissionEventMessage submissionEventMessage) {
         Objects.requireNonNull(event, "Event must not be null.");
+
+        Submission submission = event.getSubmission();
+        Objects.requireNonNull(submission, "Submission must not be null.");
 
         if (!event.getSubmission().getId().equals(submission.getId())) {
             // todo: exception?
@@ -113,7 +116,7 @@ public class Composer implements BiFunction<Submission, SubmissionEvent, Notific
         notification.setRecipients(recipients);
         params.put(NotificationParam.TO, join(",", recipients));
 
-        params.put(NotificationParam.LINKS, concat(submissionLinkAnalyzer.apply(submission, event))
+        params.put(NotificationParam.LINKS, concat(submissionLinkAnalyzer.apply(event, submissionEventMessage))
                 .filter(linkValidator)
                 .collect(serialized()));
 

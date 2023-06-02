@@ -30,6 +30,7 @@ import java.util.List;
 import lombok.SneakyThrows;
 import org.eclipse.pass.notification.dispatch.DispatchService;
 import org.eclipse.pass.notification.model.Notification;
+import org.eclipse.pass.notification.model.SubmissionEventMessage;
 import org.eclipse.pass.support.client.PassClient;
 import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
@@ -58,7 +59,7 @@ public class NotificationServiceTest {
         // GIVEN
         SubmissionPreparer sp = new SubmissionPreparer(passClient);
         Notification n = mock(Notification.class);
-        when(composer.apply(sp.submission, sp.event)).thenReturn(n);
+        when(composer.apply(sp.event, sp.eventMessage)).thenReturn(n);
 
         // The preparers and the submitter must differ (i.e. must *not* be a self-submission) for the submissionevent to
         // be processed by defaultnotificationservice
@@ -70,12 +71,12 @@ public class NotificationServiceTest {
         when(sp.submission.getPreparers()).thenReturn(List.of(preparer));
 
         // WHEN
-        notificationService.notify(sp.event);
+        notificationService.notify(sp.eventMessage);
 
         // THEN
         verify(passClient, times(1))
             .getObject(SubmissionEvent.class, "test-event-id", "submission", "performedBy");
-        verify(composer).apply(sp.submission, sp.event);
+        verify(composer).apply(sp.event, sp.eventMessage);
         verify(dispatchService).dispatch(n);
     }
 
@@ -91,7 +92,7 @@ public class NotificationServiceTest {
         when(sp.submission.getPreparers()).thenReturn(null);
 
         // WHEN
-        notificationService.notify(sp.event);
+        notificationService.notify(sp.eventMessage);
 
         // THEN
         verify(passClient, times(1))
@@ -112,7 +113,7 @@ public class NotificationServiceTest {
         when(sp.submission.getPreparers()).thenReturn(Collections.emptyList());
 
         // WHEN
-        notificationService.notify(sp.event);
+        notificationService.notify(sp.eventMessage);
 
         // THEN
         verify(passClient, times(1))
@@ -136,7 +137,7 @@ public class NotificationServiceTest {
         when(sp.submission.getSubmitter()).thenReturn(submitter);
 
         // WHEN
-        notificationService.notify(sp.event);
+        notificationService.notify(sp.eventMessage);
 
         // THEN
         verify(passClient, times(1))
@@ -166,19 +167,20 @@ public class NotificationServiceTest {
         when(sp.submission.getSubmitter()).thenReturn(submitter);
 
         Notification n = mock(Notification.class);
-        when(composer.apply(sp.submission, sp.event)).thenReturn(n);
+        when(composer.apply(sp.event, sp.eventMessage)).thenReturn(n);
 
         // WHEN
-        notificationService.notify(sp.event);
+        notificationService.notify(sp.eventMessage);
 
         // THEN
         verify(passClient, times(1))
             .getObject(SubmissionEvent.class, "test-event-id", "submission", "performedBy");
-        verify(composer).apply(sp.submission, sp.event);
+        verify(composer).apply(sp.event, sp.eventMessage);
         verify(dispatchService).dispatch(n);
     }
 
     private static class SubmissionPreparer {
+        private final SubmissionEventMessage eventMessage;
         private final SubmissionEvent event;
         private final Submission submission;
 
@@ -187,6 +189,9 @@ public class NotificationServiceTest {
             String eventId = "test-event-id";
             String submissionId = "test-submission-id";
 
+            eventMessage = new SubmissionEventMessage();
+            eventMessage.setSubmissionEventId(eventId)
+            ;
             event = mock(SubmissionEvent.class);
             when(event.getId()).thenReturn(eventId);
 
