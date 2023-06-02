@@ -64,7 +64,6 @@ public class Parameterizer {
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey,
                         entry -> parameterizer.parameterize(
-                                entry.getKey(),
                                 ofNullable(notification.getParameters())
                                     .orElseGet(Collections::emptyMap),
                                 entry.getValue())));

@@ -22,18 +22,36 @@ import org.eclipse.pass.notification.model.Notification;
  */
 public class DispatchException extends RuntimeException {
 
+    /**
+     * The notification involved in the exception.
+     */
     private final Notification notification;
 
+    /**
+     * Constructor.
+     * @param message error message
+     * @param notification the notification involved
+     */
     public DispatchException(String message, Notification notification) {
         super(message);
         this.notification = notification;
     }
 
+    /**
+     * Constructor.
+     * @param message error message
+     * @param cause the cause of the error
+     * @param notification the notification involved
+     */
     public DispatchException(String message, Throwable cause, Notification notification) {
         super(message, cause);
         this.notification = notification;
     }
 
+    /**
+     * Returns the notification involved in exception.
+     * @return the notification
+     */
     public Notification getNotification() {
         return notification;
     }

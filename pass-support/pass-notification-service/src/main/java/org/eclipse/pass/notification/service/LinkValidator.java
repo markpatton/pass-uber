@@ -37,6 +37,11 @@ public class LinkValidator implements Predicate<Link> {
     private final Collection<LinkValidationRule> rules;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Constructor.
+     * @param config the notification config
+     * @param objectMapper the object mapper
+     */
     public LinkValidator(NotificationConfig config,
                          ObjectMapper objectMapper) {
         this.rules = config.getLinkValidatorConfig();

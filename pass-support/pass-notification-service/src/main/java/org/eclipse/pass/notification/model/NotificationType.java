@@ -8,8 +8,13 @@ import static org.eclipse.pass.support.client.model.EventType.SUBMITTED;
 
 import java.util.stream.Stream;
 
+import lombok.AllArgsConstructor;
 import org.eclipse.pass.support.client.model.EventType;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
+@AllArgsConstructor
 public enum NotificationType {
     /**
      * Preparer has requested approval of a Submission by an Authorized Submitter
@@ -39,10 +44,6 @@ public enum NotificationType {
     SUBMISSION_SUBMISSION_CANCELLED(CANCELLED);
 
     private final EventType eventType;
-
-    NotificationType(EventType eventType) {
-        this.eventType = eventType;
-    }
 
     /**
      * Find NotificationType for EventType.

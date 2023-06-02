@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
 @Getter
 @Setter
 public class SubmissionEventMessage {

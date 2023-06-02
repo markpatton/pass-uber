@@ -125,7 +125,7 @@ public class EmailDispatchImplMockTest {
         when(templateResolver.resolve(any(), any())).thenAnswer(inv ->
                 IOUtils.toInputStream(inv.getArgument(1), "UTF-8"));
 
-        when(templateParameterizer.parameterize(any(), any(), any())).thenAnswer(inv -> {
+        when(templateParameterizer.parameterize(any(), any())).thenAnswer(inv -> {
             NotificationTemplateName name = inv.getArgument(0);
             switch (name) {
                 case SUBJECT -> {

@@ -45,6 +45,10 @@ public class LoggingAspect {
     @Pointcut("execution(public * org.eclipse.pass.notification.dispatch.DispatchService.dispatch(..))")
     void dispatchApiMethod() {}
 
+    /**
+     * Pointcut for before dispatch logging.
+     * @param jp the joinpoint
+     */
     @Before("dispatchApiMethod()")
     public void logNotification(JoinPoint jp) {
         Object[] args = jp.getArgs();
@@ -64,6 +68,11 @@ public class LoggingAspect {
                 n.getResourceId());
     }
 
+    /**
+     * Pointcut for after dispatch logging.
+     * @param jp the joinpoint
+     * @param id the id
+     */
     @AfterReturning(pointcut = "dispatchApiMethod()", returning = "id")
     public void logNotificationReturn(JoinPoint jp, String id) {
         Object[] args = jp.getArgs();
@@ -86,6 +95,10 @@ public class LoggingAspect {
 
     }
 
+    /**
+     * Pointcut for exception during dispatch logging.
+     * @param ex the exception
+     */
     @AfterThrowing(pointcut = "dispatchApiMethod()", throwing = "ex")
     public void logNotificationError(Throwable ex) {
         Notification n;

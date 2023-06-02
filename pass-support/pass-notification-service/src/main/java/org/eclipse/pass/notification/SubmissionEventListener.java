@@ -9,6 +9,9 @@ import org.eclipse.pass.notification.service.NotificationService;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
 @AllArgsConstructor
 @Slf4j
 @Component
@@ -17,6 +20,10 @@ public class SubmissionEventListener {
     private final NotificationService notificationService;
     private final NotificationConfig notificationConfig;
 
+    /**
+     * Listen for submission even messages and process them.
+     * @param submissionEventMessage the message
+     */
     @JmsListener(destination = "${pass.notification.queue.event.name}",
         containerFactory = "jmsListenerContainerFactory")
     public void processMessage(SubmissionEventMessage submissionEventMessage) {

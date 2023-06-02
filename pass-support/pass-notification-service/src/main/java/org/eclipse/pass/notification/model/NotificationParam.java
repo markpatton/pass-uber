@@ -1,8 +1,13 @@
 package org.eclipse.pass.notification.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
 @Getter
+@AllArgsConstructor
 public enum NotificationParam {
     /**
      * Placeholder for the addressee of the notification
@@ -49,9 +54,5 @@ public enum NotificationParam {
      * String representation of the parameter name, suitable for use as a key in a key-value pair.
      */
     private final String paramName;
-
-    NotificationParam(String paramName) {
-        this.paramName = paramName;
-    }
 
 }

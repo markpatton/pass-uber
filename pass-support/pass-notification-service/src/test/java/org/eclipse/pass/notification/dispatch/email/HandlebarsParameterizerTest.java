@@ -28,7 +28,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.eclipse.pass.notification.model.NotificationParam;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,7 +91,7 @@ public class HandlebarsParameterizerTest {
 
     @Test
     public void simpleParameterization() {
-        String parameterized = handlebarsParameterizer.parameterize(NotificationTemplateName.BODY, paramMap,
+        String parameterized = handlebarsParameterizer.parameterize(paramMap,
                                                       new ByteArrayInputStream(BODY_TEMPLATE.getBytes()));
 
         assertTrue(parameterized.contains(TO));
@@ -108,7 +107,7 @@ public class HandlebarsParameterizerTest {
         HashMap<NotificationParam, String> paramMap = new HashMap<>() {{
                     put(NotificationParam.TO, href);
                 }};
-        String parameterized = handlebarsParameterizer.parameterize(NotificationTemplateName.BODY, paramMap,
+        String parameterized = handlebarsParameterizer.parameterize(paramMap,
                                                       IOUtils.toInputStream("{{to}}", "UTF-8"));
 
         assertEquals(href, parameterized);

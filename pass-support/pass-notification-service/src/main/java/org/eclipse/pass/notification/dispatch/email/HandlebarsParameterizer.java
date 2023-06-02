@@ -28,7 +28,6 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.pass.notification.config.NotificationTemplateName;
 import org.eclipse.pass.notification.model.NotificationParam;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +45,10 @@ public class HandlebarsParameterizer {
     private final Handlebars handlebars;
     private final ObjectMapper mapper;
 
+    /**
+     * Constructor.
+     * @param mapper the object mapper
+     */
     public HandlebarsParameterizer(ObjectMapper mapper) {
         this.mapper = mapper;
         Handlebars handlebars = new Handlebars();
@@ -53,8 +56,13 @@ public class HandlebarsParameterizer {
         this.handlebars = handlebars.with(EscapingStrategy.NOOP);
     }
 
-    public String parameterize(NotificationTemplateName templateName, Map<NotificationParam, String> paramMap,
-                               InputStream template) {
+    /**
+     * Populate template stream with param values and return it as a String.
+     * @param paramMap the map of params
+     * @param template the template
+     * @return the populated template as String
+     */
+    public String parameterize(Map<NotificationParam, String> paramMap, InputStream template) {
 
         Map<String, Object> mustacheModel = paramMap
                 .entrySet()
@@ -84,7 +92,7 @@ public class HandlebarsParameterizer {
                             return entry.getValue();
                         }));
 
-        String parameterizedTemplate = null;
+        String parameterizedTemplate;
         try {
             String templateString = IOUtils.toString(template, StandardCharsets.UTF_8);
             Template t = handlebars.compileInline(templateString);

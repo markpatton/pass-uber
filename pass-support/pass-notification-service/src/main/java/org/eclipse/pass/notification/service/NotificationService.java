@@ -41,6 +41,10 @@ public class NotificationService {
     private final DispatchService dispatchService;
     private final Composer composer;
 
+    /**
+     * Create notification for submission event message.
+     * @param submissionEventMessage the message
+     */
     public void notify(SubmissionEventMessage submissionEventMessage) {
 
         SubmissionEvent submissionEvent;

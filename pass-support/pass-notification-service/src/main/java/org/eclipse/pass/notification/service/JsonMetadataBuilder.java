@@ -12,10 +12,19 @@ import org.eclipse.pass.support.client.model.Submission;
 import org.eclipse.pass.support.client.model.SubmissionEvent;
 import org.springframework.util.ReflectionUtils;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
 public class JsonMetadataBuilder {
 
     private JsonMetadataBuilder() {}
 
+    /**
+     * Build and return resource metadata for Submission.
+     * @param submission the submission
+     * @param mapper the object mapper
+     * @return resource metadata as String
+     */
     public static String resourceMetadata(Submission submission, ObjectMapper mapper) {
         String metadata = submission.getMetadata();
         if (metadata == null || metadata.trim().length() == 0) {
@@ -40,6 +49,12 @@ public class JsonMetadataBuilder {
         return resourceMetadata.toString();
     }
 
+    /**
+     * Build and return resource metadata for SubmissionEvent.
+     * @param event the submission event
+     * @param mapper the object mapper
+     * @return resource metadata as String
+     */
     public static String eventMetadata(SubmissionEvent event, ObjectMapper mapper) {
         ObjectNode eventMetadata = mapper.createObjectNode();
         eventMetadata.put("id", field("id", event).orElse(""));

@@ -56,8 +56,16 @@ public class Link {
     private String rel;
     private URI href;
 
+    /**
+     * Default constructor.
+     */
     public Link() {}
 
+    /**
+     * Constructor.
+     * @param href the uri
+     * @param rel the rel
+     */
     public Link(URI href, String rel) {
         Objects.requireNonNull(href, "Link must not be null.");
         Objects.requireNonNull(rel, "Rel must not be null.");
@@ -66,11 +74,19 @@ public class Link {
         this.href = href;
     }
 
+    /**
+     * Set the rel.
+     * @param rel the rel
+     */
     public void setRel(String rel) {
         Objects.requireNonNull(rel, "Rel must not be null.");
         this.rel = rel;
     }
 
+    /**
+     * Set the href.
+     * @param href the href
+     */
     public void setHref(URI href) {
         Objects.requireNonNull(rel, "Href must not be null.");
         this.href = href;

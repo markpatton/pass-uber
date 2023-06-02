@@ -26,6 +26,10 @@ import org.eclipse.pass.notification.model.Notification;
 @FunctionalInterface
 public interface DispatchService {
 
+    /**
+     * Dispatch notification to recipients.
+     * @param notification the notification to dispatch
+     */
     void dispatch(Notification notification);
 
 }

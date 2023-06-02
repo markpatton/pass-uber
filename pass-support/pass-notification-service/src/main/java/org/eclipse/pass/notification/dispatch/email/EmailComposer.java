@@ -40,8 +40,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailComposer {
 
-    public static final String SUBMISSION_SMTP_HEADER = "X-PASS-Submission-ID";
-    public static final String NOTIFICATION_TYPE_SMTP_HEADER = "X-PASS-Notification-Type";
+    private static final String SUBMISSION_SMTP_HEADER = "X-PASS-Submission-ID";
+    private static final String NOTIFICATION_TYPE_SMTP_HEADER = "X-PASS-Notification-Type";
 
     private final SimpleWhitelist whitelist;
     private final JavaMailSender javaMailSender;

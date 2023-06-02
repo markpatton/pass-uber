@@ -43,11 +43,19 @@ public class SpringBootNotificationConfig {
     @Value("${pass.notification.configuration}")
     private Resource notificationConfigResource;
 
+    /**
+     * Configure the PassClient.
+     * @return the PassClient bean
+     */
     @Bean
     public PassClient passClient() {
         return PassClient.newInstance();
     }
 
+    /**
+     * Configure the NotificationConfig.
+     * @return the NotificationConfig bean
+     */
     @Bean
     public NotificationConfig notificationConfiguration(ObjectMapper objectMapper) throws IOException {
         NotificationConfig notificationConfig = objectMapper.readValue(notificationConfigResource.getInputStream(),
@@ -56,6 +64,10 @@ public class SpringBootNotificationConfig {
         return notificationConfig;
     }
 
+    /**
+     * Configure the RecipientConfig. The appropriate RecipientConfig will be selected based on Mode.
+     * @return the RecipientConfig bean
+     */
     @Bean
     public RecipientConfig recipientConfig(NotificationConfig config) {
         return config.getRecipientConfigs().stream()
@@ -64,6 +76,10 @@ public class SpringBootNotificationConfig {
                 new RuntimeException("Missing recipient configuration for Mode '" + config.getMode() + "'"));
     }
 
+    /**
+     * Configure the DefaultJmsListenerContainerFactory.
+     * @return the DefaultJmsListenerContainerFactory bean
+     */
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(
         @Value("${spring.jms.listener.concurrency}")

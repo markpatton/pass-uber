@@ -1,8 +1,13 @@
 package org.eclipse.pass.notification.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
 @Getter
+@AllArgsConstructor
 public enum NotificationTemplateName {
 
     /**
@@ -21,9 +26,5 @@ public enum NotificationTemplateName {
     FOOTER("footer");
 
     private final String templateName;
-
-    NotificationTemplateName(String templateName) {
-        this.templateName = templateName;
-    }
 
 }
