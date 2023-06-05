@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
 import javax.jms.ConnectionFactory;
+import javax.jms.TextMessage;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 
@@ -55,6 +56,7 @@ public class JmsConfiguration {
     static final String DEPOSIT_KEY = "deposit";
     static final String SUBMISSION_EVENT_KEY = "submission-event";
     static final String TYPE_KEY = "type";
+    static final String MESSAGE_PROPERTY_TYPE_KEY = "type";
 
     @Value("${pass.jms.queue.submission}")
     private String submission_queue;
@@ -119,7 +121,7 @@ public class JmsConfiguration {
     }
 
     /**
-     * Optionally start a JMS
+     * Optionally start a JMS broker
      *
      * @param url for the broker
      * @return BrokerService
@@ -164,17 +166,17 @@ public class JmsConfiguration {
 
     private void setupHooks(EntityDictionary dictionary, JmsTemplate jms, TokenFactory userTokenFactory) {
         LifeCycleHook<SubmissionEvent> sub_event_hook = (op, phase, event, scope, changes) -> {
-            send(jms, submission_event_queue, createMessage(event, userTokenFactory));
+            send(jms, submission_event_queue, createMessage(event, userTokenFactory), SUBMISSION_EVENT_MESSAGE_TYPE);
         };
 
         LifeCycleHook<Submission> sub_hook = (op, phase, sub, scope, changes) -> {
             if (sub.getSubmitted() != null && sub.getSubmitted() == true) {
-                send(jms, submission_queue, createMessage(sub));
+                send(jms, submission_queue, createMessage(sub), SUBMISSION_MESSAGE_TYPE);
             }
         };
 
         LifeCycleHook<Deposit> deposit_hook = (op, phase, dep, scope, changes) -> {
-            send(jms, deposit_queue, createMessage(dep));
+            send(jms, deposit_queue, createMessage(dep), DEPOSIT_MESSAGE_TYPE);
         };
 
         dictionary.bindTrigger(SubmissionEvent.class, Operation.CREATE, TransactionPhase.POSTCOMMIT, sub_event_hook,
@@ -227,7 +229,11 @@ public class JmsConfiguration {
                 DEPOSIT_MESSAGE_TYPE).build().toString();
     }
 
-    private void send(JmsTemplate jms, String queue, String text) {
-        jms.send(queue, ses -> ses.createTextMessage(text));
+    private void send(JmsTemplate jms, String queue, String text, String type) {
+        jms.send(queue, ses -> {
+            TextMessage msg = ses.createTextMessage(text);
+            msg.setStringProperty(MESSAGE_PROPERTY_TYPE_KEY, type);
+            return msg;
+        });
     }
 }

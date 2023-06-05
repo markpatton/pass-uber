@@ -94,9 +94,11 @@ public class JmsConfigurationTest extends IntegrationTest {
         return null;
     }
 
-    private JsonObject get_json_message(String queue) throws JMSException {
+    private JsonObject get_json_message(String queue, String message_type) throws JMSException {
         TextMessage mesg = (TextMessage) jms.receive(queue);
         mesg.acknowledge();
+
+        assertEquals(message_type, mesg.getStringProperty(JmsConfiguration.MESSAGE_PROPERTY_TYPE_KEY));
 
         return parse_json(mesg.getText());
     }
@@ -109,7 +111,8 @@ public class JmsConfigurationTest extends IntegrationTest {
 
         client.createObject(sub);
 
-        JsonObject result = get_json_message(jmsConfig.getSubmissionQueue());
+        JsonObject result = get_json_message(jmsConfig.getSubmissionQueue(),
+                JmsConfiguration.SUBMISSION_MESSAGE_TYPE);
 
         assertEquals(sub.getId().toString(), result.getString(JmsConfiguration.SUBMISSION_KEY));
         assertEquals(JmsConfiguration.SUBMISSION_MESSAGE_TYPE, result.getString(JmsConfiguration.TYPE_KEY));
@@ -118,7 +121,8 @@ public class JmsConfigurationTest extends IntegrationTest {
 
         client.updateObject(sub);
 
-        result = get_json_message(jmsConfig.getSubmissionQueue());
+        result = get_json_message(jmsConfig.getSubmissionQueue(),
+                JmsConfiguration.SUBMISSION_MESSAGE_TYPE);
 
         assertEquals(sub.getId().toString(), result.getString(JmsConfiguration.SUBMISSION_KEY));
         assertEquals(JmsConfiguration.SUBMISSION_MESSAGE_TYPE, result.getString(JmsConfiguration.TYPE_KEY));
@@ -131,7 +135,8 @@ public class JmsConfigurationTest extends IntegrationTest {
 
         client.createObject(se);
 
-        JsonObject result = get_json_message(jmsConfig.getSubmissionEventQueue());
+        JsonObject result = get_json_message(jmsConfig.getSubmissionEventQueue(),
+                JmsConfiguration.SUBMISSION_EVENT_MESSAGE_TYPE);
 
         assertEquals(se.getId().toString(), result.getString(JmsConfiguration.SUBMISSION_EVENT_KEY));
         assertEquals(JmsConfiguration.SUBMISSION_EVENT_MESSAGE_TYPE, result.getString(JmsConfiguration.TYPE_KEY));
@@ -152,7 +157,8 @@ public class JmsConfigurationTest extends IntegrationTest {
 
         client.createObject(se);
 
-        JsonObject result = get_json_message(jmsConfig.getSubmissionEventQueue());
+        JsonObject result = get_json_message(jmsConfig.getSubmissionEventQueue(),
+                JmsConfiguration.SUBMISSION_EVENT_MESSAGE_TYPE);
 
         assertEquals(se.getId().toString(), result.getString(JmsConfiguration.SUBMISSION_EVENT_KEY));
         assertEquals(JmsConfiguration.SUBMISSION_EVENT_MESSAGE_TYPE, result.getString(JmsConfiguration.TYPE_KEY));
@@ -173,7 +179,8 @@ public class JmsConfigurationTest extends IntegrationTest {
 
         client.createObject(dep);
 
-        JsonObject result = get_json_message(jmsConfig.getDepositQueue());
+        JsonObject result = get_json_message(jmsConfig.getDepositQueue(),
+                JmsConfiguration.DEPOSIT_MESSAGE_TYPE);
 
         assertEquals(dep.getId().toString(), result.getString(JmsConfiguration.DEPOSIT_KEY));
         assertEquals(JmsConfiguration.DEPOSIT_MESSAGE_TYPE, result.getString(JmsConfiguration.TYPE_KEY));
