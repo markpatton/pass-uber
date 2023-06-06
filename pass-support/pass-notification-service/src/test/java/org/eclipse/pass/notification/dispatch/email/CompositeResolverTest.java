@@ -37,8 +37,7 @@ public class CompositeResolverTest extends AbstractNotificationSpringTest {
     @Test
     public void testSpringResolution() throws IOException {
         // GIVEN
-        String templatePath = "org/eclipse/pass/notification/dispatch/email/" +
-            "pass-body-submission-approval-invite-template.hbr";
+        String templatePath = "/templates/pass-body-submission-approval-invite-template.hbr";
         String expectedTemplate = IOUtils.toString(new ClassPathResource(templatePath).getInputStream(),
             StandardCharsets.UTF_8);
 

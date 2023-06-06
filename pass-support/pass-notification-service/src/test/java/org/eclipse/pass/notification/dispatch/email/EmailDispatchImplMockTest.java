@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.Address;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
@@ -58,17 +59,15 @@ public class EmailDispatchImplMockTest {
     private final static String CC_JOINED = "pass-prod-cc@jhu.edu,pass-admin@jhu.edu";
     private final static String USER_EMAIL = "user@bar.com";
     private final static String FROM = "pass-noreply@jhu.edu";
-    private final static String METADATA = "[\n" +
-        "  {\n" +
-        "    \"a sample metadata\": \"blob\",\n" +
-        "    \"for\": \"a Submission\"\n" +
-        "  }\n" +
-        "]";
+    private final static String METADATA =
+        "{\n" +
+        "  \"a sample metadata\": \"blob\",\n" +
+        "  \"for\": \"a Submission\"\n" +
+        "}\n";
 
     private Notification notification;
     private NotificationTemplate templateProto;
     private CompositeResolver templateResolver;
-    private HandlebarsParameterizer templateParameterizer;
     private JavaMailSender mailer;
 
     private EmailDispatchImpl emailDispatch;
@@ -81,7 +80,6 @@ public class EmailDispatchImplMockTest {
         templateResolver = mock(CompositeResolver.class);
         User user = mock(User.class);
         mailer = mock(JavaMailSender.class);
-        templateParameterizer = mock(HandlebarsParameterizer.class);
 
         when(config.getTemplates()).thenReturn(Collections.singletonList(templateProto));
         when(templateProto.getTemplates()).thenReturn(new HashMap<>() {
@@ -94,7 +92,8 @@ public class EmailDispatchImplMockTest {
         when(user.getId()).thenReturn("test-user");
         when(user.getEmail()).thenReturn(USER_EMAIL);
 
-        Parameterizer parameterizer = new Parameterizer(config, templateResolver, templateParameterizer);
+        Parameterizer parameterizer = new Parameterizer(config, templateResolver,
+            new HandlebarsParameterizer(new ObjectMapper()));
 
         // mock a whitelist that accepts all recipients by simply returning the collection of recipients it was provided
         SimpleWhitelist whitelist = mock(SimpleWhitelist.class);
@@ -125,24 +124,6 @@ public class EmailDispatchImplMockTest {
         when(templateResolver.resolve(any(), any())).thenAnswer(inv ->
                 IOUtils.toInputStream(inv.getArgument(1), "UTF-8"));
 
-        when(templateParameterizer.parameterize(any(), any())).thenAnswer(inv -> {
-            NotificationTemplateName name = inv.getArgument(0);
-            switch (name) {
-                case SUBJECT -> {
-                    return "A Subject";
-                }
-                case FOOTER -> {
-                    return "A Footer";
-                }
-                case BODY -> {
-                    return "A Body";
-                }
-                default -> {
-                }
-            }
-
-            throw new RuntimeException("Unknown template name '" + name + "'");
-        });
         MimeMessage mimeMessage = new MimeMessage((Session) null);
         when(mailer.createMimeMessage()).thenReturn(mimeMessage);
 
