@@ -1,11 +1,10 @@
-package org.eclipse.pass.notification;
+package org.eclipse.pass.notification.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.pass.notification.config.Mode;
 import org.eclipse.pass.notification.config.NotificationConfig;
 import org.eclipse.pass.notification.model.SubmissionEventMessage;
-import org.eclipse.pass.notification.service.NotificationService;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +23,7 @@ public class SubmissionEventListener {
      * Listen for submission even messages and process them.
      * @param submissionEventMessage the message
      */
-    @JmsListener(destination = "${pass.notification.queue.event.name}",
-        containerFactory = "jmsListenerContainerFactory")
+    @JmsListener(destination = "${pass.jms.queue.submission-event}")
     public void processMessage(SubmissionEventMessage submissionEventMessage) {
         log.trace("Receiving SubmissionEvent: {}", submissionEventMessage.getSubmissionEventId());
         if (Mode.DISABLED == notificationConfig.getMode()) {

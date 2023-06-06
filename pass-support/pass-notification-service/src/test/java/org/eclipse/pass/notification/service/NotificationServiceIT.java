@@ -30,20 +30,46 @@ import org.eclipse.pass.support.client.model.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * @author Russ Poetker (rpoetke1@jh.edu)
  */
+@Testcontainers
+@DirtiesContext
 public class NotificationServiceIT extends AbstractNotificationSpringIntegrationTest {
     private static final String SENDER = "demo-pass@mail.local.domain";
     private static final String RECIPIENT = "staffWithNoGrants@jhu.edu";
     private static final String CC = "notification-demo-cc@jhu.edu";
+
+    private static final DockerImageName PASS_CORE_IMG =
+        DockerImageName.parse("ghcr.io/eclipse-pass/pass-core-main");
+
+    @Container
+    static final GenericContainer<?> PASS_CORE_CONTAINER = new GenericContainer<>(PASS_CORE_IMG)
+        .withEnv("PASS_CORE_BASE_URL", "http://localhost:8080")
+        .withEnv("PASS_CORE_BACKEND_USER", "backend")
+        .withEnv("PASS_CORE_BACKEND_PASSWORD", "backend")
+        .waitingFor(Wait.forHttp("/data/grant"))
+        .withExposedPorts(8080);
 
     @RegisterExtension
     static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP_IMAP);
 
     @Autowired private PassClient passClient;
     @Autowired private NotificationService notificationService;
+
+    @DynamicPropertySource
+    static void updateProperties(DynamicPropertyRegistry registry) {
+        System.setProperty("pass.core.url", "http://localhost:" + PASS_CORE_CONTAINER.getMappedPort(8080));
+    }
 
     @Test
     void testNotify() throws Exception {
