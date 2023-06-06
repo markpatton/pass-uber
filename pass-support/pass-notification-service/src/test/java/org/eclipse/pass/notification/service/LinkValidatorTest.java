@@ -68,10 +68,7 @@ public class LinkValidatorTest {
     // Make sure a simple rule passing/failing on baseuri does the right the right thing
     @Test
     public void simpleRuleTest() {
-
         rules.add(rule);
-
-        // TODO possibly change this to spring test
         final LinkValidator toTest = new LinkValidator(config, new ObjectMapper());
         assertTrue(toTest.test(goodLink));
         assertFalse(toTest.test(badLink));
