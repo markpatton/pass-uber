@@ -58,6 +58,7 @@ public class SpringBootNotificationConfig {
 
     /**
      * Configure the NotificationConfig.
+     * @param objectMapper the object mapper
      * @return the NotificationConfig bean
      */
     @Bean
@@ -70,6 +71,7 @@ public class SpringBootNotificationConfig {
 
     /**
      * Configure the RecipientConfig. The appropriate RecipientConfig will be selected based on Mode.
+     * @param config the notification config
      * @return the RecipientConfig bean
      */
     @Bean
