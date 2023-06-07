@@ -4,6 +4,7 @@ import com.amazon.sqs.javamessaging.ProviderConfiguration;
 import com.amazon.sqs.javamessaging.SQSConnectionFactory;
 import com.amazon.sqs.javamessaging.SQSMessageConsumerPrefetch;
 import jakarta.jms.ConnectionFactory;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -13,6 +14,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
 
+@TestConfiguration
 public class AwsSqsTestConfig {
 
     static final String QUEUE_NAME = "test-event-queue";

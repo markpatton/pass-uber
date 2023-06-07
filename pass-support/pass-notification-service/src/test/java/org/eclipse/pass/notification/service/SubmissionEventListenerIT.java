@@ -29,7 +29,6 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * @author Russ Poetker (rpoetke1@jh.edu)
  */
-// TODO look at this with testconfiguration
 @Import(AwsSqsTestConfig.class)
 @TestPropertySource(properties = {
     "aws.region=us-east-1",
