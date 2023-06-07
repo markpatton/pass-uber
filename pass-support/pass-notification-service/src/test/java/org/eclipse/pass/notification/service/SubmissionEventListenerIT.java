@@ -34,7 +34,7 @@ import org.testcontainers.utility.DockerImageName;
 @TestPropertySource(properties = {
     "aws.region=us-east-1",
     "spring.jms.listener.auto-startup=true",
-    "pass.jms.queue.submission-event=" + QUEUE_NAME
+    "pass.jms.queue.submission.event.name=" + QUEUE_NAME
 })
 @Testcontainers
 @DirtiesContext

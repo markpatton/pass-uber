@@ -23,7 +23,7 @@ public class SubmissionEventListener {
      * Listen for submission even messages and process them.
      * @param submissionEventMessage the message
      */
-    @JmsListener(destination = "${pass.jms.queue.submission-event}")
+    @JmsListener(destination = "${pass.jms.queue.submission.event.name}")
     public void processMessage(SubmissionEventMessage submissionEventMessage) {
         log.trace("Receiving SubmissionEvent: {}", submissionEventMessage.getSubmissionEventId());
         if (Mode.DISABLED == notificationConfig.getMode()) {

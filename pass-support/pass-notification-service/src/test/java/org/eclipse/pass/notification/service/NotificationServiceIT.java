@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
@@ -42,6 +43,11 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * @author Russ Poetker (rpoetke1@jh.edu)
  */
+@TestPropertySource(properties = {
+    "pass.client.url=http://localhost:8080",
+    "pass.client.user=backend",
+    "pass.client.password=backend"
+})
 @Testcontainers
 @DirtiesContext
 public class NotificationServiceIT extends AbstractNotificationSpringIntegrationTest {
@@ -68,7 +74,8 @@ public class NotificationServiceIT extends AbstractNotificationSpringIntegration
 
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {
-        System.setProperty("pass.core.url", "http://localhost:" + PASS_CORE_CONTAINER.getMappedPort(8080));
+        registry.add("pass.client.url",
+            () -> "http://localhost:" + PASS_CORE_CONTAINER.getMappedPort(8080));
     }
 
     @Test

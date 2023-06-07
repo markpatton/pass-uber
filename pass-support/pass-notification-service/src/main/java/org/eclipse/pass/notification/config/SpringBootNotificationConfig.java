@@ -38,13 +38,22 @@ public class SpringBootNotificationConfig {
     @Value("${pass.notification.configuration}")
     private Resource notificationConfigResource;
 
+    @Value("${pass.client.url}")
+    private String passClientUrl;
+
+    @Value("${pass.client.user}")
+    private String passClientUser;
+
+    @Value("${pass.client.password}")
+    private String passClientPassword;
+
     /**
      * Configure the PassClient.
      * @return the PassClient bean
      */
     @Bean
     public PassClient passClient() {
-        return PassClient.newInstance();
+        return PassClient.newInstance(passClientUrl, passClientUser, passClientPassword);
     }
 
     /**
