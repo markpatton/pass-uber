@@ -123,6 +123,14 @@ Supported environment variables (system property analogs) and default values are
 - `SPRING_MAIL_PROTOCOL` (`spring.mail.transport`): `${SPRING_MAIL_PROTOCOL:SMTP}`  
 - `PASS_NOTIFICATION_CONFIGURATION` (`pass.notification.configuration`): `classpath:/notification.json`
 
+In order for notification services to connect to AWS SQS queue (the default messaging provider), the following variables must be set:
+
+As Environment Variables (System Properties (-Dargs)):
+
+- `AWS_REGION` (`aws.region`): AWS region id (i.e. `us-east-1`)
+- `AWS_ACCESS_KEY_ID` (`aws.accessKeyId`): AWS Access Key to account with access to SQS queue 
+- `AWS_SECRET_ACCESS_KEY` (`aws.secretKey`) : AWS Secret Access Key to account with access to SQS queue
+
 ## Example Configuration
 
 An example configuration file is provided below:
