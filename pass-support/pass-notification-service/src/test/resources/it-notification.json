@@ -22,7 +22,7 @@
     {
       "notification": "SUBMISSION_APPROVAL_INVITE",
       "templates": {
-        "SUBJECT": "PASS Submission Approval: ${RESOURCE_METADATA.title}",
+        "SUBJECT": "PASS Submission Approval: {{abbreviate resource_metadata.title 50}}",
         "BODY": "classpath:/templates/pass-body-submission-approval-invite-template.hbr",
         "FOOTER": "A test inline footer"
       }

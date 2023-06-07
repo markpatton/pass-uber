@@ -1,1 +1,1 @@
-PASS Submission cancelled: "{{#resource_metadata}}{{title}}{{/resource_metadata}}"
+PASS Submission cancelled: "{{abbreviate resource_metadata.title 50}}"

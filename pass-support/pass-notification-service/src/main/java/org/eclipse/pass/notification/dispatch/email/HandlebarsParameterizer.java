@@ -27,6 +27,7 @@ import com.github.jknack.handlebars.EscapingStrategy;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
+import com.github.jknack.handlebars.helper.StringHelpers;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.pass.notification.model.NotificationParam;
 import org.springframework.stereotype.Component;
@@ -53,6 +54,7 @@ public class HandlebarsParameterizer {
         this.mapper = mapper;
         Handlebars handlebars = new Handlebars();
         handlebars.registerHelper("eq", ConditionalHelpers.eq);
+        handlebars.registerHelper("abbreviate", StringHelpers.abbreviate);
         this.handlebars = handlebars.with(EscapingStrategy.NOOP);
     }
 

@@ -1,1 +1,1 @@
-PASS Submission was submitted: "{{#resource_metadata}}{{title}}{{/resource_metadata}}"
+PASS Submission was submitted: "{{abbreviate resource_metadata.title 50}}"

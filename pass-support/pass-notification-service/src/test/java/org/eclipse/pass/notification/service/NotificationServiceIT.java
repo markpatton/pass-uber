@@ -101,7 +101,7 @@ public class NotificationServiceIT extends AbstractNotificationSpringIntegration
         assertEquals(3, receivedMessages.size());
 
         MimeMessage message = receivedMessages.get(0);
-        assertTrue(message.getSubject().contains("PASS Submission Approval:"));
+        assertTrue(message.getSubject().contains("PASS Submission Approval: Specific protein"));
         assertEquals(SENDER, message.getFrom()[0].toString());
         assertEquals(CC, message.getRecipients(MimeMessage.RecipientType.CC)[0].toString());
         assertEquals(RECIPIENT, message.getRecipients(MimeMessage.RecipientType.TO)[0].toString());

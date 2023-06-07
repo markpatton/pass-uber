@@ -112,4 +112,16 @@ public class HandlebarsParameterizerTest {
 
         assertEquals(href, parameterized);
     }
+
+    @Test
+    public void testAbbreviate() {
+        String expectedTitle = "this is...";
+        HashMap<NotificationParam, String> paramMap = new HashMap<>() {{
+                    put(NotificationParam.RESOURCE_METADATA, "{ \"title\": \"this is a test for loooong\" }");
+                }};
+        String parameterized = handlebarsParameterizer.parameterize(paramMap,
+            IOUtils.toInputStream("{{abbreviate resource_metadata.title 10}}", "UTF-8"));
+
+        assertEquals(expectedTitle, parameterized);
+    }
 }

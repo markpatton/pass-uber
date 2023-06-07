@@ -60,7 +60,7 @@ public class NotificationConfigTest extends AbstractNotificationSpringTest {
         NotificationTemplate template = new ArrayList<>(notificationConfig.getTemplates()).get(0);
         assertEquals(NotificationType.SUBMISSION_APPROVAL_INVITE, template.getNotificationType());
         assertEquals(3, template.getTemplates().size());
-        assertEquals("PASS Submission Approval: ${RESOURCE_METADATA.title}",
+        assertEquals("PASS Submission Approval: {{abbreviate resource_metadata.title 50}}",
             template.getTemplates().get(SUBJECT));
         assertEquals("classpath:/templates/pass-body-submission-approval-invite-template.hbr",
             template.getTemplates().get(BODY));
