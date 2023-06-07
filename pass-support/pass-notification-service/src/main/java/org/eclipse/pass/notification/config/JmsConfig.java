@@ -30,7 +30,7 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 @EnableJms
 public class JmsConfig {
 
-    @Value("${aws.region}")
+    @Value("${aws.region:AWS_REGION}")
     private String awsRegion;
 
     /**
