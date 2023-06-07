@@ -29,7 +29,7 @@ public class AwsSqsTestConfig {
     }
 
     private SqsClient testSqsClient() {
-        /**
+        /*
          * The strange code below to set WAIT_TIME_SECONDS to 2 seconds is so the Sqs message consumer
          * shuts down faster after the tests have finished.
          */
