@@ -1,6 +1,6 @@
 # Notification Services
 
-Notification Services (NS) reacts to `SubmissionEvent` messages emitted by the Fedora repository by composing and dispatching notifications in the form of emails to the participants related to the event.
+Notification Services (NS) reacts to `SubmissionEvent` messages emitted by the `pass-core` module by composing and dispatching notifications in the form of emails to the participants related to the event.
 
 # Runtime Configuration
 
@@ -18,15 +18,6 @@ Notification Services (NS) has three runtime modes:
 Configuration elements for both `PRODUCTION` and `DEMO` modes may reside in the same configuration file.  There is no need to have separate configuration files for a "demo" and "production" instance of NS.
 
 The environment variable `PASS_NOTIFICATION_MODE` (or its system property equivalent `pass.notification.mode`) is used to set the runtime mode.
-
-## SMTP Server
-
-Notification Services (NS) emits notifications in the form of email.  Therefore an SMTP relay must be configured for notification delivery.
-- `PASS_NOTIFICATION_SMTP_HOST` (`pass.notification.smtp.host`): the hostname or IP address of an SMTP mail relay
-- `PASS_NOTIFICATION_SMTP_PORT` (`pass.notification.smtp.port`): the TCP port for SMTP mail relay or submission
-- `PASS_NOTIFICATION_SMTP_USER` (`pass.notification.smtp.user`): optional username for SMTP auth
-- `PASS_NOTIFICATION_SMTP_PASS` (`pass.notification.smtp.pass`): optional password for SMTP auth
-- `PASS_NOTIFICATION_SMTP_TRANSPORT` (`pass.notification.smtp.transport`): valid options are: `SMTP`, `SMTPS`, `SMTP_TLS`
 
 ## Notification Recipients
 
@@ -120,24 +111,17 @@ The model provided for template parameterization will depend on the version of N
 
 Supported environment variables (system property analogs) and default values are:
 
-- `SPRING_ACTIVEMQ_BROKER_URL` (`spring.activemq.broker-url`): `${activemq.broker.uri:tcp://${jms.host:localhost}:${jms.port:61616}}`
-- `SPRING_JMS_LISTENER_CONCURRENCY` (`spring.jms.listener.concurrency`): `4`
-- `SPRING_JMS_LISTENER_AUTO_STARTUP` (`spring.jms.listener.auto-startup`): `true`
 - `PASS_NOTIFICATION_QUEUE_EVENT_NAME` (`pass.notification.queue.event.name`): `event`
-- `PASS_FEDORA_USER` (`pass.fedora.user`): `fedoraAdmin`
-- `PASS_FEDORA_PASSWORD` (`pass.fedora.password`): `moo`
-- `PASS_FEDORA_BASEURL` (`pass.fedora.baseurl`): `http://${fcrepo.host:localhost}:${fcrepo.port:8080}/fcrepo/rest/`
-- `PASS_ELASTICSEARCH_URL` (`pass.elasticsearch.url`): `http://${es.host:localhost}:${es.port:9200}/pass`
-- `PASS_ELASTICSEARCH_LIMIT` (`pass.elasticsearch.limit`): `100`
 - `PASS_NOTIFICATION_MODE` (`pass.notification.mode`): `DEMO`
-- `PASS_NOTIFICATION_SMTP_HOST` (`pass.notification.smtp.host`): `${pass.notification.smtp.host:localhost}`
-- `PASS_NOTIFICATION_SMTP_PORT` (`pass.notification.smtp.port`): `${pass.notification.smtp.port:587}`
-- `PASS_NOTIFICATION_SMTP_USER` (`pass.notification.smtp.user`):
-- `PASS_NOTIFICATION_SMTP_PASS` (`pass.notification.smtp.pass`):
-- `PASS_NOTIFICATION_SMTP_TRANSPORT` (`pass.notification.smtp.transport`): `${pass.notification.smtp.transport:SMTP}`  
-- `PASS_NOTIFICATION_MAILER_DEBUG` (`pass.notification.mailer.debug`): `false`
+- `PASS_CLIENT_URL` (`pass.client.url`): `{PASS_CLIENT_URL:localhost:8080}`
+- `PASS_CLIENT_USER` (`pass.client.user`): `{PASS_CLIENT_USER:fakeuser}`
+- `PASS_CLIENT_PASSWORD` (`pass.client.password`): `${PASS_CLIENT_PASSWORD:fakepassword}`
+- `SPRING_MAIL_HOST` (`spring.mail.host`): `${SPRING_MAIL_HOST:localhost}`
+- `SPRING_MAIL_PORT` (`spring.mail.port`): `${SPRING_MAIL_PORT:587}`
+- `SPRING_MAIL_USERNAME` (`spring.mail.user`): `{SPRING_MAIL_USERNAME}`
+- `SPRING_MAIL_PASSWORD` (`spring.mail.pass`): `{SPRING_MAIL_PASSWORD}`
+- `SPRING_MAIL_PROTOCOL` (`spring.mail.transport`): `${SPRING_MAIL_PROTOCOL:SMTP}`  
 - `PASS_NOTIFICATION_CONFIGURATION` (`pass.notification.configuration`): `classpath:/notification.json`
-- `PASS_NOTIFICATION_HTTP_AGENT` (`pass.notification.http.agent`): `pass-notification/x.y.z`
 
 ## Example Configuration
 
@@ -200,16 +184,6 @@ An example configuration file is provided below:
       }
     }
   ],
-  "smtp": {
-    "host": "${pass.notification.smtp.host}",
-    "port": "${pass.notification.smtp.port}",
-    "smtpUser": "${pass.notification.smtp.user}",
-    "smtpPassword": "${pass.notification.smtp.pass}",
-    "smtpTransport": "SMTP_TLS"
-  },
-  "user-token-generator": {
-    "key": "BETKPFHWGGDIEWIIYKYQ33LUS4"
-  },
   "link-validators": [
     {
       "rels" : [
@@ -231,17 +205,13 @@ An example configuration file is provided below:
 
 # Developers
 
-Design document is [here](https://docs.google.com/document/d/1k4dWIe-2pOb-E8qf-C0BE7tGDBsEZxGlHAfZ_KaDIGY/edit?usp=sharing).
-
 The major components of Notification Services (NS) are the model, business logic used to compose a `Notification`, and the dispatch of `Notification`s. 
 
-Currently each `SubmissionEvent` received by NS results in the creation of a single `Notification`, which results in the dispatch of a single email.  Multiple recipients (e.g. using CC or BCC email headers) can be specified on the email if needed.
+Currently each `SubmissionEventMessage` received by NS results in the creation of a single `Notification`, which results in the dispatch of a single email.  Multiple recipients (e.g. using CC or BCC email headers) can be specified on the email if needed.
 
 ## Model
 
 The notification model is below.  While email is the natural form of dispatching notifications, the model tries to remain independent of an underlying transport or dispatch mechanism.
-
-![Notification Services Model](src/main/resources/ns-model.png)
 
 Highlights of this model are:
 - the `parameters` map: this is the model that is injected into the templating engine
@@ -261,9 +231,9 @@ Highlights of this model are:
 
 ### Submission State
 
-The state of the `Submission` vis-a-vis the `SubmissionEvent` (adapted from the [design document](https://docs.google.com/document/d/1k4dWIe-2pOb-E8qf-C0BE7tGDBsEZxGlHAfZ_KaDIGY/edit?usp=sharing)).
+The state of the `Submission` vis-a-vis the `SubmissionEvent`.
 
-![Submission State Model](src/main/resources/submission-state.png)
+![Submission State Model](docs/submission-state.png)
 
 |What happened to the Submission |SubmissionEvent Type                             |Notification Recipient List
 |--------------------------------|-------------------------------------------------|----------------------------
@@ -285,33 +255,31 @@ The `parameters` map carries simple strings or serialized JSON structures.
 
 ## Notification Service
 
-The `NotificationService` is the primary interface that abstracts the business logic associated with composing a `Notification` and handing it off for dispatch.  If future requirements dictate multiple `Notification`s were to arise from a single `SubmissionEvent`, `DefaultNotificationService` would be the starting point for implementing the fan out.
+The `NotificationService` is the primary service that contains the business logic associated with composing a `Notification` and handing it off for dispatch.  If future requirements dictate multiple `Notification`s were to arise from a single `SubmissionEvent`, `DefaultNotificationService` would be the starting point for implementing the fan out.
 
-The `Composer` class does the heavy lifting within the `DefaultNotificationService`.  It is responsible for composing a `Notification` from the `Submission` and `SubmissionEvent`, including:
+The `Composer` class does the heavy lifting within the `NotificationService`.  It is responsible for composing a `Notification` from the `Submission` and `SubmissionEvent`, including:
 - determining the type of `Notification`
 - creating and populating the data structures used in the `parameters` map
 - determining the recipients of the `Notification`, and from whom the `Notification` should come from
 
-After a `Notification` has been created and populated, it is sent to the `DispatchApi`, which returns a unique identifier for each `Notification` it dispatches.
+After a `Notification` has been created and populated, it is sent to the `DispatchService`.
 
 ## Dispatch
 
-The Dispatch API accepts a `Notification` and returns a unique identifier for each `Notification` it dispatches.  The unique identifier is determined by the underlying notification implementation.  For example, `EmailDispatchImpl` returns the SMTP `Message-ID`.  The identifier can be used to associate a `Notification` with the underlying notification transport.
-
 The Dispatch portion of Notification Services is not concerned with populating the `Notification`; it expects that business logic to have been performed earlier in the call stack.
 
-Dispatch _does_ have to adapt a `Notification` to the underlying transport used - in this case, email.  This means resolving URIs to recipient email addresses, and invoking the templating engine for composing email subject, body, and footer.
+Dispatch _does_ have to adapt a `Notification` to the underlying transport used - in this case, email.  This means resolving User to recipient email addresses, and invoking the templating engine for composing email subject, body, and footer.
 
 ### Email Implementation
 
 The only `DispatchService` implementation is the `EmailDispatchImpl`, which is composed of three main classes:
 - `Parameterizer`: responsible for resolving template content and invoking the templating engine, producing the content for the email subject, body, and footer
 - `EmailComposer`: responsible for adapting the `Notification` to an email (including resolving and setting the from, to, and cc addresses), provided the parameterized templates
-- `Mailer`: responsible for actually sending the email to recipients
+- `JavaMailSender`: responsible for actually sending the email to recipients
 
 ### Templates
 
-Templates are used to customize the subject, body, and footer of email messages that result from a notification.  Each notification type has a corresponding template, and the templates and their content are configured in the `notification.js` configuration file.  A sample portion of the configuration is below:
+Templates are used to customize the subject, body, and footer of email messages that result from a notification.  Each notification type has a corresponding template, and the templates and their content are configured in the `notification.json` configuration file.  A sample portion of the configuration is below:
 
 ```json
 "templates": [
@@ -371,7 +339,7 @@ The value associated with `SUBJECT`, `BODY`, and `FOOTER` may be in-line content
       }
     }
 ```
-Using Spring Resource URIs to refer to the template location is a more flexible and maintainable way of managing notification templates, because it allows the templates to be updated in place without having to edit the primary configuration file (`notification.js`) any time a template needs updating.  Using Spring Resource URIs also allows template content to be shared across notification types.  For example, each notification type could use the same `FOOTER` content.  The `CompositeResolver` is responsible for determining whether or not the value represents inline content, or if it represents a Spring Resource URI to be resolved.
+Using Spring Resource URIs to refer to the template location is a more flexible and maintainable way of managing notification templates, because it allows the templates to be updated in place without having to edit the primary configuration file (`notification.json`) any time a template needs updating.  Using Spring Resource URIs also allows template content to be shared across notification types.  For example, each notification type could use the same `FOOTER` content.  The `CompositeResolver` is responsible for determining whether or not the value represents inline content, or if it represents a Spring Resource URI to be resolved.
 
 Notification Services supports Mustache templates, specifically implemented using Handlebars.  Each template is injected with the `parameters` map from the `Notification`.  See above for the documented fields of the `parameters` map.  It is beyond the scope of this README to provide guidance on using Mustache or Handlebars, but there are some examples in `pass-docker`, and in the `HandlebarsParameterizerTest`.  Both inline template content and referenced template content (i.e. Spring Resource URIs) can be Mustache templates.
 
@@ -380,8 +348,7 @@ Notification Services supports Mustache templates, specifically implemented usin
 The `EmailComposer` is responsible for adapting the `Notification` to an email.  This includes: 
 * Resolving `Notification` recipient URIs to email addresses
     * In the case of `mailto` URIs, the scheme specific part is used as the recipient
-    * In the case of `http` or `https` URIs, they are assumed to reference `User` resources in the Fedora repository.  The
-      URIs are de-referenced and the `User.email` is used
+    * In the case of User object, the `User.email` is used
 * Applying the email recipient whitelist
 * Creating the email itself, including the email subject and message body, and encoding.
     * the subject and message body are provided to the `EmailComposer` from the templating engine.
