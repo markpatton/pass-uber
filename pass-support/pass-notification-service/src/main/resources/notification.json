@@ -1,15 +1,12 @@
 {
-  "mode": "${pass.notification.mode}",
   "recipient-config": [
     {
       "mode": "DEMO",
-      "fromAddress": "${pass.notification.demo.from.address}",
+      "fromAddress": "noreply@pass.jh.edu",
       "global_cc": [
-        "${pass.notification.demo.global.cc.address}"
+        "notification-demo-cc@jhu.edu"
       ],
-      "global_bcc": [
-        "${pass.notification.demo.global.bcc.address}"
-      ],
+      "global_bcc": [],
       "whitelist": [
         "staffWithGrants@jhu.edu",
         "staffWithNoGrants@jhu.edu"
@@ -17,7 +14,7 @@
     },
     {
       "mode": "PRODUCTION",
-      "fromAddress": "${pass.notification.production.from.address}"
+      "fromAddress": "noreply@pass.jh.edu"
     }
   ],
   "templates": [
