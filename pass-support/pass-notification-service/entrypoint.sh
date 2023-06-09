@@ -1,3 +1,3 @@
 #! /bin/sh
 
-java -jar pass-notification-service-exec.jar
+java $PASS_NOTIF_SVC_JAVA_OPTS -jar pass-notification-service-exec.jar
