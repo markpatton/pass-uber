@@ -36,7 +36,6 @@ public class NotificationApp {
      */
     public static void main(String[] args) {
         SpringApplication.run(NotificationApp.class, args);
-
     }
 
 }
