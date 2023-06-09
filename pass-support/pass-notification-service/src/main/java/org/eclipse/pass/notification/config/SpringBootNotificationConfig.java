@@ -60,6 +60,7 @@ public class SpringBootNotificationConfig {
      * Configure the NotificationConfig.
      * @param objectMapper the object mapper
      * @return the NotificationConfig bean
+     * @throws IOException thrown if IO error
      */
     @Bean
     public NotificationConfig notificationConfiguration(ObjectMapper objectMapper) throws IOException {
