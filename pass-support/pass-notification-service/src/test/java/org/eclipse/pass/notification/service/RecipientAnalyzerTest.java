@@ -15,7 +15,6 @@
  *  * limitations under the License.
  *
  */
-
 package org.eclipse.pass.notification.service;
 
 import static java.util.Collections.singleton;

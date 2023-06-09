@@ -15,7 +15,6 @@
  *  * limitations under the License.
  *
  */
-
 package org.eclipse.pass.notification.dispatch.email;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
