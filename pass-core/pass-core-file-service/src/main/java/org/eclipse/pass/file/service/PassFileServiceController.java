@@ -18,15 +18,22 @@ package org.eclipse.pass.file.service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
+import java.util.Collection;
 
 import org.eclipse.pass.file.service.storage.FileStorageService;
 import org.eclipse.pass.file.service.storage.StorageFile;
+import org.eclipse.pass.object.security.WebSecurityRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +55,7 @@ public class PassFileServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassFileServiceController.class);
 
     private final FileStorageService fileStorageService;
+    private Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     /**
      *   Class constructor.
@@ -127,9 +135,25 @@ public class PassFileServiceController {
      * @param origFileName ID of the file to delete (required), is one part of the fileId
      * @return File
      */
-    @DeleteMapping("/file/{uuid:.+}/{origFileName:.+}")
-    public ResponseEntity<?> deleteFileById(@PathVariable String uuid, @PathVariable String origFileName) {
-        String fileId = uuid + "/" + origFileName;
+    @DeleteMapping("/file/{uuid:.+}/{userid:.+}/{origFileName:.+}")
+    public ResponseEntity<?> deleteFileById(@PathVariable String uuid, @PathVariable String userid,
+                                            @PathVariable String origFileName, Principal principal) {
+        Boolean isBackendUser = false;
+        if (auth != null) {
+            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+
+            for (GrantedAuthority authority : authorities) {
+                if(authority.getAuthority().equals(WebSecurityRole.BACKEND.getValue())) {
+                    isBackendUser = true;
+                }
+            }
+        }
+        String principalName = principal.getName();
+        if(!isBackendUser && !principalName.equals(userid)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("User does not have permission to delete this file.");
+        }
+        String fileId = uuid + "/" + userid + "/" + origFileName;
         fileStorageService.deleteFile(fileId);
         return ResponseEntity.ok().body("Deleted");
     }
