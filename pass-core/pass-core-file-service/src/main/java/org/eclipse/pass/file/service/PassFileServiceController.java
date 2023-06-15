@@ -135,9 +135,9 @@ public class PassFileServiceController {
      * @param origFileName ID of the file to delete (required), is one part of the fileId
      * @return File
      */
-    @DeleteMapping("/file/{uuid:.+}/{userid:.+}/{origFileName:.+}")
-    public ResponseEntity<?> deleteFileById(@PathVariable String uuid, @PathVariable String userid,
-                                            @PathVariable String origFileName, Principal principal) {
+    @DeleteMapping("/file/{uuid:.+}/{origFileName:.+}")
+    public ResponseEntity<?> deleteFileById(@PathVariable String uuid, @PathVariable String origFileName,
+                                            Principal principal) {
         Boolean isBackendUser = false;
         if (auth != null) {
             Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
@@ -149,11 +149,20 @@ public class PassFileServiceController {
             }
         }
         String principalName = principal.getName();
-        if(!isBackendUser && !principalName.equals(userid)) {
+        ByteArrayResource fileResource;
+        String fileId = principalName + "/" + uuid  + "/" + origFileName;
+        //check to see if the principal has a file with the UUID and filename. If not then return 403.
+        try {
+            fileResource = fileStorageService.getFile(fileId);
+        } catch (Exception e) {
+            LOG.error("File Service: File not found: " + e);
+            return ResponseEntity.notFound().build();
+        }
+
+        if(!isBackendUser && fileResource.getFilename().equals(principalName)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("User does not have permission to delete this file.");
         }
-        String fileId = uuid + "/" + userid + "/" + origFileName;
         fileStorageService.deleteFile(fileId);
         return ResponseEntity.ok().body("Deleted");
     }
