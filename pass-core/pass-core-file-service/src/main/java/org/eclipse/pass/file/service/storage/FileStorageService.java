@@ -376,5 +376,9 @@ public class FileStorageService {
             return "UNKNOWN_FILE_TYPE";
         }
     }
+
+    public boolean checkUserPermissionsForDelete(){
+        return true;
+    }
 }
 

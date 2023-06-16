@@ -106,11 +106,9 @@ public class PassFileServiceController {
      */
     @GetMapping("/file/{uuid:.+}/{origFileName:.+}")
     @ResponseBody
-    public ResponseEntity<?> getFileById(@PathVariable String uuid, @PathVariable String origFileName,
-                                         Principal principal) {
-        String principalName = principal.getName();
-        String fileId = principalName + "/" + uuid  + "/" + origFileName;
-        if (StringUtils.isEmpty(uuid) || StringUtils.isEmpty(origFileName) || StringUtils.isEmpty(principalName)) {
+    public ResponseEntity<?> getFileById(@PathVariable String uuid, @PathVariable String origFileName) {
+        String fileId = uuid  + "/" + origFileName;
+        if (StringUtils.isEmpty(uuid) || StringUtils.isEmpty(origFileName)) {
             LOG.error("File ID not provided to get a file.");
             return ResponseEntity.badRequest().body("File ID not provided to get a file.");
         }
@@ -145,7 +143,11 @@ public class PassFileServiceController {
                                             Principal principal, HttpServletRequest request) {
         String principalName = principal.getName();
         ByteArrayResource fileResource;
-        String fileId = principalName + "/" + uuid  + "/" + origFileName;
+        String fileId = uuid  + "/" + origFileName;
+
+        //If the file uuid and filename match, but the username does not then return 403.
+
+
         //check to see if the principal has a file with the UUID and filename. If not then return 403.
         try {
             fileResource = fileStorageService.getFile(fileId);
