@@ -43,6 +43,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * PassFileServiceController is the controller class responsible for the File Service endpoints, which allows pass-core
  * internal and external services to upload, retrieve and delete files. Configuration of the File Service is done
@@ -55,7 +57,6 @@ public class PassFileServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(PassFileServiceController.class);
 
     private final FileStorageService fileStorageService;
-    private Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     /**
      *   Class constructor.
@@ -137,17 +138,7 @@ public class PassFileServiceController {
      */
     @DeleteMapping("/file/{uuid:.+}/{origFileName:.+}")
     public ResponseEntity<?> deleteFileById(@PathVariable String uuid, @PathVariable String origFileName,
-                                            Principal principal) {
-        Boolean isBackendUser = false;
-        if (auth != null) {
-            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-
-            for (GrantedAuthority authority : authorities) {
-                if(authority.getAuthority().equals(WebSecurityRole.BACKEND.getValue())) {
-                    isBackendUser = true;
-                }
-            }
-        }
+                                            Principal principal, HttpServletRequest request) {
         String principalName = principal.getName();
         ByteArrayResource fileResource;
         String fileId = principalName + "/" + uuid  + "/" + origFileName;
@@ -158,8 +149,9 @@ public class PassFileServiceController {
             LOG.error("File Service: File not found: " + e);
             return ResponseEntity.notFound().build();
         }
-
-        if(!isBackendUser && fileResource.getFilename().equals(principalName)) {
+        String userNameInFileName = fileResource.getFilename().split("/")[0];
+        if(!request.isUserInRole(WebSecurityRole.BACKEND.getValue())
+                && !principalName.equals(userNameInFileName)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("User does not have permission to delete this file.");
         }
