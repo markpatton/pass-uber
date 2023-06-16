@@ -145,23 +145,25 @@ public class PassFileServiceController {
         ByteArrayResource fileResource;
         String fileId = uuid  + "/" + origFileName;
 
-        //If the file uuid and filename match, but the username does not then return 403.
-
-
-        //check to see if the principal has a file with the UUID and filename. If not then return 403.
+        //Get the file, check that it exists, and get the owner of the file.
         try {
             fileResource = fileStorageService.getFile(fileId);
         } catch (Exception e) {
             LOG.error("File Service: File not found: " + e);
             return ResponseEntity.notFound().build();
         }
-        String userNameInFileName = fileResource.getFilename().split("/")[0];
-        if(!request.isUserInRole(WebSecurityRole.BACKEND.getValue())
-                && !principalName.equals(userNameInFileName)) {
+
+        if(fileResource == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if(request.isUserInRole(WebSecurityRole.BACKEND.getValue()) ||
+                fileStorageService.checkUserDeletePermissions(principalName, fileId)) {
+            fileStorageService.deleteFile(fileId);
+            return ResponseEntity.ok().body("Deleted");
+        } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("User does not have permission to delete this file.");
         }
-        fileStorageService.deleteFile(fileId);
-        return ResponseEntity.ok().body("Deleted");
     }
 }

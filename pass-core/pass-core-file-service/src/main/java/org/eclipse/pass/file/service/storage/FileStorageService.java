@@ -32,6 +32,7 @@ import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import edu.wisc.library.ocfl.api.model.FileDetails;
 import edu.wisc.library.ocfl.api.model.ObjectVersionId;
+import edu.wisc.library.ocfl.api.model.User;
 import edu.wisc.library.ocfl.api.model.VersionDetails;
 import edu.wisc.library.ocfl.api.model.VersionInfo;
 import edu.wisc.library.ocfl.aws.OcflS3Client;
@@ -249,11 +250,15 @@ public class FileStorageService {
             String origFileNameExt = Jsoup.clean(mFile.getOriginalFilename(), Safelist.basic());
             String fileExt = FilenameUtils.getExtension(origFileNameExt);
             String fileUuid = UUID.randomUUID().toString();
-            String fileId = userName + "/" + fileUuid + "/" + origFileNameExt;
+            String fileId = fileUuid + "/" + origFileNameExt;
             String mimeType = URLConnection.guessContentTypeFromName(origFileNameExt);
             //changing the stored file name to UUID to prevent any issues with long file names
             //e.g. 260 char limit on the path in Windows. Original filename is preserved in the fileId.
             String ocflRepoFileName = fileUuid + "." + fileExt;
+
+            //Create OCFL user to identify the owner of the file
+            User fileUser = new User();
+            fileUser.setName(userName);
 
             if (!Files.exists(Paths.get(tempLoc.toString()))) {
                 Files.createDirectory(Paths.get(tempLoc.toString()));
@@ -262,7 +267,7 @@ public class FileStorageService {
             mFile.transferTo(tempPathAndFileName);
             if (storageType.equals(StorageServiceType.FILE_SYSTEM)) {
                 ocflRepository.putObject(ObjectVersionId.head(fileId), tempPathAndFileName,
-                        new VersionInfo().setMessage("Pass-Core File Service: Initial commit"));
+                        new VersionInfo().setMessage("Pass-Core File Service: Initial commit").setUser(fileUser));
                 String fileRepoRelPath = ocflRepository.describeVersion(ObjectVersionId.head(fileId))
                         .getFileMap().entrySet().iterator().next().getValue().getStorageRelativePath();
                 LOG.info("File Service: File with ID " + fileId + " was stored in the file system repo at the " +
@@ -270,7 +275,7 @@ public class FileStorageService {
 
             } else if (storageType.equals(StorageServiceType.S3)) {
                 ocflRepository.putObject(ObjectVersionId.head(fileId), tempPathAndFileName,
-                        new VersionInfo().setMessage("Pass-Core File Service: Initial commit"));
+                        new VersionInfo().setMessage("Pass-Core File Service: Initial commit").setUser(fileUser));
                 String fileRepoRelPath = ocflRepository.describeVersion(ObjectVersionId.head(fileId))
                         .getFileMap().entrySet().iterator().next().getValue().getStorageRelativePath();
                 LOG.info("File Service: File with ID " + fileId + " was stored in the S3 repo at location: " +
@@ -377,7 +382,7 @@ public class FileStorageService {
         }
     }
 
-    public boolean checkUserPermissionsForDelete(){
+    public boolean checkUserDeletePermissions(String fileId, String userId) {
         return true;
     }
 }
