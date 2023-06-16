@@ -21,9 +21,11 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.Collection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.pass.file.service.storage.FileStorageService;
 import org.eclipse.pass.file.service.storage.StorageFile;
 import org.eclipse.pass.object.security.WebSecurityRole;
+import org.jsoup.internal.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -74,7 +76,7 @@ public class PassFileServiceController {
      * @return return a File object that has been uploaded.
      */
     @PostMapping("/file")
-    public ResponseEntity<?> fileUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> fileUpload(@RequestParam("file") MultipartFile file, Principal principal) {
         StorageFile returnStorageFile;
         try {
             if (file.getBytes().length == 0 || file.isEmpty()) {
@@ -86,7 +88,7 @@ public class PassFileServiceController {
         }
 
         try {
-            returnStorageFile = fileStorageService.storeFile(file);
+            returnStorageFile = fileStorageService.storeFile(file, principal.getName());
         } catch (IOException e) {
             LOG.error("File Service: Error storing file upload: " + e);
             return ResponseEntity.internalServerError().build();
@@ -104,9 +106,11 @@ public class PassFileServiceController {
      */
     @GetMapping("/file/{uuid:.+}/{origFileName:.+}")
     @ResponseBody
-    public ResponseEntity<?> getFileById(@PathVariable String uuid, @PathVariable String origFileName) {
-        String fileId = uuid + "/" + origFileName;
-        if (uuid == null || origFileName == null) {
+    public ResponseEntity<?> getFileById(@PathVariable String uuid, @PathVariable String origFileName,
+                                         Principal principal) {
+        String principalName = principal.getName();
+        String fileId = principalName + "/" + uuid  + "/" + origFileName;
+        if (StringUtils.isEmpty(uuid) || StringUtils.isEmpty(origFileName) || StringUtils.isEmpty(principalName)) {
             LOG.error("File ID not provided to get a file.");
             return ResponseEntity.badRequest().body("File ID not provided to get a file.");
         }

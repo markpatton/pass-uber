@@ -241,8 +241,7 @@ public class FileStorageService {
      *
      * @see StorageFile
      */
-    public StorageFile storeFile(MultipartFile mFile) throws IOException {
-        //TODO: refactor so that file is not stored with original file name, but with a UUID
+    public StorageFile storeFile(MultipartFile mFile, String userName) throws IOException {
         StorageFile storageFile = null;
         //NOTE: the work directory on the ocfl-java client should be located on the same mount as the OCFL storage root.
         try {
@@ -250,7 +249,7 @@ public class FileStorageService {
             String origFileNameExt = Jsoup.clean(mFile.getOriginalFilename(), Safelist.basic());
             String fileExt = FilenameUtils.getExtension(origFileNameExt);
             String fileUuid = UUID.randomUUID().toString();
-            String fileId = fileUuid + "/" + origFileNameExt;
+            String fileId = userName + "/" + fileUuid + "/" + origFileNameExt;
             String mimeType = URLConnection.guessContentTypeFromName(origFileNameExt);
             //changing the stored file name to UUID to prevent any issues with long file names
             //e.g. 260 char limit on the path in Windows. Original filename is preserved in the fileId.

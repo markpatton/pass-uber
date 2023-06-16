@@ -24,6 +24,7 @@ public class FileStorageServiceTest {
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
     private final String rootDir = System.getProperty("java.io.tmpdir") + "/pass-file-system-test";
+    private final static String USER_NAME = "USER1";
 
     /**
      * Setup the FileStorageService for testing. Uses the system temp directory for the root directory.
@@ -60,7 +61,7 @@ public class FileStorageServiceTest {
     public void storeFileThatExists() {
         try {
             StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
+                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
             assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
         } catch (Exception e) {
             assertEquals("An exception was thrown in storeFileThatExists.", e.getMessage());
@@ -74,7 +75,7 @@ public class FileStorageServiceTest {
     void getFileShouldReturnFile() {
         try {
             StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
+                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
             ByteArrayResource file = fileStorageService.getFile(storageFile.getId());
             assertTrue(file.contentLength() > 0);
         } catch (IOException e) {
@@ -121,7 +122,7 @@ public class FileStorageServiceTest {
         allCharSets.forEach((k,v) -> {
             try {
                 StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", v,
-                        MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
+                        MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
                 assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
             } catch (IOException e) {
                 assertEquals("An exception was thrown in storeFileWithDifferentLangFilesNames. On charset=" + k,
@@ -137,7 +138,7 @@ public class FileStorageServiceTest {
     void deleteShouldThrowExceptionFileNotExist() {
         try {
             StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
+                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
             fileStorageService.deleteFile(storageFile.getId());
             Exception exception = assertThrows(NotFoundException.class,
                     () -> {

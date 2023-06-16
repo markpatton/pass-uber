@@ -22,6 +22,7 @@ import org.springframework.util.FileSystemUtils;
 
 class FileStorageServiceS3Test {
     private final static String ROOT_DIR = System.getProperty("java.io.tmpdir") + "/pass-s3-test";
+    private final static String USER_NAME = "USER1";
 
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
@@ -68,7 +69,7 @@ class FileStorageServiceS3Test {
     void storeFileToS3ThatExists() {
         try {
             StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test S3 Pass-core".getBytes()));
+                    MediaType.TEXT_PLAIN_VALUE, "Test S3 Pass-core".getBytes()), USER_NAME);
             assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
         } catch (Exception e) {
             assertEquals("An exception was thrown in storeFileThatExists.", e.getMessage());
@@ -82,7 +83,7 @@ class FileStorageServiceS3Test {
     void getFileFromS3ShouldReturnFile() {
         try {
             StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test S3 Pass-core".getBytes()));
+                    MediaType.TEXT_PLAIN_VALUE, "Test S3 Pass-core".getBytes()), USER_NAME);
             ByteArrayResource file = fileStorageService.getFile(storageFile.getId());
             assertTrue(file.contentLength() > 0);
         } catch (IOException e) {
@@ -129,7 +130,7 @@ class FileStorageServiceS3Test {
         allCharSets.forEach((k,v) -> {
             try {
                 StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", v,
-                        MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
+                        MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
                 assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
             } catch (IOException e) {
                 assertEquals("An exception was thrown in storeFileWithDifferentLangFilesNames. On charset=" + k,
@@ -145,7 +146,7 @@ class FileStorageServiceS3Test {
     void deleteShouldThrowExceptionFileNotExist() {
         try {
             StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()));
+                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
             fileStorageService.deleteFile(storageFile.getId());
             Exception exception = assertThrows(NotFoundException.class,
                     () -> fileStorageService.getResourceFileRelativePath(storageFile.getId()));
