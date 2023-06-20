@@ -23,6 +23,7 @@ import org.springframework.util.FileSystemUtils;
 class FileStorageServiceS3Test {
     private final static String ROOT_DIR = System.getProperty("java.io.tmpdir") + "/pass-s3-test";
     private final static String USER_NAME = "USER1";
+    private final static String USER_NAME2 = "USER2";
 
     private FileStorageService fileStorageService;
     private final StorageProperties properties = new StorageProperties();
@@ -155,5 +156,33 @@ class FileStorageServiceS3Test {
         } catch (IOException e) {
             assertEquals("Exception during deleteShouldThrowExceptionFileNotExist", e.getMessage());
         }
+    }
+
+    //TODO: will be refactored in the next ticket #478
+    @Test
+    void userHasPermissionToDeleteFile() {
+        Boolean hasPermission = false;
+        try {
+            StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
+                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
+            hasPermission = fileStorageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME);
+        } catch (IOException e) {
+            assertEquals("Exception during userHasPermissionToDeleteFile", e.getMessage());
+        }
+        assertTrue(hasPermission);
+    }
+
+    //TODO: will be refactored in the next ticket #478
+    @Test
+    void userNoPermissionToDeleteFile() {
+        Boolean hasPermission = false;
+        try {
+            StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
+                    MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
+            hasPermission = fileStorageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME2);
+        } catch (IOException e) {
+            assertEquals("Exception during userHasPermissionToDeleteFile", e.getMessage());
+        }
+        assertFalse(hasPermission);
     }
 }
