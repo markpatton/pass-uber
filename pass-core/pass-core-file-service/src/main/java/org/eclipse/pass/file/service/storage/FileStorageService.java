@@ -25,13 +25,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import edu.wisc.library.ocfl.api.model.FileDetails;
-import edu.wisc.library.ocfl.api.model.ObjectDetails;
 import edu.wisc.library.ocfl.api.model.ObjectVersionId;
 import edu.wisc.library.ocfl.api.model.User;
 import edu.wisc.library.ocfl.api.model.VersionDetails;
@@ -87,9 +87,9 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 public class FileStorageService {
     private static final Logger LOG = LoggerFactory.getLogger(FileStorageService.class);
 
-    private Path tempLoc;
-    private StorageServiceType storageType;
-    private OcflRepository ocflRepository;
+    private final Path tempLoc;
+    private final StorageServiceType storageType;
+    private final OcflRepository ocflRepository;
     private Path ocflLoc;
     private S3Client cloudS3Client;
     private String bucketName;
@@ -98,7 +98,8 @@ public class FileStorageService {
     /**
      *  FileStorageService Class constructor.
      * @param storageConfiguration A set of configuration properties of the File Service.
-     * @throws IOException
+     * @param awsRegion The AWS region where the S3 bucket is located.
+     * @throws IOException If the storage root directory cannot be created.
      */
     public FileStorageService(StorageConfiguration storageConfiguration,
             @Value("${aws.region}") String awsRegion) throws IOException {
@@ -192,7 +193,7 @@ public class FileStorageService {
                 LOG.info("File Service: S3 client built");
             }
 
-            if (!cloudS3Client.listBuckets().buckets().stream().anyMatch(b -> b.name().equals(bucketName))) {
+            if (cloudS3Client.listBuckets().buckets().stream().noneMatch(b -> b.name().equals(bucketName))) {
                 cloudS3Client.createBucket(CreateBucketRequest.builder().bucket(bucketName).build());
             }
 
@@ -236,6 +237,7 @@ public class FileStorageService {
      * Persists a file to the repository/storage indicated in the StorageProperties.
      *
      * @param mFile A MultiPart file that is to be persisted into storage or repository.
+     * @param userName The username of the user that is uploading the file.
      * @return StorageFile representation of the file that was persisted. It contains meta information about the file
      * for example the name, file size and mime type.
      * @throws IOException If a file is empty or missing, paths are incorrect, or the appropriate permissions
@@ -248,7 +250,7 @@ public class FileStorageService {
         //NOTE: the work directory on the ocfl-java client should be located on the same mount as the OCFL storage root.
         try {
             //remove any unsafe characters from the original file name and the hyphen, since it is used as a delimiter
-            String origFileNameExt = Jsoup.clean(mFile.getOriginalFilename(), Safelist.basic());
+            String origFileNameExt = Jsoup.clean(Objects.requireNonNull(mFile.getOriginalFilename()), Safelist.basic());
             String fileExt = FilenameUtils.getExtension(origFileNameExt);
             String fileUuid = UUID.randomUUID().toString();
             String fileId = fileUuid + "/" + origFileNameExt;
@@ -256,13 +258,14 @@ public class FileStorageService {
             //changing the stored file name to UUID to prevent any issues with long file names
             //e.g. 260 char limit on the path in Windows. Original filename is preserved in the fileId.
             String ocflRepoFileName = fileUuid + "." + fileExt;
+            Path pathTempLoc = Paths.get(tempLoc.toString());
 
             //Create OCFL user to identify the owner of the file
             User fileUser = new User();
             fileUser.setName(userName);
 
-            if (!Files.exists(Paths.get(tempLoc.toString()))) {
-                Files.createDirectory(Paths.get(tempLoc.toString()));
+            if (!Files.exists(pathTempLoc)) {
+                Files.createDirectory(pathTempLoc);
             }
             Path tempPathAndFileName = Paths.get(tempLoc.toString(), ocflRepoFileName);
             mFile.transferTo(tempPathAndFileName);
@@ -321,7 +324,7 @@ public class FileStorageService {
             // the output path for getObject must not exist, hence temp dir is created on the fly
             ocflRepository.getObject(ObjectVersionId.head(fileId), tempLoadDir);
             LOG.info("File Service: File with ID " + fileId + " was loaded from the repo");
-            Path fileNamePath = tempLoadDir.toFile().listFiles()[0].toPath();
+            Path fileNamePath = Objects.requireNonNull(tempLoadDir.toFile().listFiles())[0].toPath();
             loadedResource = new ByteArrayResource(Files.readAllBytes(fileNamePath));
 
         } catch (NotFoundException e) {
@@ -375,22 +378,23 @@ public class FileStorageService {
         File file = fileDetailPath.toFile();
         //get the content type from the file
         try {
-            String contentType = Files.probeContentType(file.toPath());
-            return contentType;
+            return Files.probeContentType(file.toPath());
         } catch (IOException e) {
             LOG.info("File Service: Unable to determine the content type of the file with ID: " + fileId);
             return "UNKNOWN_FILE_TYPE";
         }
     }
 
+    /**
+     * Checks the users permissions to delete a file. The user must be the same user that uploaded the file.
+     * @param fileId The fileId of the file to be deleted
+     * @param userId The userId of the user requesting to delete the file
+     * @return Returns true if the user has permissions to delete the file, false if not.
+     */
     public boolean checkUserDeletePermissions(String fileId, String userId) {
         VersionInfo versionInfo = ocflRepository.describeVersion(ObjectVersionId.head(fileId)).getVersionInfo();
         User user = versionInfo.getUser();
-        if (user.getName().equals(userId)) {
-            return true;
-        } else {
-            return false;
-        }
+        return user.getName().equals(userId);
     }
 }
 

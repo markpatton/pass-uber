@@ -19,13 +19,12 @@ package org.eclipse.pass.file.service;
 import java.io.IOException;
 import java.net.URI;
 import java.security.Principal;
-import java.util.Collection;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.pass.file.service.storage.FileStorageService;
 import org.eclipse.pass.file.service.storage.StorageFile;
 import org.eclipse.pass.object.security.WebSecurityRole;
-import org.jsoup.internal.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -33,9 +32,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,8 +40,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * PassFileServiceController is the controller class responsible for the File Service endpoints, which allows pass-core
@@ -73,6 +67,7 @@ public class PassFileServiceController {
      * deposited.
      *
      * @param file A multipart file that is uploaded from the client.
+     * @param principal The user that is uploading the file.
      * @return return a File object that has been uploaded.
      */
     @PostMapping("/file")
@@ -136,6 +131,8 @@ public class PassFileServiceController {
      *
      * @param uuid ID of the file to delete (required), is one part of the fileId
      * @param origFileName ID of the file to delete (required), is one part of the fileId
+     * @param principal the user making the request
+     * @param request the request
      * @return File
      */
     @DeleteMapping("/file/{uuid:.+}/{origFileName:.+}")
@@ -153,11 +150,11 @@ public class PassFileServiceController {
             return ResponseEntity.notFound().build();
         }
 
-        if(fileResource == null) {
+        if (fileResource == null) {
             return ResponseEntity.notFound().build();
         }
 
-        if(request.isUserInRole(WebSecurityRole.BACKEND.getValue()) ||
+        if (request.isUserInRole(WebSecurityRole.BACKEND.getValue()) ||
                 fileStorageService.checkUserDeletePermissions(principalName, fileId)) {
             fileStorageService.deleteFile(fileId);
             return ResponseEntity.ok().body("Deleted");
