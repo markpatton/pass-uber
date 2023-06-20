@@ -31,6 +31,7 @@ import java.util.UUID;
 import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import edu.wisc.library.ocfl.api.model.FileDetails;
+import edu.wisc.library.ocfl.api.model.ObjectDetails;
 import edu.wisc.library.ocfl.api.model.ObjectVersionId;
 import edu.wisc.library.ocfl.api.model.User;
 import edu.wisc.library.ocfl.api.model.VersionDetails;
@@ -383,7 +384,13 @@ public class FileStorageService {
     }
 
     public boolean checkUserDeletePermissions(String fileId, String userId) {
-        return true;
+        VersionInfo versionInfo = ocflRepository.describeVersion(ObjectVersionId.head(fileId)).getVersionInfo();
+        User user = versionInfo.getUser();
+        if (user.getName().equals(userId)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
