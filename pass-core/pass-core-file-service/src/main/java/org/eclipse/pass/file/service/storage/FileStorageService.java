@@ -290,6 +290,7 @@ public class FileStorageService {
                     fileId,
                     fileUuid,
                     origFileNameExt,
+                    userName,
                     mimeType,
                     storageType.label,
                     mFile.getSize(),
@@ -392,9 +393,19 @@ public class FileStorageService {
      * @return Returns true if the user has permissions to delete the file, false if not.
      */
     public boolean checkUserDeletePermissions(String fileId, String userId) {
+        return userId.equals(getFileOwner(fileId));
+    }
+
+    /**
+     * Get the owner of the file from the fileID supplied. It will look at the most recent version of the file to
+     * obtain the owner.
+     *
+     * @param fileId The fileId of the file.
+     * @return The owner of the file.
+     */
+    public String getFileOwner(String fileId) {
         VersionInfo versionInfo = ocflRepository.describeVersion(ObjectVersionId.head(fileId)).getVersionInfo();
-        User user = versionInfo.getUser();
-        return user.getName().equals(userId);
+        return versionInfo.getUser().getName().toString();
     }
 }
 

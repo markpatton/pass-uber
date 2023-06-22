@@ -139,28 +139,32 @@ public class PassFileServiceController {
     public ResponseEntity<?> deleteFileById(@PathVariable String uuid, @PathVariable String origFileName,
                                             Principal principal, HttpServletRequest request) {
         String principalName = principal.getName();
-        ByteArrayResource fileResource;
         String fileId = uuid  + "/" + origFileName;
 
-        //Get the file, check that it exists, and get the owner of the file.
+        //Get the file, check that it exists, and then check if current user has permissions to delete
         try {
-            fileResource = fileStorageService.getFile(fileId);
+            ByteArrayResource fileResource = fileStorageService.getFile(fileId);
         } catch (Exception e) {
             LOG.error("File Service: File not found: " + e);
             return ResponseEntity.notFound().build();
         }
 
-        if (fileResource == null) {
-            return ResponseEntity.notFound().build();
-        }
+        return canUserDeleteFile(principalName, fileId, request) ? deleteFile(fileId) :
+                ResponseEntity.status(HttpStatus.FORBIDDEN).body("User does not have permission to delete this file.");
+    }
 
+    private boolean canUserDeleteFile(String principalName, String fileId, HttpServletRequest request) {
         if (request.isUserInRole(WebSecurityRole.BACKEND.getValue()) ||
                 fileStorageService.checkUserDeletePermissions(principalName, fileId)) {
             fileStorageService.deleteFile(fileId);
-            return ResponseEntity.ok().body("Deleted");
+            return true;
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("User does not have permission to delete this file.");
+            return false;
         }
+    }
+
+    private ResponseEntity deleteFile(String fileId) {
+        fileStorageService.deleteFile(fileId);
+        return ResponseEntity.ok().body("Deleted");
     }
 }

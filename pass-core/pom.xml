@@ -84,7 +84,6 @@
     <commons.codec.version>1.13</commons.codec.version>
     <spring.boot.version>2.7.5</spring.boot.version>
     <amazon.sqs.version>1.0.4</amazon.sqs.version>
-    <spring.security.core.version>5.7.7</spring.security.core.version>
   </properties>
 
   <dependencyManagement>
