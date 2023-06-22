@@ -68,9 +68,7 @@ class FileStorageServiceS3Test {
                 MediaType.TEXT_PLAIN_VALUE, "Test S3 Pass-core".getBytes()), USER_NAME);
         assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
 
-        //verify the object returned has the same owner
-        assertEquals(storageFile.getFileOwner(), USER_NAME);
-        //get the file from the S3 bucket and check that the owner is the same
+        //check that the owner is the same
         assertEquals(fileStorageService.getFileOwner(storageFile.getId()), USER_NAME);
     }
 

@@ -28,7 +28,6 @@ public class StorageFile {
     private String id;
     private String uuid;
     private String fileName;
-    private String fileOwner;
     private String mimeType;
     private String storageType;
     private Long size;
@@ -62,12 +61,11 @@ public class StorageFile {
      *
      * @see StorageServiceType
      */
-    public StorageFile(String id, String uuid, String fileName, String fileOwner, String mimeType, String storageType,
+    public StorageFile(String id, String uuid, String fileName, String mimeType, String storageType,
                        Long size, String extension) {
         this.id = id;
         this.uuid = uuid;
         this.fileName = fileName;
-        this.fileOwner = fileOwner;
         this.mimeType = mimeType;
         this.storageType = storageType;
         this.size = size;
@@ -112,14 +110,6 @@ public class StorageFile {
      **/
     public String getFileName() {
         return fileName;
-    }
-
-    /**
-     * Get fileOwner
-     * @return fileOwner of the StorageFile
-     **/
-    public String getFileOwner() {
-        return fileOwner;
     }
 
     /**
@@ -205,7 +195,6 @@ public class StorageFile {
         StorageFile storageFile = (StorageFile) o;
         return Objects.equals(this.id, storageFile.id) &&
                 Objects.equals(this.fileName, storageFile.fileName) &&
-                Objects.equals(this.fileOwner, storageFile.fileOwner) &&
                 Objects.equals(this.mimeType, storageFile.mimeType) &&
                 Objects.equals(this.storageType, storageFile.storageType) &&
                 Objects.equals(this.size, storageFile.size) &&
@@ -223,7 +212,6 @@ public class StorageFile {
         sb.append("class File {\n");
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    fileName: ").append(toIndentedString(fileName)).append("\n");
-        sb.append("    fileOwner: ").append(toIndentedString(fileOwner)).append("\n");
         sb.append("    mimeType: ").append(toIndentedString(mimeType)).append("\n");
         sb.append("    storageType: ").append(toIndentedString(storageType)).append("\n");
         sb.append("    size: ").append(toIndentedString(size)).append("\n");

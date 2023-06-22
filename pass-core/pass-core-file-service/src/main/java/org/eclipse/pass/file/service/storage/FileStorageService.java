@@ -290,7 +290,6 @@ public class FileStorageService {
                     fileId,
                     fileUuid,
                     origFileNameExt,
-                    userName,
                     mimeType,
                     storageType.label,
                     mFile.getSize(),
