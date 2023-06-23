@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,15 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.util.FileSystemUtils;
 
 public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
-    StorageConfiguration storageConfiguration;
-    private FileStorageService fileStorageService;
-    private final StorageProperties properties = new StorageProperties();
-    private final String rootDir = System.getProperty("java.io.tmpdir") + "/pass-file-system-test";
-    private final static String USER_NAME = "USER1";
-    private final static String USER_NAME2 = "USER2";
 
     /**
      * Set up the FileStorageService for testing. Uses the system temp directory for the root directory.
@@ -48,17 +40,18 @@ public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
     @BeforeEach
     protected void setUp() throws IOException {
         properties.setStorageType(StorageServiceType.FILE_SYSTEM);
-        properties.setRootDir(rootDir);
+        properties.setRootDir(ROOT_DIR);
         storageConfiguration =  new StorageConfiguration(properties);
-        fileStorageService = new FileStorageService(storageConfiguration, null);
+        storageService = new FileStorageService(storageConfiguration, null);
     }
 
     /**
      * Cleanup the FileStorageService after testing. Deletes the root directory.
      */
     @AfterEach
-    void tearDown() throws IOException {
-        FileSystemUtils.deleteRecursively(Paths.get(rootDir));
+    @Override
+    protected void tearDown() throws IOException {
+        super.tearDown();
     }
 
     /**
@@ -67,12 +60,12 @@ public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
      */
     @Test
     public void storeFileThatExists() throws IOException {
-        StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
+        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-        assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
+        assertFalse(storageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
 
         //check that the owner is the same
-        assertEquals(fileStorageService.getFileOwner(storageFile.getId()), USER_NAME);
+        assertEquals(storageService.getFileOwner(storageFile.getId()), USER_NAME);
     }
 
     /**
@@ -80,9 +73,9 @@ public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
      */
     @Test
     void getFileShouldReturnFile() throws IOException {
-        StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
+        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-        ByteArrayResource file = fileStorageService.getFile(storageFile.getId());
+        ByteArrayResource file = storageService.getFile(storageFile.getId());
         assertTrue(file.contentLength() > 0);
     }
 
@@ -93,7 +86,7 @@ public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
     void getFileShouldThrowException() {
         Exception exception = assertThrows(IOException.class,
                 () -> {
-                    fileStorageService.getFile("12345");
+                    storageService.getFile("12345");
                 }
         );
         String expectedExceptionText = "File Service: The file could not be loaded";
@@ -124,9 +117,9 @@ public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
 
         allCharSets.forEach((k,v) -> {
             try {
-                StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", v,
+                StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", v,
                         MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-                assertFalse(fileStorageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
+                assertFalse(storageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
             } catch (IOException e) {
                 assertEquals("An exception was thrown in storeFileWithDifferentLangFilesNames. On charset=" + k,
                         e.getMessage());
@@ -139,34 +132,14 @@ public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
      */
     @Test
     void deleteShouldThrowExceptionFileNotExist() throws IOException {
-        StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
+        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-        fileStorageService.deleteFile(storageFile.getId());
+        storageService.deleteFile(storageFile.getId());
         Exception exception = assertThrows(NotFoundException.class,
                 () -> {
-                    fileStorageService.getResourceFileRelativePath(storageFile.getId());
+                    storageService.getResourceFileRelativePath(storageFile.getId());
                 });
         String exceptionText = exception.getMessage();
         assertTrue(exceptionText.matches("(.)+(was not found){1}(.)+"));
-    }
-
-    //TODO: will be refactored in the next ticket #478
-    @Test
-    void userHasPermissionToDeleteFile() throws IOException {
-        Boolean hasPermission = false;
-        StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-        hasPermission = fileStorageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME);
-        assertTrue(hasPermission);
-    }
-
-    //TODO: will be refactored in the next ticket #478
-    @Test
-    void userNoPermissionToDeleteFile() throws IOException {
-        Boolean hasPermission = false;
-        StorageFile storageFile = fileStorageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-        hasPermission = fileStorageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME2);
-        assertFalse(hasPermission);
     }
 }

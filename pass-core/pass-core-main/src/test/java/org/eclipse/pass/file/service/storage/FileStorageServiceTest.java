@@ -35,12 +35,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.FileSystemUtils;
 
 public abstract class FileStorageServiceTest {
-    StorageConfiguration storageConfiguration;
-    private FileStorageService storageService;
-    private final StorageProperties properties = new StorageProperties();
-    private final static String ROOT_DIR = System.getProperty("java.io.tmpdir") + "/pass-file-service-test";
-    private final static String USER_NAME = "USER1";
-    private final static String USER_NAME2 = "USER2";
+    protected StorageConfiguration storageConfiguration;
+    protected FileStorageService storageService;
+    protected final StorageProperties properties = new StorageProperties();
+    protected final static String ROOT_DIR = System.getProperty("java.io.tmpdir") + "/pass-file-service-test";
+    protected final static String USER_NAME = "USER1";
+    protected final static String USER_NAME2 = "USER2";
 
     @BeforeEach
     protected abstract void setUp() throws IOException;
@@ -49,7 +49,7 @@ public abstract class FileStorageServiceTest {
      * Cleanup the FileStorageService after testing. Deletes the root directory.
      */
     @AfterEach
-    void tearDown() throws IOException {
+    protected void tearDown() throws IOException {
         FileSystemUtils.deleteRecursively(Paths.get(ROOT_DIR));
     }
 
@@ -142,7 +142,6 @@ public abstract class FileStorageServiceTest {
         assertTrue(exceptionText.matches("(.)+(was not found){1}(.)+"));
     }
 
-    //TODO: will be refactored in the next ticket #478
     @Test
     void userHasPermissionToDeleteFile() throws IOException {
         Boolean hasPermission = false;
@@ -152,7 +151,6 @@ public abstract class FileStorageServiceTest {
         assertTrue(hasPermission);
     }
 
-    //TODO: will be refactored in the next ticket #478
     @Test
     void userNoPermissionToDeleteFile() throws IOException {
         Boolean hasPermission = false;
