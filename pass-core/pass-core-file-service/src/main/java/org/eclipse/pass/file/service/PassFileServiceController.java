@@ -109,9 +109,9 @@ public class PassFileServiceController {
         }
         ByteArrayResource fileResource;
         String contentType = "";
-        contentType = fileStorageService.getFileContentType(fileId);
 
         try {
+            contentType = fileStorageService.getFileContentType(fileId);
             fileResource = fileStorageService.getFile(fileId);
         } catch (Exception e) {
             LOG.error("File Service: File not found: " + e);

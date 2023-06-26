@@ -15,22 +15,10 @@
  */
 package org.eclipse.pass.file.service.storage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 
 public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
 
@@ -52,94 +40,5 @@ public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
     @Override
     protected void tearDown() throws IOException {
         super.tearDown();
-    }
-
-    /**
-     * Test that the file is stored and the relative path is returned. If the file didn't exist then
-     * its relative path would not be found.
-     */
-    @Test
-    public void storeFileThatExists() throws IOException {
-        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-        assertFalse(storageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
-
-        //check that the owner is the same
-        assertEquals(storageService.getFileOwner(storageFile.getId()), USER_NAME);
-    }
-
-    /**
-     * File is stored and then retrieved.
-     */
-    @Test
-    void getFileShouldReturnFile() throws IOException {
-        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-        ByteArrayResource file = storageService.getFile(storageFile.getId());
-        assertTrue(file.contentLength() > 0);
-    }
-
-    /**
-     * Should throw exception because file ID does not exist
-     */
-    @Test
-    void getFileShouldThrowException() {
-        Exception exception = assertThrows(IOException.class,
-                () -> {
-                    storageService.getFile("12345");
-                }
-        );
-        String expectedExceptionText = "File Service: The file could not be loaded";
-        String actualExceptionText = exception.getMessage();
-        assertTrue(actualExceptionText.contains(expectedExceptionText));
-    }
-
-    @Test
-    void storeFileWithDifferentLangFilesNames() {
-        String engFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:\"<>?`~[]\\;',./.txt";
-        String frFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝßàáâãäå" +
-                "çèéêëìíîïñòóôõöùúûüýÿœŒæÆ.txt";
-        String spFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÑÓÚÜáéíñóúü¡¿.txt";
-        String arFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZءآأؤإئابةتثجحخدذرزسشصضطظعغ" +
-                "ـفقكلمنهوي.txt";
-        String chFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ我 爱 你 我爱你 家庭 家人 我想你 我想你 " +
-                "我喜欢你 的 shì yí de 一个人 - yí gè rén 是 shì wǒ 我 .txt";
-        String ruFileName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZАа Бб Вв Гг Дд Ее Ёё Жж Зз Ии Йй Кк " +
-                "Лл Мм Нн Оо Пп Рр Сс Тт Уу Фф Хх Цц Чч Шш Щщ Ъъ Ыы Ьь Ээ Юю Яя .txt";
-
-        Map<String, String> allCharSets = new HashMap<>();
-        allCharSets.put("eng", engFileName);
-        allCharSets.put("fr", frFileName);
-        allCharSets.put("sp", spFileName);
-        allCharSets.put("ar", arFileName);
-        allCharSets.put("ch", chFileName);
-        allCharSets.put("ru", ruFileName);
-
-        allCharSets.forEach((k,v) -> {
-            try {
-                StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", v,
-                        MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-                assertFalse(storageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
-            } catch (IOException e) {
-                assertEquals("An exception was thrown in storeFileWithDifferentLangFilesNames. On charset=" + k,
-                        e.getMessage());
-            }
-        });
-    }
-
-    /**
-     * Store file, then delete it. Should throw exception because the file was deleted.
-     */
-    @Test
-    void deleteShouldThrowExceptionFileNotExist() throws IOException {
-        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MediaType.TEXT_PLAIN_VALUE, "Test Pass-core".getBytes()), USER_NAME);
-        storageService.deleteFile(storageFile.getId());
-        Exception exception = assertThrows(NotFoundException.class,
-                () -> {
-                    storageService.getResourceFileRelativePath(storageFile.getId());
-                });
-        String exceptionText = exception.getMessage();
-        assertTrue(exceptionText.matches("(.)+(was not found){1}(.)+"));
     }
 }

@@ -372,15 +372,14 @@ public class FileStorageService {
      * @return The content type of the file.
      */
     public String getFileContentType(String fileId) {
-        VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
-        FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().get();
-        Path fileDetailPath = Paths.get(fileDetails.getPath());
-        File file = fileDetailPath.toFile();
-        //get the content type from the file
         try {
+            VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
+            FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().get();
+            Path fileDetailPath = Paths.get(fileDetails.getPath());
+            File file = fileDetailPath.toFile();
             return Files.probeContentType(file.toPath());
         } catch (IOException e) {
-            LOG.info("File Service: Unable to determine the content type of the file with ID: " + fileId);
+            LOG.error("File Service: Unable to determine the content type of the file with ID: " + fileId);
             return "UNKNOWN_FILE_TYPE";
         }
     }
