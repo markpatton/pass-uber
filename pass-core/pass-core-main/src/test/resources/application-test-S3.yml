@@ -1,0 +1,10 @@
+aws:
+  region: us-east-1
+
+pass:
+  file-service:
+    storage-type: S3
+    root-dir:
+    s3-bucket-name: pass-core-file-s3-it
+    s3-repo-prefix: pass-core-file-s3-it
+    s3-endpoint: http://localhost:8010

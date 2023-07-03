@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,25 +40,22 @@ import org.eclipse.pass.main.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 public abstract class FileStorageServiceTest extends IntegrationTest {
     private final String credentials = Credentials.basic(BACKEND_USER, BACKEND_PASSWORD);
     private final OkHttpClient httpClient = new OkHttpClient();
     public static final MediaType MEDIA_TYPE_TEXT
             = MediaType.parse("text/plain");
-
     public static final MediaType MEDIA_TYPE_APPLICATION
             = MediaType.parse("application/octet-stream");
-
+    @Autowired
     protected StorageConfiguration storageConfiguration;
+    @Autowired
     protected FileStorageService storageService;
-    protected final StorageProperties properties = new StorageProperties();
-    protected final String ROOT_DIR = System.getProperty("java.io.tmpdir") + "/pass-file-service-test";
     protected final String USER_NAME = "USER1";
     protected final String USER_NAME2 = "USER2";
 
@@ -71,7 +67,6 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
      */
     @AfterEach
     protected void tearDown() throws IOException {
-        FileSystemUtils.deleteRecursively(Paths.get(ROOT_DIR));
     }
 
     /**
@@ -83,7 +78,6 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
         assertFalse(storageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
-
         //check that the owner is the same
         assertEquals(storageService.getFileOwner(storageFile.getId()), USER_NAME);
     }
@@ -197,17 +191,11 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
 
-        //get a file from the /file endpoint
+        ByteArrayResource file = storageService.getFile(storageFile.getId());
+        //ensure that the file has been stored by the service
+        assertTrue(file.contentLength() > 0);
+
         String url = getBaseUrl() + "file/" + storageFile.getId();
-        /*Request request = new Request.Builder()
-                .url(url)
-                .header("Authorization", credentials)
-                .get()
-                .build();
-
-        Response response = httpClient.newCall(request).execute();
-
-         */
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();

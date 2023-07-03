@@ -20,30 +20,49 @@ import java.io.IOException;
 import io.findify.s3mock.S3Mock;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+//import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
+@ActiveProfiles("test-S3")
+@DirtiesContext
 class FileStorageServiceS3Test extends FileStorageServiceTest {
-    private S3Mock s3MockApi;
+    private static S3Mock s3MockApi;
+    private static final int S3_MOCK_PORT = 8010;
+    private static boolean s3MockStarted = false;
 
     /**
-     * Set up the test environment. Uses custom endpoint for the in-memory S3 mock.
+     * Set up the S3 mock server before the Application Context is loaded.
      */
-    @BeforeEach
-    @Override
-    protected void setUp() throws IOException {
-        s3MockApi = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
+    static {
+        s3MockApi = new S3Mock.Builder().withPort(S3_MOCK_PORT).withInMemoryBackend().build();
         s3MockApi.start();
-        properties.setStorageType(StorageServiceType.S3);
-        properties.setRootDir(ROOT_DIR);
-        properties.setS3Endpoint("http://localhost:8001");
-        properties.setS3BucketName("bucket-test-name");
-        properties.setS3RepoPrefix("s3-repo-prefix");
-        StorageConfiguration storageConfiguration = new StorageConfiguration(properties);
+        s3MockStarted = true;
+    }
 
-        // Set properties to make the credentials provider happy
+    /**
+     * Set up the FileStorageService for testing. Set environment variables for AWS access key and secret key that are
+     * required for the aws s3 client.
+     * @param registry the dynamic property registry
+     */
+    @DynamicPropertySource
+    static void setupBeforeAppContext(DynamicPropertyRegistry registry) {
         System.setProperty("aws.accessKeyId", "A B C");
         System.setProperty("aws.secretAccessKey", "D E F");
 
-        storageService = new FileStorageService(storageConfiguration, "us-east-1");
+    }
+
+    /**
+     * Start the S3 mock server.
+     */
+    @BeforeEach
+    protected void setUp() {
+        if (!s3MockStarted) {
+            s3MockApi.start();
+            s3MockStarted = true;
+        }
     }
 
     /**
@@ -52,7 +71,8 @@ class FileStorageServiceS3Test extends FileStorageServiceTest {
     @AfterEach
     @Override
     protected void tearDown() throws IOException {
-        s3MockApi.stop();
         super.tearDown();
+        s3MockApi.stop();
+        s3MockStarted = false;
     }
 }

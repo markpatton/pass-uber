@@ -41,6 +41,7 @@ import edu.wisc.library.ocfl.core.OcflRepositoryBuilder;
 import edu.wisc.library.ocfl.core.extension.storage.layout.config.HashedNTupleLayoutConfig;
 import edu.wisc.library.ocfl.core.path.constraint.ContentPathConstraints;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
@@ -177,7 +178,8 @@ public class FileStorageService {
             Region region = Region.of(awsRegion);
 
             //endpoint is not required, but if one is supplied then S3 client is built with endpoint override
-            if (storageProperties.getS3Endpoint().isPresent()) {
+            if (storageProperties.getS3Endpoint().isPresent()
+                    && StringUtils.isNotEmpty(storageProperties.getS3Endpoint().get().toString())) {
                 String endpoint = storageProperties.getS3Endpoint().get();
                 cloudS3Client = S3Client.builder()
                         .credentialsProvider(DefaultCredentialsProvider.create())

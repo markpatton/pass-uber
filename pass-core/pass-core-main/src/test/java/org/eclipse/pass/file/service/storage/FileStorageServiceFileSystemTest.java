@@ -19,18 +19,16 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.test.annotation.DirtiesContext;
 
+@DirtiesContext
 public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
 
     /**
      * Set up the FileStorageService for testing. Uses the system temp directory for the root directory.
      */
     @BeforeEach
-    protected void setUp() throws IOException {
-        properties.setStorageType(StorageServiceType.FILE_SYSTEM);
-        properties.setRootDir(ROOT_DIR);
-        storageConfiguration =  new StorageConfiguration(properties);
-        storageService = new FileStorageService(storageConfiguration, null);
+    protected void setUp() {
     }
 
     /**
