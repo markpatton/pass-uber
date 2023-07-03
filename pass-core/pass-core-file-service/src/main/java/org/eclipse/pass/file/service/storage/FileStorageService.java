@@ -248,7 +248,7 @@ public class FileStorageService {
      * @see StorageFile
      */
     public StorageFile storeFile(MultipartFile mFile, String userName) throws IOException {
-        StorageFile storageFile = null;
+        StorageFile storageFile;
         //NOTE: the work directory on the ocfl-java client should be located on the same mount as the OCFL storage root.
         try {
             //remove any unsafe characters from the original file name and the hyphen, since it is used as a delimiter
@@ -363,7 +363,7 @@ public class FileStorageService {
         VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
         Collection<FileDetails> allVersionFiles = versionDetails.getFiles();
         Optional<FileDetails> fileDetails = allVersionFiles.stream().findFirst();
-        return fileDetails.get().getStorageRelativePath();
+        return fileDetails.orElse(null).getStorageRelativePath();
     }
 
     /**
@@ -376,7 +376,7 @@ public class FileStorageService {
     public String getFileContentType(String fileId) {
         try {
             VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
-            FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().get();
+            FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().orElse(null);
             Path fileDetailPath = Paths.get(fileDetails.getPath());
             File file = fileDetailPath.toFile();
             return Files.probeContentType(file.toPath());
@@ -405,7 +405,7 @@ public class FileStorageService {
      */
     public String getFileOwner(String fileId) {
         VersionInfo versionInfo = ocflRepository.describeVersion(ObjectVersionId.head(fileId)).getVersionInfo();
-        return versionInfo.getUser().getName().toString();
+        return versionInfo.getUser().getName();
     }
 }
 
