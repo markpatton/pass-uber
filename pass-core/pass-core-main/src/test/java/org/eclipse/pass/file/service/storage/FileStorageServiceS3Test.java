@@ -20,22 +20,18 @@ import java.io.IOException;
 import io.findify.s3mock.S3Mock;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-//import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 @ActiveProfiles("test-S3")
-@DirtiesContext
 class FileStorageServiceS3Test extends FileStorageServiceTest {
     private static S3Mock s3MockApi;
     private static final int S3_MOCK_PORT = 8010;
-    private static boolean s3MockStarted = false;
+    private static boolean s3MockStarted;
 
-    /**
-     * Set up the S3 mock server before the Application Context is loaded.
-     */
+
+    // Set up the S3 mock server before the Application Context is loaded.
     static {
         s3MockApi = new S3Mock.Builder().withPort(S3_MOCK_PORT).withInMemoryBackend().build();
         s3MockApi.start();

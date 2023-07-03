@@ -217,7 +217,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
 
         RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file",file.getName(),
-                        RequestBody.create(MEDIA_TYPE_APPLICATION, createTestFile()))
+                        RequestBody.create(MEDIA_TYPE_APPLICATION, file))
                 .build();
 
         Request request = new Request.Builder()
@@ -229,22 +229,46 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         Response response = httpClient.newCall(request).execute();
         assertEquals(HttpStatus.CREATED.value(), response.code());
         assertNotNull(response.body());
+    }
+
+    @Test
+    void uploadFileMissingFile() throws IOException {
+        String url = getBaseUrl() + "file";
+
+        RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file","test.txt",
+                        RequestBody.create(MEDIA_TYPE_APPLICATION, ""))
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Authorization", credentials)
+                .build();
+
+        Response response = httpClient.newCall(request).execute();
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
 
     }
 
     @Test
-    void uploadFileMissingFile() {
+    void uploadFileMissingFileName() throws IOException {
+        String url = getBaseUrl() + "file";
+        File file = createTestFile();
 
-    }
+        RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file",null,
+                        RequestBody.create(MEDIA_TYPE_APPLICATION, file))
+                .build();
 
-    @Test
-    void uploadFileMissingFileName() {
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Authorization", credentials)
+                .build();
 
-    }
-
-    @Test
-    void uploadFileMissingUser() {
-
+        Response response = httpClient.newCall(request).execute();
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
     }
 
     private File createTestFile() throws IOException {

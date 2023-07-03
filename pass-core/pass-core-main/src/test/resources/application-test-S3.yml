@@ -2,6 +2,8 @@ aws:
   region: us-east-1
 
 pass:
+  jms:
+    embed: false
   file-service:
     storage-type: S3
     root-dir:
