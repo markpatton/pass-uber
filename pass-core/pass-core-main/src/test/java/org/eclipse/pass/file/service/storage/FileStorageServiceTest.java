@@ -168,6 +168,11 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         assertTrue(exceptionText.matches("(.)+(was not found){1}(.)+"));
     }
 
+    /**
+     * Store file, and then check user permissions on that file. User has permissions to delete file.
+     *
+     * @throws IOException if there is an error
+     */
     @Test
     void userHasPermissionToDeleteFile() throws IOException {
         Boolean hasPermission = false;
@@ -177,6 +182,11 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         assertTrue(hasPermission);
     }
 
+    /**
+     * Store file, and then check user permissions on that file. User does not have permissions to delete file.
+     *
+     * @throws IOException if there is an error
+     */
     @Test
     void userNoPermissionToDeleteFile() throws IOException {
         Boolean hasPermission = false;
@@ -186,6 +196,11 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         assertFalse(hasPermission);
     }
 
+    /**
+     * Get file by ID using the PassFileServiceController.
+     *
+     * @throws IOException if there is an error
+     */
     @Test
     void getFileByIdUsingController() throws IOException {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
@@ -210,6 +225,11 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         assertNotNull(response.body());
     }
 
+    /**
+     * Upload file using the PassFileServiceController.
+     *
+     * @throws IOException if there is an error
+     */
     @Test
     void uploadFile() throws IOException {
         String url = getBaseUrl() + "file";
@@ -231,6 +251,10 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         assertNotNull(response.body());
     }
 
+    /**
+     * Attempt to upload a file, that has file missing in the body. Should return 400 Bad Request.
+     * @throws IOException if there is an error
+     */
     @Test
     void uploadFileMissingFile() throws IOException {
         String url = getBaseUrl() + "file";
@@ -248,9 +272,12 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
 
         Response response = httpClient.newCall(request).execute();
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
-
     }
 
+    /**
+     * Attempt to upload a file, that has file name missing in the body. Should return 400 Bad Request.
+     * @throws IOException if there is an error
+     */
     @Test
     void uploadFileMissingFileName() throws IOException {
         String url = getBaseUrl() + "file";
@@ -269,6 +296,26 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
 
         Response response = httpClient.newCall(request).execute();
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
+    }
+
+    /**
+     * Delete file using the controller. Should return 200 OK.
+     * @throws IOException if there is an error
+     */
+    @Test
+    void deleteFileUsingFileServiceController() throws IOException {
+        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
+                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+        String url = getBaseUrl() + "file" + "/" + storageFile.getId();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .delete()
+                .addHeader("Authorization", credentials)
+                .build();
+
+        Response response = httpClient.newCall(request).execute();
+        assertEquals(HttpStatus.OK.value(), response.code());
     }
 
     private File createTestFile() throws IOException {
