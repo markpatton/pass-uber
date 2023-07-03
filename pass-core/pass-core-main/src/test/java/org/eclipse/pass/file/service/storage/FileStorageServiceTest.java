@@ -53,8 +53,6 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
     public static final MediaType MEDIA_TYPE_APPLICATION
             = MediaType.parse("application/octet-stream");
     @Autowired
-    protected StorageConfiguration storageConfiguration;
-    @Autowired
     protected FileStorageService storageService;
     protected final String USER_NAME = "USER1";
     protected final String USER_NAME2 = "USER2";
@@ -110,9 +108,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
     @Test
     void getFileShouldThrowException() {
         Exception exception = assertThrows(IOException.class,
-                () -> {
-                    storageService.getFile("12345");
-                }
+                () -> storageService.getFile("12345")
         );
         String expectedExceptionText = "File Service: The file could not be loaded";
         String actualExceptionText = exception.getMessage();
@@ -161,9 +157,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
                 MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
         storageService.deleteFile(storageFile.getId());
         Exception exception = assertThrows(NotFoundException.class,
-                () -> {
-                    storageService.getResourceFileRelativePath(storageFile.getId());
-                });
+                () -> storageService.getResourceFileRelativePath(storageFile.getId()));
         String exceptionText = exception.getMessage();
         assertTrue(exceptionText.matches("(.)+(was not found){1}(.)+"));
     }
@@ -175,7 +169,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
      */
     @Test
     void userHasPermissionToDeleteFile() throws IOException {
-        Boolean hasPermission = false;
+        boolean hasPermission;
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
         hasPermission = storageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME);
@@ -189,7 +183,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
      */
     @Test
     void userNoPermissionToDeleteFile() throws IOException {
-        Boolean hasPermission = false;
+        boolean hasPermission = false;
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
         hasPermission = storageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME2);
@@ -237,7 +231,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
 
         RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file",file.getName(),
-                        RequestBody.create(MEDIA_TYPE_APPLICATION, file))
+                        RequestBody.create(file, MEDIA_TYPE_APPLICATION))
                 .build();
 
         Request request = new Request.Builder()
@@ -261,7 +255,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
 
         RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file","test.txt",
-                        RequestBody.create(MEDIA_TYPE_APPLICATION, ""))
+                        RequestBody.create("", MEDIA_TYPE_APPLICATION))
                 .build();
 
         Request request = new Request.Builder()
@@ -285,7 +279,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
 
         RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file",null,
-                        RequestBody.create(MEDIA_TYPE_APPLICATION, file))
+                        RequestBody.create(file, MEDIA_TYPE_APPLICATION))
                 .build();
 
         Request request = new Request.Builder()

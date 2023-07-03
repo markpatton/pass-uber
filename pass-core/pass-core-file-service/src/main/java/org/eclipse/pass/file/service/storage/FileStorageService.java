@@ -179,7 +179,7 @@ public class FileStorageService {
 
             //endpoint is not required, but if one is supplied then S3 client is built with endpoint override
             if (storageProperties.getS3Endpoint().isPresent()
-                    && StringUtils.isNotEmpty(storageProperties.getS3Endpoint().get().toString())) {
+                    && StringUtils.isNotEmpty(storageProperties.getS3Endpoint().get())) {
                 String endpoint = storageProperties.getS3Endpoint().get();
                 cloudS3Client = S3Client.builder()
                         .credentialsProvider(DefaultCredentialsProvider.create())
