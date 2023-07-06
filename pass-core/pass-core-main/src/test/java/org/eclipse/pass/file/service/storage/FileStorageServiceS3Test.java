@@ -28,13 +28,11 @@ import org.springframework.test.context.DynamicPropertySource;
 class FileStorageServiceS3Test extends FileStorageServiceTest {
     private static S3Mock s3MockApi;
     private static final int S3_MOCK_PORT = 8010;
-    private static boolean s3MockStarted;
 
     // Set up the S3 mock server before the Application Context is loaded.
     static {
         s3MockApi = new S3Mock.Builder().withPort(S3_MOCK_PORT).withInMemoryBackend().build();
         s3MockApi.start();
-        s3MockStarted = true;
     }
 
     /**
@@ -54,10 +52,8 @@ class FileStorageServiceS3Test extends FileStorageServiceTest {
      */
     @BeforeEach
     protected void setUp() {
-        if (!s3MockStarted) {
-            s3MockApi.start();
-            s3MockStarted = true;
-        }
+        s3MockApi.stop();
+        s3MockApi.start();
     }
 
     /**
@@ -67,7 +63,5 @@ class FileStorageServiceS3Test extends FileStorageServiceTest {
     @Override
     protected void tearDown() throws IOException {
         super.tearDown();
-        s3MockApi.stop();
-        s3MockStarted = false;
     }
 }
