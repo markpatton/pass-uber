@@ -112,6 +112,9 @@ public class FileStorageService {
                 || storageProperties.getStorageRootDir().isEmpty()) {
             //when a storage root is not specified, then it should be: system_temp/create_temp_dir
             rootLoc = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")),null);
+            //set the rootLoc in the storageProperties
+            storageProperties.setRootDir(rootLoc.toString().
+                    substring(rootLoc.toString().lastIndexOf(File.separator) + 1));
         } else {
             rootLoc = Paths.get(storageProperties.getStorageRootDir());
         }

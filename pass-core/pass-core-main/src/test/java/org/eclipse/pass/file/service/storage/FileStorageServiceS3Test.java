@@ -57,11 +57,11 @@ class FileStorageServiceS3Test extends FileStorageServiceTest {
     }
 
     /**
-     * Tear down the test environment. Deletes the temporary directory.
+     * Stop the S3 mock server.
      */
     @AfterEach
-    @Override
-    protected void tearDown() throws IOException {
-        super.tearDown();
+    protected void stops3Server() {
+        s3MockApi.stop();
     }
+
 }

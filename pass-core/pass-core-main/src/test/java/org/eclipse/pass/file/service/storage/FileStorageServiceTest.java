@@ -16,6 +16,7 @@
 package org.eclipse.pass.file.service.storage;
 
 import static java.io.File.createTempFile;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +39,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.pass.main.IntegrationTest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,17 +59,20 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
             = MediaType.parse("application/octet-stream");
     @Autowired
     protected FileStorageService storageService;
+    @Autowired
+    protected StorageConfiguration storageConfiguration;
     protected final String USER_NAME = "USER1";
     protected final String USER_NAME2 = "USER2";
-
-    @BeforeEach
-    protected abstract void setUp() throws IOException;
 
     /**
      * Cleanup the FileStorageService after testing. Deletes the root directory.
      */
-    @AfterEach
+    @AfterAll
     protected void tearDown() throws IOException {
+        Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
+        String rootDirName = storageConfiguration.getStorageProperties().getStorageRootDir();
+        File tempRootDir = tempDir.resolve(rootDirName).toFile();
+        deleteDirectory(tempRootDir);
     }
 
     /**
@@ -243,6 +251,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         Response response = httpClient.newCall(request).execute();
         assertEquals(HttpStatus.CREATED.value(), response.code());
         assertNotNull(response.body());
+        file.delete();
     }
 
     /**
@@ -290,6 +299,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
 
         Response response = httpClient.newCall(request).execute();
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
+        file.delete();
     }
 
     /**

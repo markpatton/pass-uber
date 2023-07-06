@@ -15,26 +15,10 @@
  */
 package org.eclipse.pass.file.service.storage;
 
-import java.io.IOException;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-
+/**
+ * Application Context sets up the FileService. The default of the FileService is FILE_SYSTEM, therefore no
+ * setup is needed here.
+ */
 public class FileStorageServiceFileSystemTest extends FileStorageServiceTest {
 
-    /**
-     * Set up the FileStorageService for testing. Uses the system temp directory for the root directory.
-     */
-    @BeforeEach
-    protected void setUp() {
-    }
-
-    /**
-     * Cleanup the FileStorageService after testing. Deletes the root directory.
-     */
-    @AfterEach
-    @Override
-    protected void tearDown() throws IOException {
-        super.tearDown();
-    }
 }
