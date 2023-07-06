@@ -366,7 +366,7 @@ public class FileStorageService {
         VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
         Collection<FileDetails> allVersionFiles = versionDetails.getFiles();
         Optional<FileDetails> fileDetails = allVersionFiles.stream().findFirst();
-        return fileDetails.orElse(null).getStorageRelativePath();
+        return fileDetails.orElseThrow().getStorageRelativePath();
     }
 
     /**
@@ -379,7 +379,7 @@ public class FileStorageService {
     public String getFileContentType(String fileId) {
         try {
             VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
-            FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().orElse(null);
+            FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().orElseThrow();
             Path fileDetailPath = Paths.get(fileDetails.getPath());
             File file = fileDetailPath.toFile();
             return Files.probeContentType(file.toPath());
