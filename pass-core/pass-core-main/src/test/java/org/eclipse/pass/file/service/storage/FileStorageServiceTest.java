@@ -47,7 +47,16 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 
-public abstract class FileStorageServiceTest extends IntegrationTest {
+/**
+ * The FileStorageServiceTest IT tests the FileStorageService and the FileStorageController. Since the
+ * FileStorageService by default uses the FILE_SYSTEM storage type, this test is responsible for testing the
+ * FileStorageService and PassFileServiceController using the file system. Since many of the tests are the same between
+ * the different storage types, the FileStorageServiceS3Test extends this class to make use of the same tests; however
+ * the S3 tests require a different configuration and setup.
+ * @see FileStorageServiceS3Test
+ * @see FileStorageService
+ */
+public class FileStorageServiceTest extends IntegrationTest {
     protected final String USER_NAME = "USER1";
     protected final String USER_NAME2 = "USER2";
     private final String credentialsBackend = Credentials.basic(BACKEND_USER, BACKEND_PASSWORD);

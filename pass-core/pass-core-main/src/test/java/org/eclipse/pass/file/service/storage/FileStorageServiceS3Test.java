@@ -22,6 +22,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
+/**
+ * The FileStorageServiceS3Test class is a test class for the FileStorageService that uses the S3 mock server. The S3
+ * configuration is managed through application-test-s3.yml profile. The AWS access key and secret need to be set prior
+ * to the Application Context initializing, and in addition, the S3 mock server needs to be started before the
+ * Application Context. The S3 mock server is stopped and started prior to each test. This test extends the
+ * FileStorageServiceTest class, which contains the tests that are common to all FileStorageService configurations.
+ * @see FileStorageServiceTest
+ * @see FileStorageService
+ */
 @ActiveProfiles("test-S3")
 class FileStorageServiceS3Test extends FileStorageServiceTest {
     private static S3Mock s3MockApi;
