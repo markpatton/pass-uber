@@ -39,11 +39,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.pass.main.IntegrationTest;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -51,7 +48,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 
 public abstract class FileStorageServiceTest extends IntegrationTest {
-    private final String credentials = Credentials.basic(BACKEND_USER, BACKEND_PASSWORD);
+    protected final String USER_NAME = "USER1";
+    protected final String USER_NAME2 = "USER2";
+    private final String credentialsBackend = Credentials.basic(BACKEND_USER, BACKEND_PASSWORD);
     private final OkHttpClient httpClient = new OkHttpClient();
     public static final MediaType MEDIA_TYPE_TEXT
             = MediaType.parse("text/plain");
@@ -61,8 +60,6 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
     protected FileStorageService storageService;
     @Autowired
     protected StorageConfiguration storageConfiguration;
-    protected final String USER_NAME = "USER1";
-    protected final String USER_NAME2 = "USER2";
 
     /**
      * Cleanup the FileStorageService after testing. Deletes the root directory.
@@ -218,7 +215,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
                 .build();
         Request request = new Request.Builder()
                 .url(url)
-                .header("Authorization", credentials)
+                .header("Authorization", credentialsBackend)
                 .get()
                 .build();
         Response response = client.newCall(request).execute();
@@ -245,7 +242,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         Request request = new Request.Builder()
                 .url(url)
                 .post(requestBody)
-                .addHeader("Authorization", credentials)
+                .addHeader("Authorization", credentialsBackend)
                 .build();
 
         Response response = httpClient.newCall(request).execute();
@@ -270,7 +267,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         Request request = new Request.Builder()
                 .url(url)
                 .post(requestBody)
-                .addHeader("Authorization", credentials)
+                .addHeader("Authorization", credentialsBackend)
                 .build();
 
         Response response = httpClient.newCall(request).execute();
@@ -294,7 +291,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         Request request = new Request.Builder()
                 .url(url)
                 .post(requestBody)
-                .addHeader("Authorization", credentials)
+                .addHeader("Authorization", credentialsBackend)
                 .build();
 
         Response response = httpClient.newCall(request).execute();
@@ -315,7 +312,7 @@ public abstract class FileStorageServiceTest extends IntegrationTest {
         Request request = new Request.Builder()
                 .url(url)
                 .delete()
-                .addHeader("Authorization", credentials)
+                .addHeader("Authorization", credentialsBackend)
                 .build();
 
         Response response = httpClient.newCall(request).execute();

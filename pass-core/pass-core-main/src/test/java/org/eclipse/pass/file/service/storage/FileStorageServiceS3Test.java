@@ -15,8 +15,6 @@
  */
 package org.eclipse.pass.file.service.storage;
 
-import java.io.IOException;
-
 import io.findify.s3mock.S3Mock;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
