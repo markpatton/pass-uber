@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
@@ -362,11 +361,12 @@ public class FileStorageService {
      * @param fileId The fileId of the file path to be returned.
      * @return The relative path of the file.
      */
-    public String getResourceFileRelativePath(String fileId) {
+    public String getResourceFileRelativePath(String fileId) throws IOException {
         VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
         Collection<FileDetails> allVersionFiles = versionDetails.getFiles();
-        Optional<FileDetails> fileDetails = allVersionFiles.stream().findFirst();
-        return fileDetails.orElseThrow().getStorageRelativePath();
+        return allVersionFiles.stream().findFirst()
+                .orElseThrow(() -> new IOException("The relative path could not be found for file ID: " + fileId))
+                .getStorageRelativePath();
     }
 
     /**
@@ -379,7 +379,8 @@ public class FileStorageService {
     public String getFileContentType(String fileId) {
         try {
             VersionDetails versionDetails = ocflRepository.describeVersion(ObjectVersionId.head(fileId));
-            FileDetails fileDetails = versionDetails.getFiles().stream().findFirst().orElseThrow();
+            FileDetails fileDetails = versionDetails.getFiles().stream().findFirst()
+                    .orElseThrow(() -> new IOException("The content type could not be found for file ID: " + fileId));
             Path fileDetailPath = Paths.get(fileDetails.getPath());
             File file = fileDetailPath.toFile();
             return Files.probeContentType(file.toPath());
