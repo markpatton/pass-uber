@@ -76,6 +76,8 @@ logging:
 
 aws:
   region: us-east-1
+  sqs:
+    endpoint-override: ${AWS_SQS_ENDPOINT_OVERRIDE:}
 
 pass:
   auth:

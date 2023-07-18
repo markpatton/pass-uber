@@ -11,6 +11,7 @@ import javax.json.JsonObjectBuilder;
 
 import com.amazon.sqs.javamessaging.ProviderConfiguration;
 import com.amazon.sqs.javamessaging.SQSConnectionFactory;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.yahoo.elide.RefreshableElide;
@@ -25,6 +26,7 @@ import com.yahoo.elide.core.utils.coerce.CoerceUtil;
 import com.yahoo.elide.modelconfig.DynamicConfiguration;
 import com.yahoo.elide.spring.config.ElideConfigProperties;
 import org.apache.activemq.broker.BrokerService;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.pass.object.model.Deposit;
 import org.eclipse.pass.object.model.EventType;
 import org.eclipse.pass.object.model.Submission;
@@ -66,6 +68,9 @@ public class JmsConfiguration {
 
     @Value("${pass.jms.queue.deposit}")
     private String deposit_queue;
+
+    @Value("${aws.sqs.endpoint-override:AWS_SQS_ENDPOINT_OVERRIDE}")
+    private String awsSqsEndpointOverride;
 
     /**
      * @return name of queue for Submission object updates
@@ -114,10 +119,18 @@ public class JmsConfiguration {
      * @return JmsListenerContainerFactory
      */
     @Bean
-    @ConditionalOnProperty(name = "pass.jms.sqs", havingValue = "true", matchIfMissing = false)
+    @ConditionalOnProperty(name = "pass.jms.sqs", havingValue = "true")
     public ConnectionFactory jmsConnectionFactory(@Value("${aws.region}") String awsRegion) {
-        return new SQSConnectionFactory(new ProviderConfiguration(),
-                AmazonSQSClientBuilder.standard().withRegion(Regions.fromName(awsRegion)));
+        AmazonSQSClientBuilder sqsClientBuilder = configureSqsBuilder(AmazonSQSClientBuilder.standard(), awsRegion);
+        return new SQSConnectionFactory(new ProviderConfiguration(), sqsClientBuilder);
+    }
+
+    private AmazonSQSClientBuilder configureSqsBuilder(AmazonSQSClientBuilder sqsClientBuilder, String awsRegion) {
+        if (StringUtils.isNotEmpty(awsSqsEndpointOverride)) {
+            return sqsClientBuilder.withEndpointConfiguration(
+                    new AwsClientBuilder.EndpointConfiguration(awsSqsEndpointOverride, awsRegion));
+        }
+        return sqsClientBuilder.withRegion(Regions.fromName(awsRegion));
     }
 
     /**
