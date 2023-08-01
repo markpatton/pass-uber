@@ -143,7 +143,7 @@ public class PassFileServiceController {
 
         //Get the file, check that it exists, and then check if current user has permissions to delete
         try {
-            ByteArrayResource fileResource = fileStorageService.getFile(fileId);
+            fileStorageService.getFile(fileId);
         } catch (Exception e) {
             LOG.error("File Service: File not found: " + e);
             return ResponseEntity.notFound().build();
@@ -158,7 +158,7 @@ public class PassFileServiceController {
                 fileStorageService.checkUserDeletePermissions(principalName, fileId));
     }
 
-    private ResponseEntity deleteFile(String fileId) {
+    private ResponseEntity<?> deleteFile(String fileId) {
         fileStorageService.deleteFile(fileId);
         return ResponseEntity.ok().body("Deleted");
     }
