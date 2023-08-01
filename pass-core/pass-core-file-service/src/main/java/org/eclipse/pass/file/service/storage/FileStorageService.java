@@ -50,6 +50,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -383,10 +384,16 @@ public class FileStorageService {
                     .orElseThrow(() -> new IOException("The content type could not be found for file ID: " + fileId));
             Path fileDetailPath = Paths.get(fileDetails.getPath());
             File file = fileDetailPath.toFile();
-            return Files.probeContentType(file.toPath());
+
+            String type = Files.probeContentType(file.toPath());
+            if (type == null) {
+                type = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE;
+            }
+
+            return type;
         } catch (IOException e) {
-            LOG.error("File Service: Unable to determine the content type of the file with ID: " + fileId);
-            return "UNKNOWN_FILE_TYPE";
+            LOG.error("File Service: Unable to determine the content type of the file with ID: " + fileId, e);
+            return MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE;
         }
     }
 
