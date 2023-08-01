@@ -293,7 +293,7 @@ public class FileStorageServiceTest extends IntegrationTest {
 
         // Download
         Request dlRequest = new Request.Builder().url(url + "/" + id).
-                addHeader("Authorization", credentialsBackend).get().build();
+                addHeader("Authorization", credentialsBackend).build();
         Response dlResponse = httpClient.newCall(dlRequest).execute();
         assertEquals(HttpStatus.OK.value(), dlResponse.code());
 
