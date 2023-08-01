@@ -318,9 +318,9 @@ public class FileStorageService {
      */
     public ByteArrayResource getFile(String fileId) throws IOException {
         ByteArrayResource loadedResource;
-        Path tempLoadDir = Paths.get(this.tempLoc.toString(), fileId.split("/")[0],
+        Path tempLoadDir = Paths.get(this.tempLoc.toString(),"output", fileId.split("/")[0],
                 Instant.now().toString().replace(":","-").replace(".","-"));
-        Path tempLoadParentDir = Paths.get(this.tempLoc.toString(), fileId.split("/")[0]);
+        Path tempLoadParentDir = Paths.get(this.tempLoc.toString(),"output", fileId.split("/")[0]);
         try {
             //need the parent directory for the OCFL getObject to work
             if (!Files.exists(tempLoadParentDir)) {

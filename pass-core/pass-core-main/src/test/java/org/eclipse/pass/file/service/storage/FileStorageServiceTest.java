@@ -81,7 +81,7 @@ public class FileStorageServiceTest extends IntegrationTest {
         Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
         String rootDirName = storageConfiguration.getStorageProperties().getStorageRootDir();
         File tempRootDir = tempDir.resolve(rootDirName).toFile();
-        //deleteDirectory(tempRootDir);
+        deleteDirectory(tempRootDir);
     }
 
     /**
