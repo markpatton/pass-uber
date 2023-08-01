@@ -262,7 +262,7 @@ public class FileStorageService {
             String mimeType = URLConnection.guessContentTypeFromName(origFileNameExt);
             //changing the stored file name to UUID to prevent any issues with long file names
             //e.g. 260 char limit on the path in Windows. Original filename is preserved in the fileId.
-            String ocflRepoFileName = fileUuid + "." + fileExt;
+            String ocflRepoFileName = StringUtils.isNotEmpty(fileExt) ? fileUuid + "." + fileExt : fileUuid;
             Path pathTempLoc = Paths.get(tempLoc.toString());
 
             //Create OCFL user to identify the owner of the file
@@ -318,9 +318,9 @@ public class FileStorageService {
      */
     public ByteArrayResource getFile(String fileId) throws IOException {
         ByteArrayResource loadedResource;
-        Path tempLoadDir = Paths.get(this.tempLoc.toString(), fileId,
+        Path tempLoadDir = Paths.get(this.tempLoc.toString(), fileId.split("/")[0],
                 Instant.now().toString().replace(":","-").replace(".","-"));
-        Path tempLoadParentDir = Paths.get(this.tempLoc.toString(), fileId);
+        Path tempLoadParentDir = Paths.get(this.tempLoc.toString(), fileId.split("/")[0]);
         try {
             //need the parent directory for the OCFL getObject to work
             if (!Files.exists(tempLoadParentDir)) {

@@ -81,7 +81,7 @@ public class FileStorageServiceTest extends IntegrationTest {
         Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
         String rootDirName = storageConfiguration.getStorageProperties().getStorageRootDir();
         File tempRootDir = tempDir.resolve(rootDirName).toFile();
-        deleteDirectory(tempRootDir);
+        //deleteDirectory(tempRootDir);
     }
 
     /**
@@ -293,7 +293,7 @@ public class FileStorageServiceTest extends IntegrationTest {
 
         // Download
         Request dlRequest = new Request.Builder().url(url + "/" + id).
-                addHeader("Authorization", credentialsBackend).build();
+                addHeader("Authorization", credentialsBackend).get().build();
         Response dlResponse = httpClient.newCall(dlRequest).execute();
         assertEquals(HttpStatus.OK.value(), dlResponse.code());
 
