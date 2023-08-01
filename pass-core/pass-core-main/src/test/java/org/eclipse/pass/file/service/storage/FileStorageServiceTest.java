@@ -17,6 +17,7 @@ package org.eclipse.pass.file.service.storage;
 
 import static java.io.File.createTempFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,6 +41,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.eclipse.pass.main.IntegrationTest;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -258,6 +261,82 @@ public class FileStorageServiceTest extends IntegrationTest {
         assertEquals(HttpStatus.CREATED.value(), response.code());
         assertNotNull(response.body());
         file.delete();
+    }
+
+    /**
+     * Test upload and download of file with not known content type.
+     *
+     * @throws IOException if there is an error
+     * @throws JSONException
+     */
+    @Test
+    void uploadFileWithUnknownType() throws IOException, JSONException {
+        String url = getBaseUrl() + "file";
+        byte[] data = {1, 2, 3};
+
+        // Upload
+        RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file", "blah",
+                        RequestBody.create(data))
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Authorization", credentialsBackend)
+                .build();
+
+        Response response = httpClient.newCall(request).execute();
+        assertEquals(HttpStatus.CREATED.value(), response.code());
+
+        String id = new JSONObject(response.body().string()).getString("id");
+
+        // Download
+        Request dlRequest = new Request.Builder().url(url + "/" + id).
+                addHeader("Authorization", credentialsBackend).build();
+        Response dlResponse = httpClient.newCall(dlRequest).execute();
+        assertEquals(HttpStatus.OK.value(), dlResponse.code());
+
+        assertArrayEquals(data, dlResponse.body().bytes());
+        assertEquals(MEDIA_TYPE_APPLICATION, dlResponse.body().contentType());
+    }
+
+    /**
+     * Test upload and download of a large file
+     *
+     * @throws IOException if there is an error
+     * @throws JSONException
+     */
+    @Test
+    void uploadLargeFile() throws IOException, JSONException {
+        String url = getBaseUrl() + "file";
+        String data = "moo".repeat(2000000);
+
+        // Upload
+        RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file", "largemoo.txt",
+                        RequestBody.create(data, MEDIA_TYPE_TEXT))
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Authorization", credentialsBackend)
+                .build();
+
+        Response response = httpClient.newCall(request).execute();
+        assertEquals(HttpStatus.CREATED.value(), response.code());
+
+        String id = new JSONObject(response.body().string()).getString("id");
+
+        // Download
+        Request dlRequest = new Request.Builder().url(url + "/" + id).
+                addHeader("Authorization", credentialsBackend).build();
+        Response dlResponse = httpClient.newCall(dlRequest).execute();
+        assertEquals(HttpStatus.OK.value(), dlResponse.code());
+
+        assertArrayEquals(data.getBytes(), dlResponse.body().bytes());
+        assertEquals(MEDIA_TYPE_TEXT, dlResponse.body().contentType());
     }
 
     /**
