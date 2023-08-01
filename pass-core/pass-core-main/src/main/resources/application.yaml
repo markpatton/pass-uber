@@ -66,6 +66,10 @@ spring:
       name: ${PASS_CORE_BACKEND_USER:backend}
       password: ${PASS_CORE_BACKEND_PASSWORD:moo}
       roles: BACKEND
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 server:
   port: 8080
