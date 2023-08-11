@@ -280,7 +280,7 @@ public class User extends PassEntity {
                 && Objects.equals(email, other.email) && Objects.equals(firstName, other.firstName)
                 && Objects.equals(lastName, other.lastName) && listEquals(locatorIds, other.locatorIds)
                 && Objects.equals(middleName, other.middleName) && Objects.equals(orcidId, other.orcidId)
-                && Objects.equals(roles, other.roles) && Objects.equals(username, other.username);
+                && listEquals(roles, other.roles) && Objects.equals(username, other.username);
     }
 
     @Override
