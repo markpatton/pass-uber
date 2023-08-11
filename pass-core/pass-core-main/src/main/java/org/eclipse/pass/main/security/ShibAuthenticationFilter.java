@@ -16,6 +16,7 @@
 package org.eclipse.pass.main.security;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.FilterChain;
@@ -28,6 +29,7 @@ import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.PassClientResult;
 import org.eclipse.pass.object.PassClientSelector;
 import org.eclipse.pass.object.RSQL;
+import org.eclipse.pass.object.model.PassEntity;
 import org.eclipse.pass.object.model.User;
 import org.eclipse.pass.object.model.UserRole;
 import org.slf4j.Logger;
@@ -125,38 +127,43 @@ public class ShibAuthenticationFilter extends OncePerRequestFilter {
     private void update_pass_user(PassClient pass_client, User shib_user, User pass_user) throws IOException {
         boolean update = false;
 
-        if (!pass_user.getUsername().equals(shib_user.getUsername())) {
+        if (!Objects.equals(pass_user.getUsername(), shib_user.getUsername())) {
             pass_user.setUsername(shib_user.getUsername());
             update = true;
         }
 
-        if (!pass_user.getEmail().equals(shib_user.getEmail())) {
+        if (!Objects.equals(pass_user.getEmail(), shib_user.getEmail())) {
             pass_user.setEmail(shib_user.getEmail());
             update = true;
         }
 
-        if (!pass_user.getDisplayName().equals(shib_user.getDisplayName())) {
+        if (!Objects.equals(pass_user.getDisplayName(), shib_user.getDisplayName())) {
             pass_user.setDisplayName(shib_user.getDisplayName());
             update = true;
         }
 
-        if (!pass_user.getFirstName().equals(shib_user.getFirstName())) {
+        if (!Objects.equals(pass_user.getFirstName(), shib_user.getFirstName())) {
             pass_user.setFirstName(shib_user.getFirstName());
             update = true;
         }
 
-        if (!pass_user.getLastName().equals(shib_user.getLastName())) {
+        if (!Objects.equals(pass_user.getLastName(), shib_user.getLastName())) {
             pass_user.setLastName(shib_user.getLastName());
             update = true;
         }
 
-        if (!pass_user.getLocatorIds().equals(shib_user.getLocatorIds())) {
+        if (!PassEntity.listEquals(pass_user.getLocatorIds(), shib_user.getLocatorIds())) {
             pass_user.setLocatorIds(shib_user.getLocatorIds());
             update = true;
         }
 
-        if (!pass_user.getAffiliation().equals(shib_user.getAffiliation())) {
+        if (!Objects.equals(pass_user.getAffiliation(), shib_user.getAffiliation())) {
             pass_user.setAffiliation(shib_user.getAffiliation());
+            update = true;
+        }
+
+        if (!PassEntity.listEquals(pass_user.getRoles(), shib_user.getRoles())) {
+            pass_user.setRoles(shib_user.getRoles());
             update = true;
         }
 
