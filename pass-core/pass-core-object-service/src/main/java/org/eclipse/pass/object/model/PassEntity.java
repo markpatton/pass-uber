@@ -37,7 +37,7 @@ public abstract class PassEntity {
      * @param list2 List to compare
      * @return list equality
      */
-    protected static boolean listEquals(List<?> list1, List<?> list2) {
+    public static boolean listEquals(List<?> list1, List<?> list2) {
         if (list1 == list2) {
             return true;
         }
