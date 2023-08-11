@@ -23,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import okhttp3.Credentials;
 import okhttp3.MediaType;
@@ -32,9 +35,11 @@ import okhttp3.Response;
 import org.eclipse.pass.main.ShibIntegrationTest;
 import org.eclipse.pass.object.PassClient;
 import org.eclipse.pass.object.model.Grant;
+import org.eclipse.pass.object.model.PassEntity;
 import org.eclipse.pass.object.model.Source;
 import org.eclipse.pass.object.model.Submission;
 import org.eclipse.pass.object.model.User;
+import org.eclipse.pass.object.model.UserRole;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -578,6 +583,65 @@ public class AccessControlTest extends ShibIntegrationTest {
             Response response = client.newCall(request).execute();
 
             check(response, 204);
+        }
+    }
+
+    @Test
+    public void testUpdateExistingShibUserWithNullValues() throws IOException {
+        // Create a user with null values except for the required locators
+        User user = new User();
+
+        try (PassClient pass_client = PassClient.newInstance(refreshableElide)) {
+            String[] locators = {
+                "johnshopkins.edu:unique-id:cow123",
+                "johnshopkins.edu:eppn:bessiecow123"
+            };
+            user.setLocatorIds(Arrays.asList(locators));
+
+            pass_client.createObject(user);
+        }
+
+        // User should be matched by request and updated
+
+        String url = getBaseUrl() + "data/grant";
+
+        Request.Builder builder = new Request.Builder();
+
+        builder.addHeader(ShibConstants.SCOPED_AFFILIATION_HEADER, SUBMITTER_SCOPED_AFFILIATION);
+        builder.addHeader(ShibConstants.SN_HEADER, "Cow");
+        builder.addHeader(ShibConstants.GIVENNAME_HEADER, "Bessie");
+        builder.addHeader(ShibConstants.UNIQUE_ID_HEADER, "cow123@johnshopkins.edu");
+        builder.addHeader(ShibConstants.EMAIL_HEADER, "cow123@jhu.edu");
+        builder.addHeader(ShibConstants.EMPLOYEE_ID_HEADER, "123");
+        builder.addHeader(ShibConstants.DISPLAY_NAME_HEADER, "Bessie the Cow");
+        builder.addHeader(ShibConstants.EPPN_HEADER, "bessiecow123@johnshopkins.edu");
+
+        Request request = builder.url(url).header("Accept", JSON_API_CONTENT_TYPE)
+                .addHeader("Content-Type", JSON_API_CONTENT_TYPE).get().build();
+
+        Response response = client.newCall(request).execute();
+
+        check(response, 200);
+
+        // Check that user is updated
+
+        try (PassClient pass_client = PassClient.newInstance(refreshableElide)) {
+            user = pass_client.getObject(User.class, user.getId());
+
+            String[] locators = {
+                "johnshopkins.edu:unique-id:cow123",
+                "johnshopkins.edu:eppn:bessiecow123",
+                "johnshopkins.edu:employeeid:123"
+            };
+            String[] affil = {"FACULTY@johnshopkins.edu", "johnshopkins.edu"};
+
+            assertEquals(user.getDisplayName(), "Bessie the Cow");
+            assertEquals(user.getUsername(), "bessiecow123@johnshopkins.edu");
+            assertEquals(user.getLastName(), "Cow");
+            assertEquals(user.getEmail(), "cow123@jhu.edu");
+            assertTrue(PassEntity.listEquals(user.getLocatorIds(), List.of(locators)));
+            assertEquals(user.getRoles(), List.of(UserRole.SUBMITTER));
+            assertEquals(user.getAffiliation(), Set.of(affil));
         }
     }
 }
