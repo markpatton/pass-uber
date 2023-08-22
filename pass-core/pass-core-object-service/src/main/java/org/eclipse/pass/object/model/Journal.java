@@ -18,10 +18,12 @@ package org.eclipse.pass.object.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -35,9 +37,9 @@ import com.yahoo.elide.annotation.Include;
 
 @Include
 @Entity
-@Table(name = "pass_journal")
+@Table(name = "pass_journal", indexes = {
+    @Index(name = "pass_journal_name_ix", columnList = "journalname")})
 public class Journal extends PassEntity {
-
     /**
      * Name of journal
      */
@@ -47,6 +49,9 @@ public class Journal extends PassEntity {
      * Array of ISSN(s) for Journal
      */
     @ElementCollection(targetClass = String.class)
+    @CollectionTable(name = "pass_journal_issns", indexes = {
+        @Index(name = "pass_journal_issns_id_ix", columnList = "journal_id"),
+        @Index(name = "pass_journal_issns_issn_ix", columnList = "issns")})
     private List<String> issns = new ArrayList<>();
 
     /**

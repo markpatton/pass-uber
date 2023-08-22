@@ -20,9 +20,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.persistence.CollectionTable;
 import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
@@ -85,6 +87,9 @@ public class User extends PassEntity {
      * "johnshopkins.edu:jhed:bostaur1"]}
      */
     @ElementCollection(targetClass = String.class)
+    @CollectionTable(name = "pass_user_locators", indexes = {
+        @Index(name = "pass_user_locators_id_ix", columnList = "user_id"),
+        @Index(name = "pass_user_locators_locator_ix", columnList = "locatorids")})
     private List<String> locatorIds = new ArrayList<String>();
 
     /**
