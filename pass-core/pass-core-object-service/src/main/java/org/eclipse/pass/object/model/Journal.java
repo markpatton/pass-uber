@@ -49,9 +49,7 @@ public class Journal extends PassEntity {
      * Array of ISSN(s) for Journal
      */
     @ElementCollection(targetClass = String.class)
-    @CollectionTable(name = "pass_journal_issns", indexes = {
-        @Index(name = "pass_journal_issns_id_ix", columnList = "journal_id"),
-        @Index(name = "pass_journal_issns_issn_ix", columnList = "issns")})
+    @CollectionTable(name = "pass_journal_issns")
     private List<String> issns = new ArrayList<>();
 
     /**
