@@ -23,7 +23,6 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -37,8 +36,7 @@ import com.yahoo.elide.annotation.Include;
 
 @Include
 @Entity
-@Table(name = "pass_journal", indexes = {
-    @Index(name = "pass_journal_name_ix", columnList = "journalname")})
+@Table(name = "pass_journal")
 public class Journal extends PassEntity {
     /**
      * Name of journal
