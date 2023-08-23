@@ -1,0 +1,15 @@
+databaseChangeLog:
+  -  changeSet:
+       id:  1
+       author:  russ-poetker
+       preConditions:
+         - onFail: MARK_RAN
+         - not:
+             - tableExists:
+                tableName: pass_submission
+       changes:
+         - sqlFile:
+             encoding: utf-8
+             path: /db/changelog/schema/initial-schema.sql
+             splitStatements: true
+             stripComments: true

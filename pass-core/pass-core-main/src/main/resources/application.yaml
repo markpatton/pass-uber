@@ -56,8 +56,7 @@ spring:
     password: ''
     driver-class-name: 'org.h2.Driver'
   liquibase:
-    change-log: 'classpath:db/changelog/changelog.xml'
-    enabled: false
+    change-log: 'classpath:db/changelog/changelog.yaml'
   activemq:
     broker-url: 'vm://embedded?broker.persistent=false,useShutdownHook=false'
     in-memory: true
@@ -125,8 +124,6 @@ spring:
     username: ${PASS_CORE_DATABASE_USERNAME}
     password: ${PASS_CORE_DATABASE_PASSWORD}
     driver-class-name: 'org.postgresql.Driver'
-  liquibase:
-    enabled: false
   security:
     user:
       name: ${PASS_CORE_BACKEND_USER}
