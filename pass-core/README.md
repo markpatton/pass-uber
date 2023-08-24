@@ -38,7 +38,7 @@ docker-compose up -d
 The application is configured by its application.yaml which in turn references a number of environment variables.
 
 By default, pass-core-main, will run with an in memory database. In order to use Postgres, switch to the production profile and set the database environment variables as below.
-Note that the system property `javax.persistence.schema-generation.database.action` can be used to automatically create database tables.
+The liquibase changelog located `pass-core-main/src/main/resources/db/changelog/changelog.yaml` will create the pass-core database schema if needed.
 
 If `PASS_CORE_USE_SQS` is `true`, then pass-core will attempt to connect to Amazon SQS. The connection must be configured with `AWS_REGION`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`.
 The AWS credentials are also needed if the file service S3 backend is used.
@@ -65,7 +65,7 @@ Environment variables:
 * PASS_CORE_SUBMISSION_EVENT_QUEUE=pass-submission-event
 * PASS_CORE_USERTOKEN_KEY=xxx
   * If not present, one is generated. See the [user service](pass-core-user-service/README.md) for how to create manually.
-* PASS_CORE_JAVA_OPTS="-Djavax.persistence.schema-generation.database.action=create"
+* PASS_CORE_JAVA_OPTS=""
   * Used by the Docker image to pass arguments to Java
 * PASS_CORE_BASE_URL=http://localhost:8080
   * Used when services send URLs to the client such as relationship links.
