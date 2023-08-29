@@ -13,3 +13,17 @@ databaseChangeLog:
              path: /db/changelog/schema/initial-schema.sql
              splitStatements: true
              stripComments: true
+  -  changeSet:
+       id:  2
+       author:  mark-patton
+       preConditions:
+         - onFail: MARK_RAN
+         - not:
+             - tableExists:
+                tableName: pass_repository_copy_external_ids
+       changes:
+         - sqlFile:
+             encoding: utf-8
+             path: /db/changelog/schema/rc-external-ids.sql
+             splitStatements: true
+             stripComments: true
