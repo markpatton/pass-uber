@@ -48,10 +48,7 @@ databaseChangeLog:
   -  changeSet:
        id:  5
        author:  mark-patton
-       preConditions:
-         - dbms:
-             type: postgresql
-         - onFail: MARK_RAN
+       dbms: postgresql
        changes:
          - sqlFile:
              encoding: utf-8
