@@ -22,3 +22,17 @@ databaseChangeLog:
              path: /db/changelog/schema/rc-external-ids.sql
              splitStatements: true
              stripComments: true
+  - changeSet:
+      id: 3
+      author: russ-poetker
+      changes:
+        - sqlFile:
+            encoding: utf-8
+            path: /db/changelog/data/rc-ext-ids-migration.sql
+            splitStatements: true
+            stripComments: true
+        - dropColumn:
+            tableName: pass_repository_copy
+            columns:
+            - column:
+                name: externalids
