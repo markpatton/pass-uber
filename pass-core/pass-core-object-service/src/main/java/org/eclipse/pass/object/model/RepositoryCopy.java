@@ -19,14 +19,15 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CollectionTable;
 import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
 import org.eclipse.pass.object.converter.CopyStatusToStringConverter;
-import org.eclipse.pass.object.converter.ListToStringConverter;
 
 /**
  * A Repository Copy represents a copy of a Publication that exists in a target Repository.
@@ -41,7 +42,8 @@ public class RepositoryCopy extends PassEntity {
     /**
      * IDs assigned by the repository
      */
-    @Convert(converter = ListToStringConverter.class)
+    @ElementCollection(targetClass = String.class)
+    @CollectionTable(name = "pass_repository_copy_external_ids")
     private List<String> externalIds = new ArrayList<>();
 
     /**
@@ -170,7 +172,7 @@ public class RepositoryCopy extends PassEntity {
         }
         RepositoryCopy other = (RepositoryCopy) obj;
         return Objects.equals(accessUrl, other.accessUrl) && copyStatus == other.copyStatus
-                && Objects.equals(externalIds, other.externalIds) && Objects.equals(publication, other.publication)
+                && listEquals(externalIds, other.externalIds) && Objects.equals(publication, other.publication)
                 && Objects.equals(repository, other.repository);
     }
 
