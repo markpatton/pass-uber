@@ -35,6 +35,7 @@ import org.eclipse.pass.object.model.Grant;
 import org.eclipse.pass.object.model.Journal;
 import org.eclipse.pass.object.model.PmcParticipation;
 import org.eclipse.pass.object.model.Publication;
+import org.eclipse.pass.object.model.RepositoryCopy;
 import org.eclipse.pass.object.model.Source;
 import org.eclipse.pass.object.model.Submission;
 import org.eclipse.pass.object.model.SubmissionEvent;
@@ -292,7 +293,7 @@ public abstract class PassClientTest extends IntegrationTest {
         String locatorid1 = UUID.randomUUID().toString();
         String locatorid2 = UUID.randomUUID().toString();
 
-        user.setLocatorIds(java.util.Arrays.asList(locatorid1, locatorid2));
+        user.setLocatorIds(List.of(locatorid1, locatorid2));
 
         client.createObject(user);
 
@@ -318,6 +319,27 @@ public abstract class PassClientTest extends IntegrationTest {
         result = client.streamObjects(selector).collect(Collectors.toList());
         assertEquals(1, result.size());
         assertEquals(user, result.get(0));
+    }
+
+    @Test
+    public void testHasRepositoryCopy() throws IOException {
+        RepositoryCopy rc = new RepositoryCopy();
+
+        rc.setAccessUrl(URI.create("http://example.com"));
+
+        String externalid1 = UUID.randomUUID().toString();
+        String externalid2 = UUID.randomUUID().toString();
+
+        rc.setExternalIds(List.of(externalid1, externalid2));
+
+        client.createObject(rc);
+
+        PassClientSelector<RepositoryCopy> selector = new PassClientSelector<>(RepositoryCopy.class);
+        selector.setFilter(RSQL.hasMember("externalIds", externalid1));
+
+        List<RepositoryCopy> result = client.streamObjects(selector).collect(Collectors.toList());
+        assertEquals(1, result.size());
+        assertEquals(rc, result.get(0));
     }
 
     @Test
