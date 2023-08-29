@@ -36,3 +36,26 @@ databaseChangeLog:
             columns:
             - column:
                 name: externalids
+  -  changeSet:
+       id:  4
+       author:  mark-patton
+       changes:
+         - sqlFile:
+             encoding: utf-8
+             path: /db/changelog/schema/indices.sql
+             splitStatements: true
+             stripComments: true
+  -  changeSet:
+       id:  5
+       author:  mark-patton
+       preConditions:
+         - dbms:
+             type: postgresql
+         - onFail: MARK_RAN
+       changes:
+         - sqlFile:
+             encoding: utf-8
+             path: /db/changelog/schema/postgres-pattern-indices.sql
+             splitStatements: true
+             stripComments: true
+
