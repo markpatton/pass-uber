@@ -16,11 +16,6 @@ databaseChangeLog:
   -  changeSet:
        id:  2
        author:  mark-patton
-       preConditions:
-         - onFail: MARK_RAN
-         - not:
-             - tableExists:
-                tableName: pass_repository_copy_external_ids
        changes:
          - sqlFile:
              encoding: utf-8
