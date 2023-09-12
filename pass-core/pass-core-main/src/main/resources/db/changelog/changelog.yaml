@@ -82,3 +82,20 @@ databaseChangeLog:
              path: /db/changelog/schema/remove-contrib-pub.sql
              splitStatements: true
              stripComments: true
+  - changeSet:
+      id: 9
+      author: russ-poetker
+      changes:
+        - addColumn:
+            tableName: pass_submission
+            columns:
+              - column:
+                  name: version
+                  type: bigint
+        - addColumn:
+            tableName: pass_deposit
+            columns:
+              - column:
+                  name: version
+                  type: bigint
+

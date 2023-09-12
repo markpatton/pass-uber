@@ -2,12 +2,13 @@ package org.eclipse.pass.main;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
 import javax.jms.ConnectionFactory;
 import javax.jms.TextMessage;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
+import javax.persistence.OptimisticLockException;
 
 import com.amazon.sqs.javamessaging.ProviderConfiguration;
 import com.amazon.sqs.javamessaging.SQSConnectionFactory;
@@ -23,12 +24,13 @@ import com.yahoo.elide.core.lifecycle.LifeCycleHook;
 import com.yahoo.elide.core.type.Type;
 import com.yahoo.elide.core.utils.ClassScanner;
 import com.yahoo.elide.core.utils.coerce.CoerceUtil;
-import com.yahoo.elide.modelconfig.DynamicConfiguration;
-import com.yahoo.elide.spring.config.ElideConfigProperties;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.pass.main.repository.DepositRepository;
+import org.eclipse.pass.main.repository.SubmissionRepository;
 import org.eclipse.pass.object.model.Deposit;
 import org.eclipse.pass.object.model.EventType;
+import org.eclipse.pass.object.model.PassEntity;
 import org.eclipse.pass.object.model.Submission;
 import org.eclipse.pass.object.model.SubmissionEvent;
 import org.eclipse.pass.usertoken.KeyGenerator;
@@ -156,8 +158,6 @@ public class JmsConfiguration {
      *
      * @param injector the Injector
      * @param scanner the ClassScanner
-     * @param optionalDynamicConfig the DynamicConfiguration
-     * @param settings the ElideConfigProperties
      * @param entitiesToExclude the set of entities to exclude
      * @param jms the JmsTemplate used by the hooks
      * @param userTokenFactory the TokenFactory
@@ -165,19 +165,22 @@ public class JmsConfiguration {
      */
     @Bean
     public EntityDictionary buildDictionary(Injector injector, ClassScanner scanner,
-            Optional<DynamicConfiguration> optionalDynamicConfig, ElideConfigProperties settings,
-            @Qualifier("entitiesToExclude") Set<Type<?>> entitiesToExclude, JmsTemplate jms,
-            TokenFactory userTokenFactory) {
+                                            @Qualifier("entitiesToExclude") Set<Type<?>> entitiesToExclude,
+                                            JmsTemplate jms,
+                                            TokenFactory userTokenFactory,
+                                            SubmissionRepository submissionRepository,
+                                            DepositRepository depositRepository) {
 
         EntityDictionary dictionary = new EntityDictionary(new HashMap<>(), new HashMap<>(), injector,
                 CoerceUtil::lookup, entitiesToExclude, scanner);
 
-        setupHooks(dictionary, jms, userTokenFactory);
+        setupHooks(dictionary, jms, userTokenFactory, submissionRepository, depositRepository);
 
         return dictionary;
     }
 
-    private void setupHooks(EntityDictionary dictionary, JmsTemplate jms, TokenFactory userTokenFactory) {
+    private void setupHooks(EntityDictionary dictionary, JmsTemplate jms, TokenFactory userTokenFactory,
+                            SubmissionRepository submissionRepository, DepositRepository depositRepository) {
         LifeCycleHook<SubmissionEvent> sub_event_hook = (op, phase, event, scope, changes) -> {
             send(jms, submission_event_queue, createMessage(event, userTokenFactory), SUBMISSION_EVENT_MESSAGE_TYPE);
         };
@@ -200,6 +203,34 @@ public class JmsConfiguration {
 
         dictionary.bindTrigger(Deposit.class, Operation.CREATE, TransactionPhase.POSTCOMMIT, deposit_hook, false);
         dictionary.bindTrigger(Deposit.class, Operation.UPDATE, TransactionPhase.POSTCOMMIT, deposit_hook, false);
+
+        setupCheckVersionHooks(dictionary, submissionRepository, depositRepository);
+    }
+
+    private void setupCheckVersionHooks(EntityDictionary dictionary, SubmissionRepository submissionRepository,
+                                        DepositRepository depositRepository) {
+        LifeCycleHook<Submission> submission_version_check = (op, phase, sub, scope, changes) -> {
+            Long repoSubVersion = submissionRepository.findSubmissionVersionById(sub.getId());
+            validateEntityVersions(repoSubVersion, sub.getVersion(), sub);
+        };
+
+        LifeCycleHook<Deposit> deposit_version_check = (op, phase, dep, scope, changes) -> {
+            Long repoDepVersion = depositRepository.findDepositVersionById(dep.getId());
+            validateEntityVersions(repoDepVersion, dep.getVersion(), dep);
+        };
+
+        dictionary.bindTrigger(Submission.class, Operation.UPDATE, TransactionPhase.PREFLUSH,
+            submission_version_check, false);
+        dictionary.bindTrigger(Deposit.class, Operation.UPDATE, TransactionPhase.PREFLUSH,
+            deposit_version_check, false);
+    }
+
+    private void validateEntityVersions(Long repoVersion, Long entityVersion, PassEntity passEntity) {
+        if (!Objects.equals(repoVersion, entityVersion)) {
+            throw new OptimisticLockException(
+                String.format("Optimistic lock check failed for %s [ID=%d]. Request version: %d, Stored version: %d",
+                    passEntity.getClass().getSimpleName(), passEntity.getId(), entityVersion, repoVersion));
+        }
     }
 
     private String createMessage(Submission s) {

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -177,6 +178,11 @@ public class ElidePassClient implements PassClient {
 
         String id = elide.getMapper().readJsonApiDocument(response.getBody()).getData().getSingleValue().getId();
         settings.getDictionary().setId(obj, id);
+        Object version = elide.getMapper().readJsonApiDocument(response.getBody()).getData().getSingleValue()
+            .getAttributes().get("version");
+        if (Objects.nonNull(version)) {
+            settings.getDictionary().setValue(obj, "version", version);
+        }
     }
 
     @Override

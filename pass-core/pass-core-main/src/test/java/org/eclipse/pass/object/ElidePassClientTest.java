@@ -15,7 +15,20 @@
  */
 package org.eclipse.pass.object;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import javax.persistence.OptimisticLockException;
+
 import com.yahoo.elide.RefreshableElide;
+import org.eclipse.pass.object.model.AggregatedDepositStatus;
+import org.eclipse.pass.object.model.Deposit;
+import org.eclipse.pass.object.model.DepositStatus;
+import org.eclipse.pass.object.model.Source;
+import org.eclipse.pass.object.model.Submission;
+import org.eclipse.pass.object.model.SubmissionStatus;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ElidePassClientTest extends PassClientTest {
@@ -25,5 +38,54 @@ public class ElidePassClientTest extends PassClientTest {
     @Override
     protected PassClient getNewClient() {
         return new ElidePassClient(refreshableElide);
+    }
+
+    @Test
+    public void testUpdateSubmission_OptimisticLocking() throws IOException {
+        Submission submission = new Submission();
+        submission.setAggregatedDepositStatus(AggregatedDepositStatus.NOT_STARTED);
+        submission.setSubmissionStatus(SubmissionStatus.DRAFT);
+        submission.setSubmitterName("Bessie");
+        client.createObject(submission);
+
+        Submission updateSub1 = client.getObject(submission.getClass(), submission.getId());
+        Submission updateSub2 = client.getObject(submission.getClass(), submission.getId());
+
+        updateSub1.setSource(Source.OTHER);
+        updateSub1.setSubmissionStatus(SubmissionStatus.SUBMITTED);
+
+        client.updateObject(updateSub1);
+
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            updateSub2.setSource(null);
+            updateSub2.setSubmissionStatus(SubmissionStatus.CHANGES_REQUESTED);
+            client.updateObject(updateSub2);
+        });
+
+        OptimisticLockException optimisticLockException = (OptimisticLockException) runtimeException.getCause();
+        assertTrue(optimisticLockException.getMessage().startsWith("Optimistic lock check failed for Submission [ID="));
+        assertTrue(optimisticLockException.getMessage().endsWith("]. Request version: 0, Stored version: 1"));
+    }
+
+    @Test
+    public void testUpdateDeposit_OptimisticLocking() throws IOException {
+        Deposit deposit = new Deposit();
+        deposit.setDepositStatus(DepositStatus.SUBMITTED);
+        client.createObject(deposit);
+
+        Deposit updateDep1 = client.getObject(deposit.getClass(), deposit.getId());
+        Deposit updateDep2 = client.getObject(deposit.getClass(), deposit.getId());
+
+        updateDep1.setDepositStatus(DepositStatus.FAILED);
+        client.updateObject(updateDep1);
+
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            updateDep2.setDepositStatus(DepositStatus.ACCEPTED);
+            client.updateObject(updateDep2);
+        });
+
+        OptimisticLockException optimisticLockException = (OptimisticLockException) runtimeException.getCause();
+        assertTrue(optimisticLockException.getMessage().startsWith("Optimistic lock check failed for Deposit [ID="));
+        assertTrue(optimisticLockException.getMessage().endsWith("]. Request version: 0, Stored version: 1"));
     }
 }

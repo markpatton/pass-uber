@@ -26,6 +26,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
@@ -46,6 +47,9 @@ import org.eclipse.pass.object.converter.SubmissionStatusToStringConverter;
 @Entity
 @Table(name = "pass_submission")
 public class Submission extends PassEntity {
+
+    @Version
+    private Long version;
 
     /**
      * Stringified JSON representation of metadata captured by the relevant repository forms
@@ -162,6 +166,13 @@ public class Submission extends PassEntity {
         this.preparers = new ArrayList<User>(submission.preparers);
         this.grants = new ArrayList<Grant>(submission.grants);
         this.effectivePolicies = new ArrayList<>(submission.effectivePolicies);
+    }
+
+    /**
+     * @return the version for optimistic locking
+     */
+    public Long getVersion() {
+        return version;
     }
 
     /**
@@ -388,15 +399,21 @@ public class Submission extends PassEntity {
         }
         Submission other = (Submission) obj;
         return aggregatedDepositStatus == other.aggregatedDepositStatus
-                && Objects.equals(effectivePolicies, other.effectivePolicies) && Objects.equals(grants, other.grants)
-                && Objects.equals(metadata, other.metadata) && Objects.equals(preparers, other.preparers)
-                && Objects.equals(publication, other.publication) && Objects.equals(repositories, other.repositories)
-                && source == other.source && submissionStatus == other.submissionStatus
-                && Objects.equals(submitted, other.submitted)
-                && Objects.equals(submittedDate == null ? null : submittedDate.toInstant(),
-                        other.submittedDate == null ? null : other.submittedDate.toInstant())
-                && Objects.equals(submitter, other.submitter) && Objects.equals(submitterEmail, other.submitterEmail)
-                && Objects.equals(submitterName, other.submitterName);
+            && Objects.equals(effectivePolicies, other.effectivePolicies)
+            && Objects.equals(grants, other.grants)
+            && Objects.equals(metadata, other.metadata)
+            && Objects.equals(preparers, other.preparers)
+            && Objects.equals(publication, other.publication)
+            && Objects.equals(repositories, other.repositories)
+            && source == other.source
+            && submissionStatus == other.submissionStatus
+            && Objects.equals(submitted, other.submitted)
+            && Objects.equals(submittedDate == null ? null : submittedDate.toInstant(),
+                other.submittedDate == null ? null : other.submittedDate.toInstant())
+            && Objects.equals(submitter, other.submitter)
+            && Objects.equals(submitterEmail, other.submitterEmail)
+            && Objects.equals(submitterName, other.submitterName)
+            && Objects.equals(version, other.version);
     }
 
     @Override

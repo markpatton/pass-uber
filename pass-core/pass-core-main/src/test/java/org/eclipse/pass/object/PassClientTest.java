@@ -50,7 +50,7 @@ import org.junit.jupiter.api.Test;
  * Tests must be written such that they can run in any order and handle objects already existing.
  */
 public abstract class PassClientTest extends IntegrationTest {
-    private PassClient client;
+    protected PassClient client;
 
     protected abstract PassClient getNewClient();
 

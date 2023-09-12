@@ -20,6 +20,7 @@ import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.yahoo.elide.annotation.Include;
 import org.eclipse.pass.object.converter.DepositStatusToStringConverter;
@@ -36,6 +37,9 @@ import org.eclipse.pass.object.converter.DepositStatusToStringConverter;
 @Entity
 @Table(name = "pass_deposit")
 public class Deposit extends PassEntity {
+
+    @Version
+    private Long version;
 
     /**
      * A URL or some kind of reference that can be dereferenced, entity body parsed, and used to determine the status
@@ -86,6 +90,13 @@ public class Deposit extends PassEntity {
         this.submission = deposit.submission;
         this.repository = deposit.repository;
         this.repositoryCopy = deposit.repositoryCopy;
+    }
+
+    /**
+     * @return the version for optimistic locking
+     */
+    public Long getVersion() {
+        return version;
     }
 
     /**
@@ -170,9 +181,12 @@ public class Deposit extends PassEntity {
             return false;
         }
         Deposit other = (Deposit) obj;
-        return depositStatus == other.depositStatus && Objects.equals(depositStatusRef, other.depositStatusRef)
-                && Objects.equals(repository, other.repository) && Objects.equals(repositoryCopy, other.repositoryCopy)
-                && Objects.equals(submission, other.submission);
+        return depositStatus == other.depositStatus
+            && Objects.equals(depositStatusRef, other.depositStatusRef)
+            && Objects.equals(repository, other.repository)
+            && Objects.equals(repositoryCopy, other.repositoryCopy)
+            && Objects.equals(submission, other.submission)
+            && Objects.equals(version, other.version);
     }
 
     @Override
