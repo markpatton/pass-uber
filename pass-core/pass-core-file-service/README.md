@@ -5,11 +5,13 @@ The pass-core-file-service is a RESTful service that provides the ability to upl
 configured persistence store. The service is currently designed to persist to a filesystem or S3 compatible storage.
 
 ## Configuration
-The service is configured via environment variables.
-The service by default will use a filesystem based persistence store and does not require any additional configuration. If the variable
-PASS_CORE_FILE_SERVICE_ROOT_DIR does not have any value, the File Service will default to the system temp folder and 
-create a temporary root folder of a random value in the system temp. The following environment variables are available 
-for configuring the service:
+The service is configured via environment variables. The service by default will use a filesystem based persistence 
+store and does not require any additional configuration. If the variable PASS_CORE_FILE_SERVICE_ROOT_DIR does not have 
+any value, the File Service will default to the system temp folder and create a temporary root folder of a random value 
+in the system temp. The variable PASS_CORE_FILE_SERVICE_ROOT_DIR is used by both the filesystem and S3 persistence. It 
+is the root directory where temporary files are stored before being persisted to the configured persistence store.
+
+The following environment variables are available for configuring the service:
 
 - PASS_CORE_FILE_SERVICE_TYPE=`FILE_SYSTEM`
   - Currently supports [`FILE_SYSTEM` | `S3`]
