@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import javax.persistence.OptimisticLockException;
 
 import com.yahoo.elide.RefreshableElide;
 import org.eclipse.pass.object.model.AggregatedDepositStatus;
@@ -56,15 +55,15 @@ public class ElidePassClientTest extends PassClientTest {
 
         client.updateObject(updateSub1);
 
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+        IOException ioException = assertThrows(IOException.class, () -> {
             updateSub2.setSource(null);
             updateSub2.setSubmissionStatus(SubmissionStatus.CHANGES_REQUESTED);
             client.updateObject(updateSub2);
         });
 
-        OptimisticLockException optimisticLockException = (OptimisticLockException) runtimeException.getCause();
-        assertTrue(optimisticLockException.getMessage().startsWith("Optimistic lock check failed for Submission [ID="));
-        assertTrue(optimisticLockException.getMessage().endsWith("]. Request version: 0, Stored version: 1"));
+        assertTrue(ioException.getMessage().startsWith("Failed to update object: 409 " +
+            "{\"errors\":[{\"detail\":\"Optimistic lock check failed for Submission [ID="));
+        assertTrue(ioException.getMessage().endsWith("]. Request version: 0, Stored version: 1\"}]}"));
     }
 
     @Test
@@ -79,13 +78,13 @@ public class ElidePassClientTest extends PassClientTest {
         updateDep1.setDepositStatus(DepositStatus.FAILED);
         client.updateObject(updateDep1);
 
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+        IOException ioException = assertThrows(IOException.class, () -> {
             updateDep2.setDepositStatus(DepositStatus.ACCEPTED);
             client.updateObject(updateDep2);
         });
 
-        OptimisticLockException optimisticLockException = (OptimisticLockException) runtimeException.getCause();
-        assertTrue(optimisticLockException.getMessage().startsWith("Optimistic lock check failed for Deposit [ID="));
-        assertTrue(optimisticLockException.getMessage().endsWith("]. Request version: 0, Stored version: 1"));
+        assertTrue(ioException.getMessage().startsWith("Failed to update object: 409 " +
+            "{\"errors\":[{\"detail\":\"Optimistic lock check failed for Deposit [ID="));
+        assertTrue(ioException.getMessage().endsWith("]. Request version: 0, Stored version: 1\"}]}"));
     }
 }
