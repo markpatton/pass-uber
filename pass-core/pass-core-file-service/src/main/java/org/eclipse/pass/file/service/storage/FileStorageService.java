@@ -67,7 +67,6 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
  * A configuration of File System requires that the environment variables are properly set in the env file and
  * the respective directories have read/write access. For a S3 configuration to work the client needs the
  * following permissions: s3:PutObject, s3:GetObject,s3:DeleteObject, s3:ListBucket, s3:AbortMultipartUpload.
- *
  * The directory structure for the File System is as follows:
  *  - rootDir: This is the root directory for the File System. This is set in the
  *      .env file (PASS_CORE_FILE_SERVICE_ROOT_DIR). If it is not set then the default is the system temp directory.
@@ -76,7 +75,6 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
  *       the rootDir. Both the ocflDir and workDir are required to be on the same mount.
  *  - tempDir: This is a temporary directory that is used to move files to/from the OCFL repository and staging them
  *      for download. This is a child of the rootDir.
- *
  * Note, the S3 OCFL implementation does not cache locally and therefore performs much slower compared to the file
  * system implementation, most notably on large files.
  *
@@ -106,6 +104,7 @@ public class FileStorageService {
             @Value("${aws.region}") String awsRegion) throws IOException {
         StorageProperties storageProperties = storageConfiguration.getStorageProperties();
         storageType = storageProperties.getStorageType();
+        LOG.info("File Service: " + storageType + " Storage Type");
 
         Path rootLoc;
         if (storageProperties.getStorageRootDir() == null
@@ -118,6 +117,7 @@ public class FileStorageService {
         } else {
             rootLoc = Paths.get(storageProperties.getStorageRootDir());
         }
+        LOG.info("File Service: " + rootLoc + " Storage Root Directory");
 
         // The ocflLoc only needs to be set if the storage type is file system.
         // If the storageType is S3 then workLoc and tempLoc are used because they are used with FILE_SYSTEM AND S3
@@ -144,8 +144,6 @@ public class FileStorageService {
             throw new IOException("File Service: Unable to setup File Storage directories: " + e);
         }
 
-        LOG.info("File Service: " + storageType + " Storage Type");
-        LOG.info("File Service: " + rootLoc + " Storage Root Directory");
         if (storageType.equals(StorageServiceType.FILE_SYSTEM)) {
             try {
                 if (!Files.exists(ocflLoc)) {
@@ -301,6 +299,7 @@ public class FileStorageService {
                     fileExt
             );
 
+            Files.delete(tempPathAndFileName);
         } catch (IOException e) {
             LOG.error(e.toString());
             throw new IOException("File Service: The file system was unable to store the uploaded file", e);

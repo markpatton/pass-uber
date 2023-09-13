@@ -108,6 +108,18 @@ public class FileStorageServiceTest extends IntegrationTest {
         assertTrue(file.contentLength() > 0);
     }
 
+    @Test
+    void storeFileAndEnsureTempIsCleaned() throws IOException {
+        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
+                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+
+        Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
+        String rootDirName = storageConfiguration.getStorageProperties().getStorageRootDir();
+        String tempDirName = storageConfiguration.getStorageProperties().getStorageTempDir();
+        int fileCount = tempDir.resolve(Paths.get(rootDirName, tempDirName)).toFile().listFiles().length;
+        assertEquals(0, fileCount);
+    }
+
     /**
      * Test file content type is returned.
      */

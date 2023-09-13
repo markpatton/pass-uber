@@ -10,18 +10,21 @@ store and does not require any additional configuration. If the variable PASS_CO
 any value, the File Service will default to the system temp folder and create a temporary root folder of a random value 
 in the system temp. The variable PASS_CORE_FILE_SERVICE_ROOT_DIR is used by both the FILE_SYSTEM and S3 service types. 
 It is the root directory where temporary files are stored before being persisted to the configured persistence store as 
-specified by PASS_CORE_FILE_SERVICE_TYPE. The value for the PASS_CORE_FILE_SERVICE_ROOT_DIR can be a file system path 
-or a S3 bucket name, however it is NOT recommended to have the PASS_CORE_FILE_SERVICE_ROOT_DIR be a S3 bucket as it is 
-much slower to process files.
+specified by PASS_CORE_FILE_SERVICE_TYPE. If using FILE_SYSTEM as the persistence store, PASS_CORE_FILE_SERVICE_ROOT_DIR
+is also the root directory for file persistence. The value for the PASS_CORE_FILE_SERVICE_ROOT_DIR can be a file system 
+path or a S3 bucket name, however it is NOT recommended to have the PASS_CORE_FILE_SERVICE_ROOT_DIR be a S3 bucket as 
+it is much slower to process files.
 
 The following environment variables are available for configuring the service:
 
 - PASS_CORE_FILE_SERVICE_TYPE=`FILE_SYSTEM`
   - Currently supports [`FILE_SYSTEM` | `S3`]
 - PASS_CORE_FILE_SERVICE_ROOT_DIR=`/path/to/root/dir`
-  - The root directory of the service that is used to support file uploads and downloads.
+  - The root directory of the service that is used to support file uploads and downloads and the root directory 
+    for file persistence if using FILE_SYSTEM as the persistence store.
   - Default example: system_tmp/17318424270250529523
 - PASS_CORE_S3_BUCKET_NAME=`bucket-test-name`
+  - The name of the S3 bucket to use for file persistence if using S3 as the persistence store.
 - PASS_CORE_S3_REPO_PREFIX=`s3-repo-prefix`
 - PASS_CORE_S3_ENDPOINT=`http://localhost:9090`
   - If using a custom endpoint for S3, this value should be set to the endpoint URL.
