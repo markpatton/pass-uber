@@ -24,6 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
 @Component
 public class PassErrorMapper implements ErrorMapper {
     @Nullable

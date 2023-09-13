@@ -19,8 +19,16 @@ import org.eclipse.pass.object.model.Deposit;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
 public interface DepositRepository extends CrudRepository<Deposit, String> {
 
+    /**
+     * Returns deposit version from datastore.
+     * @param depositId the id of the deposit
+     * @return the deposit version
+     */
     @Query("select d.version from Deposit d where d.id = ?1")
     Long findDepositVersionById(Long depositId);
 }

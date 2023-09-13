@@ -19,8 +19,16 @@ import org.eclipse.pass.object.model.Submission;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+/**
+ * @author Russ Poetker (rpoetke1@jh.edu)
+ */
 public interface SubmissionRepository extends CrudRepository<Submission, String> {
 
+    /**
+     * Returns submission version from datastore.
+     * @param submissionId the id of the submission
+     * @return the submission version
+     */
     @Query("select s.version from Submission s where s.id = ?1")
     Long findSubmissionVersionById(Long submissionId);
 }
