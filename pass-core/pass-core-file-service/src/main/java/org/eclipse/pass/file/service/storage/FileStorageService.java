@@ -144,8 +144,9 @@ public class FileStorageService {
             throw new IOException("File Service: Unable to setup File Storage directories: " + e);
         }
 
+        LOG.info("File Service: " + storageType + " Storage Type");
+        LOG.info("File Service: " + rootLoc + " Storage Root Directory");
         if (storageType.equals(StorageServiceType.FILE_SYSTEM)) {
-            LOG.info("File Service: FILE_SYSTEM Storage Type");
             try {
                 if (!Files.exists(ocflLoc)) {
                     Files.createDirectory(ocflLoc);
@@ -162,7 +163,6 @@ public class FileStorageService {
                 throw new IOException("File Service: Unable to setup File Storage directories: " + e);
             }
         } else if (storageType.equals(StorageServiceType.S3)) {
-            LOG.info("File Service: S3 Storage Type");
             if (storageProperties.getBucketName().isPresent()) {
                 bucketName = storageProperties.getBucketName().get();
             } else {
