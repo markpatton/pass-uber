@@ -109,6 +109,10 @@ public class FileStorageServiceTest extends IntegrationTest {
         assertTrue(file.contentLength() > 0);
     }
 
+    /**
+     * Test that temporary files are cleaned up after being persisted.
+     * @throws IOException if there is an error
+     */
     @Test
     void storeFileAndEnsureTempIsCleaned() throws IOException {
         storageService.storeFile(new MockMultipartFile("test", "test.txt",
