@@ -247,7 +247,8 @@ public class JmsConfiguration {
 
     private Long getRequestVersion(RequestScope scope) {
         Object requestVersion = scope.getJsonApiDocument().getData().getSingleValue().getAttributes().get("version");
-        return Objects.isNull(requestVersion) ? null : Long.parseLong(requestVersion.toString());
+        // The string -> double -> long conversion is needed because json could send number as float
+        return Objects.isNull(requestVersion) ? null : Double.valueOf(requestVersion.toString()).longValue();
     }
 
     private void validateEntityVersions(Long repoVersion, Long requestVersion, PassEntity passEntity) {
