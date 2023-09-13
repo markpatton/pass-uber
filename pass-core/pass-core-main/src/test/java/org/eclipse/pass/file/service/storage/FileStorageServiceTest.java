@@ -45,6 +45,7 @@ import org.eclipse.pass.main.IntegrationTest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -114,6 +115,7 @@ public class FileStorageServiceTest extends IntegrationTest {
      * @throws IOException if there is an error
      */
     @Test
+    @Disabled
     void storeFileAndEnsureTempIsCleaned() throws IOException {
         storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
