@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import okhttp3.Credentials;
@@ -91,7 +92,7 @@ public class FileStorageServiceTest extends IntegrationTest {
     @Test
     public void storeFileThatExists() throws IOException {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
         assertFalse(storageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
         //check that the owner is the same
         assertEquals(storageService.getFileOwner(storageFile.getId()), USER_NAME);
@@ -103,20 +104,21 @@ public class FileStorageServiceTest extends IntegrationTest {
     @Test
     void getFileShouldReturnFile() throws IOException {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
         ByteArrayResource file = storageService.getFile(storageFile.getId());
         assertTrue(file.contentLength() > 0);
     }
 
     @Test
     void storeFileAndEnsureTempIsCleaned() throws IOException {
-        StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+        storageService.storeFile(new MockMultipartFile("test", "test.txt",
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
 
         Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
         String rootDirName = storageConfiguration.getStorageProperties().getStorageRootDir();
         String tempDirName = storageConfiguration.getStorageProperties().getStorageTempDir();
-        int fileCount = tempDir.resolve(Paths.get(rootDirName, tempDirName)).toFile().listFiles().length;
+        int fileCount = Objects.requireNonNull(tempDir.resolve(Paths.get(rootDirName, tempDirName))
+                .toFile().listFiles()).length;
         assertEquals(0, fileCount);
     }
 
@@ -126,7 +128,7 @@ public class FileStorageServiceTest extends IntegrationTest {
     @Test
     void getFileContentTypeShouldReturnContentType() throws IOException {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
         String contentType = storageService.getFileContentType(storageFile.getId());
         assertEquals(MEDIA_TYPE_TEXT.toString(), contentType);
     }
@@ -168,7 +170,7 @@ public class FileStorageServiceTest extends IntegrationTest {
         allCharSets.forEach((k,v) -> {
             try {
                 StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", v,
-                        MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                        Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
                 assertFalse(storageService.getResourceFileRelativePath(storageFile.getId()).isEmpty());
             } catch (IOException e) {
                 assertEquals("An exception was thrown in storeFileWithDifferentLangFilesNames. On charset=" + k,
@@ -183,12 +185,12 @@ public class FileStorageServiceTest extends IntegrationTest {
     @Test
     void deleteShouldThrowExceptionFileNotExist() throws IOException {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
         storageService.deleteFile(storageFile.getId());
         Exception exception = assertThrows(NotFoundException.class,
                 () -> storageService.getResourceFileRelativePath(storageFile.getId()));
         String exceptionText = exception.getMessage();
-        assertTrue(exceptionText.matches("(.)+(was not found){1}(.)+"));
+        assertTrue(exceptionText.matches("(.)+(was not found)(.)+"));
     }
 
     /**
@@ -200,7 +202,7 @@ public class FileStorageServiceTest extends IntegrationTest {
     void userHasPermissionToDeleteFile() throws IOException {
         boolean hasPermission;
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
         hasPermission = storageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME);
         assertTrue(hasPermission);
     }
@@ -214,7 +216,7 @@ public class FileStorageServiceTest extends IntegrationTest {
     void userNoPermissionToDeleteFile() throws IOException {
         boolean hasPermission = false;
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
         hasPermission = storageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME2);
         assertFalse(hasPermission);
     }
@@ -227,7 +229,7 @@ public class FileStorageServiceTest extends IntegrationTest {
     @Test
     void getFileByIdUsingController() throws IOException {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
 
         ByteArrayResource file = storageService.getFile(storageFile.getId());
         //ensure that the file has been stored by the service
@@ -242,10 +244,11 @@ public class FileStorageServiceTest extends IntegrationTest {
                 .header("Authorization", credentialsBackend)
                 .get()
                 .build();
-        Response response = client.newCall(request).execute();
 
-        assertEquals(HttpStatus.OK.value(), response.code());
-        assertNotNull(response.body());
+        try (Response response = client.newCall(request).execute()) {
+            assertEquals(HttpStatus.OK.value(), response.code());
+            assertNotNull(response.body());
+        }
     }
 
     /**
@@ -269,17 +272,18 @@ public class FileStorageServiceTest extends IntegrationTest {
                 .addHeader("Authorization", credentialsBackend)
                 .build();
 
-        Response response = httpClient.newCall(request).execute();
-        assertEquals(HttpStatus.CREATED.value(), response.code());
-        assertNotNull(response.body());
-        file.delete();
+        try (Response response = httpClient.newCall(request).execute()) {
+            assertEquals(HttpStatus.CREATED.value(), response.code());
+            assertNotNull(response.body());
+            assertTrue(file.delete());
+        }
     }
 
     /**
      * Test upload and download of file with not known content type.
      *
      * @throws IOException if there is an error
-     * @throws JSONException
+     * @throws JSONException if there is an error
      */
     @Test
     void uploadFileWithUnknownType() throws IOException, JSONException {
@@ -298,26 +302,29 @@ public class FileStorageServiceTest extends IntegrationTest {
                 .addHeader("Authorization", credentialsBackend)
                 .build();
 
-        Response response = httpClient.newCall(request).execute();
-        assertEquals(HttpStatus.CREATED.value(), response.code());
+        try (Response response = httpClient.newCall(request).execute()) {
+            assertEquals(HttpStatus.CREATED.value(), response.code());
 
-        String id = new JSONObject(response.body().string()).getString("id");
+            String id = new JSONObject(Objects.requireNonNull(response.body()).string()).getString("id");
 
-        // Download
-        Request dlRequest = new Request.Builder().url(url + "/" + id).
-                addHeader("Authorization", credentialsBackend).build();
-        Response dlResponse = httpClient.newCall(dlRequest).execute();
-        assertEquals(HttpStatus.OK.value(), dlResponse.code());
+            // Download
+            Request dlRequest = new Request.Builder().url(url + "/" + id).
+                    addHeader("Authorization", credentialsBackend).build();
 
-        assertArrayEquals(data, dlResponse.body().bytes());
-        assertEquals(MEDIA_TYPE_APPLICATION, dlResponse.body().contentType());
+            try (Response dlResponse = httpClient.newCall(dlRequest).execute()) {
+                assertEquals(HttpStatus.OK.value(), dlResponse.code());
+
+                assertArrayEquals(data, Objects.requireNonNull(dlResponse.body()).bytes());
+                assertEquals(MEDIA_TYPE_APPLICATION, dlResponse.body().contentType());
+            }
+        }
     }
 
     /**
      * Test upload and download of a large file
      *
      * @throws IOException if there is an error
-     * @throws JSONException
+     * @throws JSONException if there is an error
      */
     @Test
     void uploadLargeFile() throws IOException, JSONException {
@@ -336,19 +343,22 @@ public class FileStorageServiceTest extends IntegrationTest {
                 .addHeader("Authorization", credentialsBackend)
                 .build();
 
-        Response response = httpClient.newCall(request).execute();
-        assertEquals(HttpStatus.CREATED.value(), response.code());
+        try (Response response = httpClient.newCall(request).execute()) {
+            assertEquals(HttpStatus.CREATED.value(), response.code());
 
-        String id = new JSONObject(response.body().string()).getString("id");
+            String id = new JSONObject(Objects.requireNonNull(response.body()).string()).getString("id");
 
-        // Download
-        Request dlRequest = new Request.Builder().url(url + "/" + id).
-                addHeader("Authorization", credentialsBackend).build();
-        Response dlResponse = httpClient.newCall(dlRequest).execute();
-        assertEquals(HttpStatus.OK.value(), dlResponse.code());
+            // Download
+            Request dlRequest = new Request.Builder().url(url + "/" + id).
+                    addHeader("Authorization", credentialsBackend).build();
 
-        assertArrayEquals(data.getBytes(), dlResponse.body().bytes());
-        assertEquals(MEDIA_TYPE_TEXT, dlResponse.body().contentType());
+            try (Response dlResponse = httpClient.newCall(dlRequest).execute()) {
+                assertEquals(HttpStatus.OK.value(), dlResponse.code());
+
+                assertArrayEquals(data.getBytes(), Objects.requireNonNull(dlResponse.body()).bytes());
+                assertEquals(MEDIA_TYPE_TEXT, dlResponse.body().contentType());
+            }
+        }
     }
 
     /**
@@ -370,8 +380,9 @@ public class FileStorageServiceTest extends IntegrationTest {
                 .addHeader("Authorization", credentialsBackend)
                 .build();
 
-        Response response = httpClient.newCall(request).execute();
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
+        try (Response response = httpClient.newCall(request).execute()) {
+            assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
+        }
     }
 
     /**
@@ -394,9 +405,10 @@ public class FileStorageServiceTest extends IntegrationTest {
                 .addHeader("Authorization", credentialsBackend)
                 .build();
 
-        Response response = httpClient.newCall(request).execute();
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
-        file.delete();
+        try (Response response = httpClient.newCall(request).execute()) {
+            assertEquals(HttpStatus.BAD_REQUEST.value(), response.code());
+        }
+        assertTrue(file.delete());
     }
 
     /**
@@ -406,7 +418,7 @@ public class FileStorageServiceTest extends IntegrationTest {
     @Test
     void deleteFileUsingFileServiceController() throws IOException {
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
-                MEDIA_TYPE_TEXT.toString(), "Test Pass-core".getBytes()), USER_NAME);
+                Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
         String url = getBaseUrl() + "file" + "/" + storageFile.getId();
 
         Request request = new Request.Builder()
@@ -415,8 +427,9 @@ public class FileStorageServiceTest extends IntegrationTest {
                 .addHeader("Authorization", credentialsBackend)
                 .build();
 
-        Response response = httpClient.newCall(request).execute();
-        assertEquals(HttpStatus.OK.value(), response.code());
+        try (Response response = httpClient.newCall(request).execute()) {
+            assertEquals(HttpStatus.OK.value(), response.code());
+        }
     }
 
     private File createTestFile() throws IOException {
