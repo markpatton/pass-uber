@@ -33,6 +33,7 @@ import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.yahoo.elide.RefreshableElide;
 import com.yahoo.elide.annotation.LifeCycleHookBinding.Operation;
 import com.yahoo.elide.annotation.LifeCycleHookBinding.TransactionPhase;
+import com.yahoo.elide.core.RequestScope;
 import com.yahoo.elide.core.dictionary.EntityDictionary;
 import com.yahoo.elide.core.dictionary.Injector;
 import com.yahoo.elide.core.lifecycle.LifeCycleHook;
@@ -176,6 +177,8 @@ public class JmsConfiguration {
      * @param entitiesToExclude the set of entities to exclude
      * @param jms the JmsTemplate used by the hooks
      * @param userTokenFactory the TokenFactory
+     * @param submissionRepository the submission spring data repository
+     * @param depositRepository the deposit spring data repository
      * @return configured EntityDictionary.
      */
     @Bean
@@ -226,12 +229,14 @@ public class JmsConfiguration {
                                         DepositRepository depositRepository) {
         LifeCycleHook<Submission> submission_version_check = (op, phase, sub, scope, changes) -> {
             Long repoSubVersion = submissionRepository.findSubmissionVersionById(sub.getId());
-            validateEntityVersions(repoSubVersion, sub.getVersion(), sub);
+            Long requestVersion = getRequestVersion((RequestScope) scope);
+            validateEntityVersions(repoSubVersion, requestVersion, sub);
         };
 
         LifeCycleHook<Deposit> deposit_version_check = (op, phase, dep, scope, changes) -> {
             Long repoDepVersion = depositRepository.findDepositVersionById(dep.getId());
-            validateEntityVersions(repoDepVersion, dep.getVersion(), dep);
+            Long requestVersion = getRequestVersion((RequestScope) scope);
+            validateEntityVersions(repoDepVersion, requestVersion, dep);
         };
 
         dictionary.bindTrigger(Submission.class, Operation.UPDATE, TransactionPhase.PREFLUSH,
@@ -240,11 +245,16 @@ public class JmsConfiguration {
             deposit_version_check, false);
     }
 
-    private void validateEntityVersions(Long repoVersion, Long entityVersion, PassEntity passEntity) {
-        if (!Objects.equals(repoVersion, entityVersion)) {
+    private Long getRequestVersion(RequestScope scope) {
+        Object requestVersion = scope.getJsonApiDocument().getData().getSingleValue().getAttributes().get("version");
+        return Objects.isNull(requestVersion) ? null : Long.parseLong(requestVersion.toString());
+    }
+
+    private void validateEntityVersions(Long repoVersion, Long requestVersion, PassEntity passEntity) {
+        if (!Objects.equals(repoVersion, requestVersion)) {
             throw new OptimisticLockException(
                 String.format("Optimistic lock check failed for %s [ID=%d]. Request version: %d, Stored version: %d",
-                    passEntity.getClass().getSimpleName(), passEntity.getId(), entityVersion, repoVersion));
+                    passEntity.getClass().getSimpleName(), passEntity.getId(), requestVersion, repoVersion));
         }
     }
 
