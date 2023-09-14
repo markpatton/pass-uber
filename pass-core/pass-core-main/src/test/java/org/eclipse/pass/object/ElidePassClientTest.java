@@ -49,11 +49,12 @@ public class ElidePassClientTest extends PassClientTest {
         client.createObject(submission);
 
         Submission updateSub1 = client.getObject(submission.getClass(), submission.getId());
-        Submission updateSub2 = client.getObject(submission.getClass(), submission.getId());
+        // This is needed to simulate second client get because client.getObject returns same instance of Submission
+        // in this test.
+        Submission updateSub2 = new Submission(updateSub1);
 
         updateSub1.setSource(Source.OTHER);
         updateSub1.setSubmissionStatus(SubmissionStatus.SUBMITTED);
-
         client.updateObject(updateSub1);
 
         IOException ioException = assertThrows(IOException.class, () -> {
@@ -102,7 +103,9 @@ public class ElidePassClientTest extends PassClientTest {
         client.createObject(deposit);
 
         Deposit updateDep1 = client.getObject(deposit.getClass(), deposit.getId());
-        Deposit updateDep2 = client.getObject(deposit.getClass(), deposit.getId());
+        // This is needed to simulate second client get because client.getObject returns same instance of Deposit
+        // in this test.
+        Deposit updateDep2 = new Deposit(updateDep1);
 
         updateDep1.setDepositStatus(DepositStatus.FAILED);
         client.updateObject(updateDep1);

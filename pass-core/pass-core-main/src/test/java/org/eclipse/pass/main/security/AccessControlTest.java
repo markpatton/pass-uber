@@ -268,7 +268,7 @@ public class AccessControlTest extends ShibIntegrationTest {
 
             Response response = client.newCall(request).execute();
 
-            check(response, 204);
+            check(response, 200);
         }
 
         {
@@ -314,7 +314,7 @@ public class AccessControlTest extends ShibIntegrationTest {
 
             Response response = client.newCall(request).execute();
 
-            check(response, 204);
+            check(response, 200);
         }
 
         {
@@ -375,7 +375,7 @@ public class AccessControlTest extends ShibIntegrationTest {
 
             Response response = client.newCall(request).execute();
 
-            check(response, 204);
+            check(response, 200);
         }
 
         {
@@ -571,7 +571,7 @@ public class AccessControlTest extends ShibIntegrationTest {
 
             Response response = client.newCall(request).execute();
 
-            check(response, 204);
+            check(response, 200);
         }
 
         // Delete the grant

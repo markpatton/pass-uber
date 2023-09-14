@@ -166,6 +166,7 @@ public class Submission extends PassEntity {
         this.preparers = new ArrayList<User>(submission.preparers);
         this.grants = new ArrayList<Grant>(submission.grants);
         this.effectivePolicies = new ArrayList<>(submission.effectivePolicies);
+        this.version = submission.version;
     }
 
     /**

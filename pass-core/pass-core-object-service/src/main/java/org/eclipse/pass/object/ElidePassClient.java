@@ -178,11 +178,7 @@ public class ElidePassClient implements PassClient {
 
         String id = elide.getMapper().readJsonApiDocument(response.getBody()).getData().getSingleValue().getId();
         settings.getDictionary().setId(obj, id);
-        Object version = elide.getMapper().readJsonApiDocument(response.getBody()).getData().getSingleValue()
-            .getAttributes().get("version");
-        if (Objects.nonNull(version)) {
-            settings.getDictionary().setValue(obj, "version", version);
-        }
+        setVersionIfNeeded(response, obj);
     }
 
     @Override
@@ -197,6 +193,16 @@ public class ElidePassClient implements PassClient {
 
         if (code < 200 || code > 204) {
             throw new IOException("Failed to update object: " + code + " " + response.getBody());
+        }
+
+        setVersionIfNeeded(response, obj);
+    }
+
+    private <T extends PassEntity> void setVersionIfNeeded(ElideResponse response, T obj) throws IOException {
+        Object version = elide.getMapper().readJsonApiDocument(response.getBody()).getData().getSingleValue()
+            .getAttributes().get("version");
+        if (Objects.nonNull(version)) {
+            settings.getDictionary().setValue(obj, "version", version);
         }
     }
 

@@ -90,6 +90,7 @@ public class Deposit extends PassEntity {
         this.submission = deposit.submission;
         this.repository = deposit.repository;
         this.repositoryCopy = deposit.repositoryCopy;
+        this.version = deposit.version;
     }
 
     /**

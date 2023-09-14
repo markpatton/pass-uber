@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TimeZone;
 import javax.jms.ConnectionFactory;
 import javax.jms.TextMessage;
 import javax.json.Json;
@@ -30,16 +31,27 @@ import com.amazon.sqs.javamessaging.SQSConnectionFactory;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.yahoo.elide.Elide;
+import com.yahoo.elide.ElideSettingsBuilder;
 import com.yahoo.elide.RefreshableElide;
 import com.yahoo.elide.annotation.LifeCycleHookBinding.Operation;
 import com.yahoo.elide.annotation.LifeCycleHookBinding.TransactionPhase;
 import com.yahoo.elide.core.RequestScope;
+import com.yahoo.elide.core.TransactionRegistry;
+import com.yahoo.elide.core.audit.Slf4jLogger;
+import com.yahoo.elide.core.datastore.DataStore;
 import com.yahoo.elide.core.dictionary.EntityDictionary;
 import com.yahoo.elide.core.dictionary.Injector;
+import com.yahoo.elide.core.exceptions.ErrorMapper;
+import com.yahoo.elide.core.filter.dialect.RSQLFilterDialect;
 import com.yahoo.elide.core.lifecycle.LifeCycleHook;
 import com.yahoo.elide.core.type.Type;
 import com.yahoo.elide.core.utils.ClassScanner;
 import com.yahoo.elide.core.utils.coerce.CoerceUtil;
+import com.yahoo.elide.jsonapi.JsonApiMapper;
+import com.yahoo.elide.jsonapi.links.DefaultJSONApiLinks;
+import com.yahoo.elide.spring.config.ElideConfigProperties;
+import com.yahoo.elide.utils.HeaderUtils;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.pass.main.repository.DepositRepository;
@@ -56,7 +68,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
@@ -167,6 +181,57 @@ public class JmsConfiguration {
         brokerService.addConnector(url);
         brokerService.setUseShutdownHook(false);
         return brokerService;
+    }
+
+    /**
+     * This Bean override for RefreshableElide is needed because of the `withUpdate200Status` setting.
+     * If Elide adds this to the config props, then it can be set application.yml, but until then,
+     * this is the only way of changing this setting.
+     * The other setting were pulled from the ElideAutoConfiguration.getRefreshableElide method.
+     * @param dictionary the elide dictionary
+     * @param dataStore the elide datastore
+     * @param headerProcessor the elide header processor
+     * @param transactionRegistry the elide transaction reg
+     * @param settings the elide settings
+     * @param mapper the elide mapper
+     * @param errorMapper the elide error mapper
+     * @return the refreshable elide
+     */
+    @Bean
+    @RefreshScope
+    @ConditionalOnMissingBean
+    public RefreshableElide getRefreshableElide(EntityDictionary dictionary, DataStore dataStore,
+                                                HeaderUtils.HeaderProcessor headerProcessor,
+                                                TransactionRegistry transactionRegistry,
+                                                ElideConfigProperties settings, JsonApiMapper mapper,
+                                                ErrorMapper errorMapper) {
+        ElideSettingsBuilder builder = new ElideSettingsBuilder(dataStore)
+            .withEntityDictionary(dictionary)
+            .withErrorMapper(errorMapper)
+            .withJsonApiMapper(mapper)
+            .withDefaultMaxPageSize(settings.getMaxPageSize())
+            .withDefaultPageSize(settings.getPageSize())
+            .withJoinFilterDialect(RSQLFilterDialect.builder().dictionary(dictionary).build())
+            .withSubqueryFilterDialect(RSQLFilterDialect.builder().dictionary(dictionary).build())
+            .withAuditLogger(new Slf4jLogger()).withBaseUrl(settings.getBaseUrl())
+            .withISO8601Dates("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
+            .withJsonApiPath(settings.getJsonApi().getPath()).withHeaderProcessor(headerProcessor)
+            .withGraphQLApiPath(settings.getGraphql().getPath())
+            .withUpdate200Status();
+
+        if (settings.getJsonApi() != null && settings.getJsonApi().isEnabled()
+            && settings.getJsonApi().isEnableLinks()) {
+            String baseUrl = settings.getBaseUrl();
+            if (StringUtils.isEmpty(baseUrl)) {
+                builder.withJSONApiLinks(new DefaultJSONApiLinks());
+            } else {
+                String jsonApiBaseUrl = baseUrl + settings.getJsonApi().getPath() + "/";
+                builder.withJSONApiLinks(new DefaultJSONApiLinks(jsonApiBaseUrl));
+            }
+        }
+
+        Elide elide = new Elide(builder.build(), transactionRegistry, dictionary.getScanner(), true);
+        return new RefreshableElide(elide);
     }
 
     /**
