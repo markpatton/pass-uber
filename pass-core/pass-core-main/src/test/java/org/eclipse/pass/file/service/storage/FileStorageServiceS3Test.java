@@ -33,7 +33,7 @@ import org.springframework.test.context.DynamicPropertySource;
  */
 @ActiveProfiles("test-S3")
 class FileStorageServiceS3Test extends FileStorageServiceTest {
-    private static S3Mock s3MockApi;
+    private static final S3Mock s3MockApi;
     private static final int S3_MOCK_PORT = 8010;
 
     // Set up the S3 mock server before the Application Context is loaded.
