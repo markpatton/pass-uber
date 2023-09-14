@@ -1,6 +1,7 @@
 package org.eclipse.pass.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -88,6 +89,7 @@ public class UserServiceTest extends ShibIntegrationTest {
         try (PassClient client = PassClient.newInstance(refreshableElide)) {
             client.createObject(submission);
         }
+        assertEquals(0, submission.getVersion());
 
         Token token = userTokenFactory.forPassResource("submission", submission.getId(), mailto);
 
@@ -114,9 +116,10 @@ public class UserServiceTest extends ShibIntegrationTest {
         try (PassClient client = PassClient.newInstance(refreshableElide)) {
             submission = client.getObject(submission.getClass(), submission.getId());
 
-            assertEquals(null, submission.getSubmitterName());
-            assertEquals(null, submission.getSubmitterEmail());
+            assertNull(submission.getSubmitterName());
+            assertNull(submission.getSubmitterEmail());
             assertEquals(submitter.getId(), submission.getSubmitter().getId());
+            assertEquals(1, submission.getVersion());
         }
     }
 }

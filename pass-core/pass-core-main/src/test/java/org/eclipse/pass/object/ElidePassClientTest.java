@@ -15,6 +15,7 @@
  */
 package org.eclipse.pass.object;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,6 +39,37 @@ public class ElidePassClientTest extends PassClientTest {
     @Override
     protected PassClient getNewClient() {
         return new ElidePassClient(refreshableElide);
+    }
+
+    @Test
+    public void testUpdateObject_CheckVersionUpdate() throws IOException {
+        Submission submission = new Submission();
+
+        submission.setAggregatedDepositStatus(AggregatedDepositStatus.NOT_STARTED);
+        submission.setSubmissionStatus(SubmissionStatus.DRAFT);
+        submission.setSubmitterName("Bessie");
+
+        client.createObject(submission);
+        assertEquals(0, submission.getVersion());
+
+        submission.setSource(Source.OTHER);
+        submission.setSubmissionStatus(SubmissionStatus.SUBMITTED);
+
+        client.updateObject(submission);
+        assertEquals(1, submission.getVersion());
+
+        Submission test = client.getObject(submission.getClass(), submission.getId());
+
+        assertEquals(submission.getId(), test.getId());
+        assertEquals(submission.getAggregatedDepositStatus(), test.getAggregatedDepositStatus());
+        assertEquals(submission.getSubmitterName(), test.getSubmitterName());
+        assertEquals(submission.getSource(), test.getSource());
+        assertEquals(submission.getSubmissionStatus(), test.getSubmissionStatus());
+        assertEquals(submission.getMetadata(), test.getMetadata());
+        assertEquals(1, test.getVersion());
+
+        // The lazy loading of objects from relationships does not play nicely with equality tests
+        // assertEquals(submission, test);
     }
 
     @Test
