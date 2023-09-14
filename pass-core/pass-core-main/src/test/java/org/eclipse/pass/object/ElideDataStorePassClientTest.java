@@ -43,6 +43,7 @@ public class ElideDataStorePassClientTest extends PassClientTest {
 
     @Test
     public void testUpdateSubmission_OptimisticLocking() throws IOException {
+        // GIVEN
         Submission submission = new Submission();
         submission.setAggregatedDepositStatus(AggregatedDepositStatus.NOT_STARTED);
         submission.setSubmissionStatus(SubmissionStatus.DRAFT);
@@ -56,6 +57,7 @@ public class ElideDataStorePassClientTest extends PassClientTest {
         updateSub1.setSubmissionStatus(SubmissionStatus.SUBMITTED);
         client.updateObject(updateSub1);
 
+        // WHEN/THEN
         TransactionException transactionException = assertThrows(TransactionException.class, () -> {
             updateSub2.setSource(null);
             updateSub2.setSubmissionStatus(SubmissionStatus.CHANGES_REQUESTED);
@@ -70,6 +72,7 @@ public class ElideDataStorePassClientTest extends PassClientTest {
 
     @Test
     public void testUpdateDeposit_OptimisticLocking() throws IOException {
+        // GIVEN
         Deposit deposit = new Deposit();
         deposit.setDepositStatus(DepositStatus.SUBMITTED);
         client.createObject(deposit);
@@ -80,6 +83,7 @@ public class ElideDataStorePassClientTest extends PassClientTest {
         updateDep1.setDepositStatus(DepositStatus.FAILED);
         client.updateObject(updateDep1);
 
+        // WHEN/THEN
         TransactionException transactionException = assertThrows(TransactionException.class, () -> {
             updateDep2.setDepositStatus(DepositStatus.ACCEPTED);
             client.updateObject(updateDep2);

@@ -43,19 +43,24 @@ public class ElidePassClientTest extends PassClientTest {
 
     @Test
     public void testUpdateObject_CheckVersionUpdate() throws IOException {
+        // GIVEN
         Submission submission = new Submission();
-
         submission.setAggregatedDepositStatus(AggregatedDepositStatus.NOT_STARTED);
         submission.setSubmissionStatus(SubmissionStatus.DRAFT);
         submission.setSubmitterName("Bessie");
 
+        // WHEN
         client.createObject(submission);
+
+        // THEN
         assertEquals(0, submission.getVersion());
 
+        // WHEN
         submission.setSource(Source.OTHER);
         submission.setSubmissionStatus(SubmissionStatus.SUBMITTED);
-
         client.updateObject(submission);
+
+        // THEN
         assertEquals(1, submission.getVersion());
 
         Submission test = client.getObject(submission.getClass(), submission.getId());
@@ -74,6 +79,7 @@ public class ElidePassClientTest extends PassClientTest {
 
     @Test
     public void testUpdateSubmission_OptimisticLocking() throws IOException {
+        // GIVEN
         Submission submission = new Submission();
         submission.setAggregatedDepositStatus(AggregatedDepositStatus.NOT_STARTED);
         submission.setSubmissionStatus(SubmissionStatus.DRAFT);
@@ -89,6 +95,7 @@ public class ElidePassClientTest extends PassClientTest {
         updateSub1.setSubmissionStatus(SubmissionStatus.SUBMITTED);
         client.updateObject(updateSub1);
 
+        // WHEN/THEN
         IOException ioException = assertThrows(IOException.class, () -> {
             updateSub2.setSource(null);
             updateSub2.setSubmissionStatus(SubmissionStatus.CHANGES_REQUESTED);
@@ -102,6 +109,7 @@ public class ElidePassClientTest extends PassClientTest {
 
     @Test
     public void testUpdateSubmission_OptimisticLocking_NullVersion() throws IOException {
+        // GIVEN
         Submission submission = new Submission();
         submission.setAggregatedDepositStatus(AggregatedDepositStatus.NOT_STARTED);
         submission.setSubmissionStatus(SubmissionStatus.DRAFT);
@@ -116,6 +124,7 @@ public class ElidePassClientTest extends PassClientTest {
 
         client.updateObject(updateSub1);
 
+        // WHEN/THEN
         IOException ioException = assertThrows(IOException.class, () -> {
             updateSub2.setSource(null);
             updateSub2.setSubmissionStatus(SubmissionStatus.CHANGES_REQUESTED);
@@ -130,6 +139,7 @@ public class ElidePassClientTest extends PassClientTest {
 
     @Test
     public void testUpdateDeposit_OptimisticLocking() throws IOException {
+        // GIVEN
         Deposit deposit = new Deposit();
         deposit.setDepositStatus(DepositStatus.SUBMITTED);
         client.createObject(deposit);
@@ -142,6 +152,7 @@ public class ElidePassClientTest extends PassClientTest {
         updateDep1.setDepositStatus(DepositStatus.FAILED);
         client.updateObject(updateDep1);
 
+        // WHEN/THEN
         IOException ioException = assertThrows(IOException.class, () -> {
             updateDep2.setDepositStatus(DepositStatus.ACCEPTED);
             client.updateObject(updateDep2);
@@ -154,6 +165,7 @@ public class ElidePassClientTest extends PassClientTest {
 
     @Test
     public void testUpdateDeposit_OptimisticLocking_NullVersion() throws IOException {
+        // GIVEN
         Deposit deposit = new Deposit();
         deposit.setDepositStatus(DepositStatus.SUBMITTED);
         client.createObject(deposit);
@@ -164,6 +176,7 @@ public class ElidePassClientTest extends PassClientTest {
         updateDep1.setDepositStatus(DepositStatus.FAILED);
         client.updateObject(updateDep1);
 
+        // WHEN/THEN
         IOException ioException = assertThrows(IOException.class, () -> {
             updateDep2.setDepositStatus(DepositStatus.ACCEPTED);
             ReflectionTestUtils.setField(updateDep2, "version", null);
