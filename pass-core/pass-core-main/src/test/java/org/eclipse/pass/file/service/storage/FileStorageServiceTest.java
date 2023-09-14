@@ -115,7 +115,6 @@ public class FileStorageServiceTest extends IntegrationTest {
      * @throws IOException if there is an error
      */
     @Test
-    @Disabled
     void storeFileAndEnsureTempIsCleaned() throws IOException {
         storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
