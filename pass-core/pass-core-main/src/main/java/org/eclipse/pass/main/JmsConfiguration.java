@@ -187,7 +187,9 @@ public class JmsConfiguration {
      * This Bean override for RefreshableElide is needed because of the `withUpdate200Status` setting.
      * If Elide adds this to the config props, then it can be set application.yml, but until then,
      * this is the only way of changing this setting.
-     * The other setting were pulled from the ElideAutoConfiguration.getRefreshableElide method.
+     * <p>
+     * The other settings were copied from the ElideAutoConfiguration.getRefreshableElide method.
+     *
      * @param dictionary the elide dictionary
      * @param dataStore the elide datastore
      * @param headerProcessor the elide header processor
