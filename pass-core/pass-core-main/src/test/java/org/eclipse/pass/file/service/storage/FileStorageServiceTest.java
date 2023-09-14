@@ -218,7 +218,7 @@ public class FileStorageServiceTest extends IntegrationTest {
      */
     @Test
     void userNoPermissionToDeleteFile() throws IOException {
-        boolean hasPermission = false;
+        boolean hasPermission;
         StorageFile storageFile = storageService.storeFile(new MockMultipartFile("test", "test.txt",
                 Objects.requireNonNull(MEDIA_TYPE_TEXT).toString(), "Test Pass-core".getBytes()), USER_NAME);
         hasPermission = storageService.checkUserDeletePermissions(storageFile.getId(), USER_NAME2);

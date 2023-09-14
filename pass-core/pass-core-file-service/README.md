@@ -11,9 +11,8 @@ any value, the File Service will default to the system temp folder and create a 
 in the system temp. The variable PASS_CORE_FILE_SERVICE_ROOT_DIR is used by both the FILE_SYSTEM and S3 service types. 
 It is the root directory where temporary files are stored before being persisted to the configured persistence store as 
 specified by PASS_CORE_FILE_SERVICE_TYPE. If using FILE_SYSTEM as the persistence store, PASS_CORE_FILE_SERVICE_ROOT_DIR
-is also the root directory for file persistence. The value for the PASS_CORE_FILE_SERVICE_ROOT_DIR can be a file system 
-path or a S3 bucket name, however it is NOT recommended to have the PASS_CORE_FILE_SERVICE_ROOT_DIR be a S3 bucket as 
-it is much slower to process files.
+is also the root directory for file persistence. The value for the PASS_CORE_FILE_SERVICE_ROOT_DIR cannot be a S3 bucket,
+and it must be a valid path on the local filesystem.
 
 The following environment variables are available for configuring the service:
 
