@@ -23,7 +23,6 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.yahoo.elide.annotation.Include;
@@ -49,12 +48,6 @@ public class Journal extends PassEntity {
     @ElementCollection(targetClass = String.class)
     @CollectionTable(name = "pass_journal_issns")
     private List<String> issns = new ArrayList<>();
-
-    /**
-     * The publisher
-     */
-    @ManyToOne
-    private Publisher publisher;
 
     /**
      * National Library of Medicine Title Abbreviation
@@ -83,7 +76,6 @@ public class Journal extends PassEntity {
         super(journal);
         this.journalName = journal.journalName;
         this.issns = new ArrayList<String>(journal.issns);
-        this.publisher = journal.publisher;
         this.nlmta = journal.nlmta;
         this.pmcParticipation = journal.pmcParticipation;
     }
@@ -114,20 +106,6 @@ public class Journal extends PassEntity {
      */
     public void setIssns(List<String> issn) {
         this.issns = issn;
-    }
-
-    /**
-     * @return the publisher ID
-     */
-    public Publisher getPublisher() {
-        return publisher;
-    }
-
-    /**
-     * @param publisher the publisher to set
-     */
-    public void setPublisher(Publisher publisher) {
-        this.publisher = publisher;
     }
 
     /**
@@ -171,8 +149,7 @@ public class Journal extends PassEntity {
         }
         Journal other = (Journal) obj;
         return listEquals(issns, other.issns) && Objects.equals(journalName, other.journalName)
-                && Objects.equals(nlmta, other.nlmta) && pmcParticipation == other.pmcParticipation
-                && Objects.equals(publisher, other.publisher);
+                && Objects.equals(nlmta, other.nlmta) && pmcParticipation == other.pmcParticipation;
     }
 
     @Override
@@ -182,7 +159,7 @@ public class Journal extends PassEntity {
 
     @Override
     public String toString() {
-        return "Journal [journalName=" + journalName + ", issns=" + issns + ", publisher=" + publisher + ", nlmta="
+        return "Journal [journalName=" + journalName + ", issns=" + issns + ", nlmta="
                 + nlmta + ", pmcParticipation=" + pmcParticipation + ", id=" + getId() + "]";
     }
 }
