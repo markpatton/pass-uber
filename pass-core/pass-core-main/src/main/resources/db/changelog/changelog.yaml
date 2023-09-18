@@ -73,3 +73,12 @@ databaseChangeLog:
              path: /db/changelog/schema/index-localkey.sql
              splitStatements: true
              stripComments: true
+  -  changeSet:
+       id:  8
+       author:  mark-patton
+       changes:
+         - sqlFile:
+             encoding: utf-8
+             path: /db/changelog/schema/remove-contrib-pub.sql
+             splitStatements: true
+             stripComments: true
