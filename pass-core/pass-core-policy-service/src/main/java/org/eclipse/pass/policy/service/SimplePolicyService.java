@@ -50,35 +50,45 @@ public class SimplePolicyService implements PolicyService {
         this.refreshableElide = refreshableElide;
     }
 
+    @Override
     public Set<Policy> findPoliciesForSubmission(Long submissionId, Principal userPrincipal, String institution,
                                                  String institutionalPolicyTitle) throws IOException {
-        Set<Policy> policies = new HashSet<>(); //use Set to avoid duplicates
         try (PassClient passClient = PassClient.newInstance(refreshableElide)) {
             Submission submission = passClient.getObject(Submission.class, submissionId);
-            for (Grant grant : submission.getGrants()) {
-                for (Funder funder : getFunders(grant)) {
-                    if (funder.getPolicy() != null) {
-                        policies.add(funder.getPolicy());
-                    }
+
+            return findPoliciesForSubmission(passClient, submission, userPrincipal, institution,
+                    institutionalPolicyTitle);
+        }
+    }
+
+    private Set<Policy> findPoliciesForSubmission(PassClient passClient, Submission submission,
+            Principal userPrincipal, String institution, String institutionalPolicyTitle) throws IOException {
+        Set<Policy> policies = new HashSet<>(); //use Set to avoid duplicates
+
+        for (Grant grant : submission.getGrants()) {
+            for (Funder funder : getFunders(grant)) {
+                if (funder.getPolicy() != null) {
+                    policies.add(funder.getPolicy());
                 }
             }
+        }
 
-            //If the user is an affiliate of the institution, add the institution's policy
-            String user_name = userPrincipal.getName();
-            PassClientSelector<User> userSelector = new PassClientSelector<>(User.class);
-            userSelector.setFilter(RSQL.equals("username", user_name));
-            PassClientResult<User> userResult = passClient.selectObjects(userSelector);
+        //If the user is an affiliate of the institution, add the institution's policy
+        String user_name = userPrincipal.getName();
+        PassClientSelector<User> userSelector = new PassClientSelector<>(User.class);
+        userSelector.setFilter(RSQL.equals("username", user_name));
+        PassClientResult<User> userResult = passClient.selectObjects(userSelector);
 
-            if (userResult.getObjects().size() == 1
+        if (userResult.getObjects().size() == 1
                 && userResult.getObjects().get(0).getAffiliation().contains(institution)
                 && institutionalPolicyTitle != null) { //have a unique user in the system
-                PassClientSelector<Policy> policySelector = new PassClientSelector<>(Policy.class);
-                policySelector.setFilter(RSQL.equals("title", institutionalPolicyTitle));
-                PassClientResult<Policy> policyResult = passClient.selectObjects(policySelector);
-                if (policyResult.getObjects().size() == 1) {
-                    policies.add(policyResult.getObjects().get(0));
-                }
+            PassClientSelector<Policy> policySelector = new PassClientSelector<>(Policy.class);
+            policySelector.setFilter(RSQL.equals("title", institutionalPolicyTitle));
+            PassClientResult<Policy> policyResult = passClient.selectObjects(policySelector);
+            if (policyResult.getObjects().size() == 1) {
+                policies.add(policyResult.getObjects().get(0));
             }
+
         }
         return policies;
     }
@@ -87,51 +97,23 @@ public class SimplePolicyService implements PolicyService {
     public Set<Repository> findRepositoriesForSubmission(Long submissionId, Principal userPrincipal,
                                                          String institution, String institutionalPolicyTitle)
         throws IOException {
-        Set<Repository> repositories = new HashSet<>(); //use Set to avoid duplicates
-
-        /* would really like to do just this, but get hibernate lazy initialization exception:
-
-        for (Policy policy : findPoliciesForSubmission(submissionId, userPrincipal)) {
-                repositories.addAll(policy.getRepositories());
-        }
-
-        Instead we copy the code for the findPoliciesForSubmission
-        method here, so it stays in the same session
-         */
-        Set<Policy> policies = new HashSet<>(); //use Set to avoid duplicates
         try (PassClient passClient = PassClient.newInstance(refreshableElide)) {
             Submission submission = passClient.getObject(Submission.class, submissionId);
-            for (Grant grant : submission.getGrants()) {
-                for (Funder funder : getFunders(grant)) {
-                    if (funder.getPolicy() != null) {
-                        policies.add(funder.getPolicy());
-                    }
-                }
-            }
 
-            //If the user is an affiliate of the institution, add the institution's policy
-            String user_name = userPrincipal.getName();
-            PassClientSelector<User> userSelector = new PassClientSelector<>(User.class);
-            userSelector.setFilter(RSQL.equals("username", user_name));
-            PassClientResult<User> userResult = passClient.selectObjects(userSelector);
+            // Set of policies is intersection of effective policies on submission and the computed policies
 
-            if (userResult.getObjects().size() == 1
-                && userResult.getObjects().get(0).getAffiliation().contains(institution)
-                && institutionalPolicyTitle != null) { //have a unique user in the system
-                PassClientSelector<Policy> policySelector = new PassClientSelector<>(Policy.class);
-                policySelector.setFilter(RSQL.equals("title", institutionalPolicyTitle));
-                PassClientResult<Policy> policyResult = passClient.selectObjects(policySelector);
-                if (policyResult.getObjects().size() == 1) {
-                    policies.add(policyResult.getObjects().get(0));
-                }
-            }
+            Set<Policy> policies = new HashSet<>(submission.getEffectivePolicies());
+            policies.retainAll(findPoliciesForSubmission(passClient, submission, userPrincipal, institution,
+                    institutionalPolicyTitle));
 
-            for (Policy policy : policies) {
-                repositories.addAll(policy.getRepositories());
-            }
+            Set<Repository> repositories = new HashSet<>();
 
+            policies.forEach(p -> {
+                repositories.addAll(p.getRepositories());
+            });
+
+            return repositories;
         }
-        return repositories;
     }
 
     /**

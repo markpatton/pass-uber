@@ -268,6 +268,7 @@ public class PolicyServiceTest extends ShibIntegrationTest {
 
         Call call1 = client.newCall(okHttpRequest1);
 
+        // Since effective policies is empty, no repositories will be returned
         try (Response okHttpResponse = call1.execute()) {
             assertEquals(200, okHttpResponse.code());
             assert okHttpResponse.body() != null;
@@ -277,7 +278,7 @@ public class PolicyServiceTest extends ShibIntegrationTest {
             assertEquals(0, optional.length());
 
             JSONArray required = (JSONArray) result.get("required");
-            assertEquals(1, required.length());
+            assertEquals(0, required.length());
         }
     }
 
