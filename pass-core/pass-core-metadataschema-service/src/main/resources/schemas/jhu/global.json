@@ -181,14 +181,14 @@
             },
             "journal-title": {
                 "type": "text",
-                "label": "Journal Title <small class=\"text-muted\">(required)</small>",
+                "label": "Journal Title",
                 "placeholder": "Enter the journal title",
                 "hidden": false,
                 "order": 2
             },
             "journal-NLMTA-ID": {
                 "type": "text",
-                "label": "Journal NLMTA ID <small class=\"text-muted\">(optional)</small>",
+                "label": "Journal NLMTA ID",
                 "placeholder": "nlmta",
                 "order": 3
             },
