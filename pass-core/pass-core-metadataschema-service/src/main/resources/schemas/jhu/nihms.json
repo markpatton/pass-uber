@@ -4,6 +4,9 @@
     "$id": "https://eclipse-pass.github.io/pass-metadata-schemas/schemas/jhu/nihms.json",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
+    "required": [
+        "journal-title"
+    ],
     "definitions": {
         "form": {
             "title": "NIH Manuscript Submission System (NIHMS) <br><p class='lead text-muted'>The following metadata fields will be part of the NIHMS submission.</p>",
