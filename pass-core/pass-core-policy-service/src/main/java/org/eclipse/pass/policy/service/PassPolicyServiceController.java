@@ -80,7 +80,6 @@ public class PassPolicyServiceController {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        LOG.info("Servicing new request......");
         LOG.debug("Context path: " + request.getContextPath() + "; query string " + request.getQueryString());
 
         // retrieve submission ID from request
@@ -96,7 +95,7 @@ public class PassPolicyServiceController {
         // handle empty or invalid request submission error
         if (submissionId == null) {
             set_error_response(response, "Missing or invalid submission parameter: " +
-                                         "must be a String representation of a Long", HttpStatus.BAD_REQUEST);
+                                         "must be a String representation of a Long", HttpStatus.BAD_REQUEST, null);
             return;
         }
 
@@ -106,8 +105,7 @@ public class PassPolicyServiceController {
                                                                institution, institutionalPolicyTitle);
         } catch (IOException ioe) {
             set_error_response(response, "IO error encountered connecting to data store",
-                               HttpStatus.INTERNAL_SERVER_ERROR);
-            LOG.debug(ioe.getMessage(), ioe);
+                               HttpStatus.INTERNAL_SERVER_ERROR, ioe);
             return;
         }
 
@@ -140,7 +138,6 @@ public class PassPolicyServiceController {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        LOG.info("Servicing new request......");
         LOG.debug("Context path: " + request.getContextPath() + "; query string " + request.getQueryString());
 
         // retrieve submission parameter value from request
@@ -157,7 +154,7 @@ public class PassPolicyServiceController {
         // handle empty or invalid request submission error
         if (submissionId == null) {
             set_error_response(response, "Missing or invalid submission parameter: " +
-                                         "must be a String representation of a Long", HttpStatus.BAD_REQUEST);
+                                         "must be a String representation of a Long", HttpStatus.BAD_REQUEST, null);
             return;
         }
 
@@ -167,8 +164,7 @@ public class PassPolicyServiceController {
                                                                        institution, institutionalPolicyTitle);
         } catch (IOException ioe) {
             set_error_response(response, "IO error encountered connecting to data store",
-                               HttpStatus.INTERNAL_SERVER_ERROR);
-            LOG.debug(ioe.getMessage(), ioe);
+                               HttpStatus.INTERNAL_SERVER_ERROR, ioe);
             return;
         }
 
@@ -207,11 +203,16 @@ public class PassPolicyServiceController {
     }
 
     private void set_error_response(HttpServletResponse response, String message,
-                                    HttpStatus status) throws IOException {
+                                    HttpStatus status, Exception e) throws IOException {
         JsonObject obj = Json.createObjectBuilder().add("message", message).build();
         response.getWriter().print(obj.toString());
         response.setStatus(status.value());
-        LOG.error(message);
+
+        if (e == null) {
+            LOG.error(message);
+        } else {
+            LOG.error(message, e);
+        }
     }
 
 }

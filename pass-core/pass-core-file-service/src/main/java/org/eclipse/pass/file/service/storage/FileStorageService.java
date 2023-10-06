@@ -301,7 +301,7 @@ public class FileStorageService {
 
             Files.delete(tempPathAndFileName);
         } catch (IOException e) {
-            LOG.error(e.toString());
+            LOG.error("Error storing file", e);
             throw new IOException("File Service: The file system was unable to store the uploaded file", e);
         }
         return storageFile;
@@ -327,7 +327,7 @@ public class FileStorageService {
             }
             // the output path for getObject must not exist, hence temp dir is created on the fly
             ocflRepository.getObject(ObjectVersionId.head(fileId), tempLoadDir);
-            LOG.info("File Service: File with ID " + fileId + " was loaded from the repo");
+            LOG.debug("File Service: File with ID " + fileId + " was loaded from the repo");
             Path fileNamePath = Objects.requireNonNull(tempLoadDir.toFile().listFiles())[0].toPath();
             loadedResource = new ByteArrayResource(Files.readAllBytes(fileNamePath));
 
@@ -338,7 +338,7 @@ public class FileStorageService {
         if (loadedResource.exists() && loadedResource.isReadable()) {
             //clean up temp directory
             if (!FileSystemUtils.deleteRecursively(Paths.get(this.tempLoc.toString()))) {
-                LOG.info("File Service: No files to cleanup on file get");
+                LOG.debug("File Service: No files to cleanup on file get");
             }
             return loadedResource;
         } else {
