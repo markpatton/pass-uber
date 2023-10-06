@@ -172,11 +172,12 @@
         "fields": {
             "title": {
                 "type": "textarea",
-                "label": "Article / Manuscript Title <small class=\"text-muted\">(required)</small>",
+                "label": "Article / Manuscript Title",
                 "placeholder": "Enter the manuscript title",
                 "rows": 2,
                 "cols": 100,
                 "hidden": false,
+                "readonly": true,
                 "order": 1
             },
             "journal-title": {
@@ -184,12 +185,14 @@
                 "label": "Journal Title",
                 "placeholder": "Enter the journal title",
                 "hidden": false,
+                "readonly": true,
                 "order": 2
             },
             "journal-NLMTA-ID": {
                 "type": "text",
                 "label": "Journal NLMTA ID",
                 "placeholder": "nlmta",
+                "readonly": true,
                 "order": 3
             },
             "volume": {
@@ -209,7 +212,31 @@
             "issns": {
                 "label": "<div>ISSN Information</div><hr/>",
                 "hidden": false,
+                "readonly": true,
+                "collapsible": false,
+                "collapsed": false,
                 "fieldClass": "",
+                "toolbar": {
+                    "actions": [{
+                        "action": "add",
+                        "enabled": false
+                    }]
+                },
+                "actionbar": {
+                    "actions": [{
+                        "action": "add",
+                        "enabled": false
+                    }, {
+                        "action": "remove",
+                        "enabled": false
+                    }, {
+                        "action": "up",
+                        "enabled": false
+                    }, {
+                        "action": "down",
+                        "enabled": false
+                    }]
+                },
                 "items": {
                     "label": "<span class=\"d-none\"></span>",
                     "fieldClass": "row",
@@ -252,6 +279,8 @@
             "authors": {
                 "label": "<div>Authors</div><hr/>",
                 "hidden": false,
+                "collapsible": false,
+                "collapsed": false,
                 "items": {
                     "label": "<span class=\"d-none\"></span>",
                     "fields": {
