@@ -107,8 +107,7 @@ public class FileStorageService {
         LOG.info("File Service: " + storageType + " Storage Type");
 
         Path rootLoc;
-        if (storageProperties.getStorageRootDir() == null
-                || storageProperties.getStorageRootDir().isEmpty()) {
+        if (StringUtils.isBlank(storageProperties.getStorageRootDir())) {
             //when a storage root is not specified, then it should be: system_temp/create_temp_dir
             rootLoc = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")),null);
             //set the rootLoc in the storageProperties
@@ -180,7 +179,7 @@ public class FileStorageService {
 
             //endpoint is not required, but if one is supplied then S3 client is built with endpoint override
             if (storageProperties.getS3Endpoint().isPresent()
-                    && StringUtils.isNotEmpty(storageProperties.getS3Endpoint().get())) {
+                    && StringUtils.isNotBlank(storageProperties.getS3Endpoint().get())) {
                 String endpoint = storageProperties.getS3Endpoint().get();
                 cloudS3Client = S3Client.builder()
                         .credentialsProvider(DefaultCredentialsProvider.create())
