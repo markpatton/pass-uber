@@ -83,12 +83,13 @@ jobs:
         with:
           add: pom.xml **/pom.xml
           message: "Update parent version to $RELEASE"
+          push: false
 
       # Will publish and create new Docker image for release version
       - name: Publish release
         run: |
-          mvn -B -U -V -ntp release:prepare -DreleaseVersion=$RELEASE -Dtag=$RELEASE -DdevelopmentVersion=$NEXT -DautoVersionSubmodules=true -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          mvn -B -U -V -ntp release:perform -P release -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+          mvn -B -U -V -ntp release:prepare -DreleaseVersion=$RELEASE -Dtag=$RELEASE -DdevelopmentVersion=$NEXT -DautoVersionSubmodules=true
+          mvn -B -U -V -ntp release:perform -P release
         env:
           # Add OSSRH_USERNAME and OSSRH_PASSWORD as GH secrets
           # https://docs.github.com/en/actions/security-guides/encrypted-secrets
