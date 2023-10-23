@@ -103,4 +103,14 @@ databaseChangeLog:
             path: /db/changelog/data/version-migration.sql
             splitStatements: true
             stripComments: true
+  - changeSet:
+      id: 10
+      author: russ-poetker
+      dbms: postgresql
+      changes:
+        - sqlFile:
+            encoding: utf-8
+            path: /db/changelog/data/deposit-repo-copy-publication-id-fix.sql
+            splitStatements: true
+            stripComments: true
 
