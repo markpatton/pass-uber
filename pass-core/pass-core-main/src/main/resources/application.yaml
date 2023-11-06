@@ -56,7 +56,7 @@ spring:
     password: ''
     driver-class-name: 'org.h2.Driver'
   liquibase:
-    change-log: 'classpath:db/changelog/changelog.yaml'
+    change-log: 'classpath:db/changelog/core-changelog.yaml'
     parameters:
       institution-changelog-file: ${PASS_CORE_INSTN_CHG_LOG:file:////tmp/instn-changelog.yaml}
   activemq:
