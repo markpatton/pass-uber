@@ -1,0 +1,148 @@
+################################################
+# Copyright 2019, Yahoo Inc.
+# Licensed under the Apache License, Version 2.0
+# See LICENSE file in project root for terms.
+################################################
+
+elide:
+  baseUrl: ${PASS_CORE_BASE_URL:http://localhost:8080}
+  json-api:
+    path: /data
+    enabled: true
+    enableLinks: true    
+  graphql:
+    path: /graphql/api/v1
+    enabled: false
+  swagger:
+    path: /doc
+    enabled: true
+  subscription:
+    enabled: false
+    path: /subscription
+  async:
+    enabled: false
+    threadPoolSize: 2
+    maxRunTime: 65
+    cleanupEnabled: true
+    queryCleanupDays: 7
+    defaultAsyncQueryDAO: true
+    export:
+      enabled: false
+  aggregation-store:
+    enabled: false
+    default-dialect: h2
+    enableMetaDataStore: false
+  dynamic-config:
+    path: src/main/resources/analytics
+    enabled: false
+
+spring:
+  application:
+    name: pass-core
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+    hibernate:
+      show_sql: true
+      naming:
+        physical-strategy: 'org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl'
+      dialect: 'org.hibernate.dialect.H2Dialect'
+      jdbc:
+        use_scrollable_resultset: true
+  datasource:
+    url: 'jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE'
+    username: 'sa'
+    password: ''
+    driver-class-name: 'org.h2.Driver'
+  liquibase:
+    change-log: 'classpath:db/changelog/core-changelog.yaml'
+    parameters:
+      institution-changelog-file: ${PASS_CORE_INSTN_CHG_LOG:file:////tmp/instn-changelog.yaml}
+  activemq:
+    broker-url: 'vm://embedded?broker.persistent=false,useShutdownHook=false'
+    in-memory: true
+  security:
+    user:
+      name: ${PASS_CORE_BACKEND_USER:backend}
+      password: ${PASS_CORE_BACKEND_PASSWORD:moo}
+      roles: BACKEND
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+server:
+  port: 8080
+  shutdown: graceful
+
+logging:
+  path: ${PASS_CORE_LOG_DIR:${java.io.tmpdir}/pass-core}
+
+aws:
+  region: us-east-1
+  sqs:
+    endpoint-override: ${AWS_SQS_ENDPOINT_OVERRIDE:}
+
+pass:
+  auth:
+    max-cache-size: 100
+    cache-duration: 30
+  file-service:
+    storage-type: 'FILE_SYSTEM'
+  jms:
+    queue:
+      submission: ${PASS_CORE_SUBMISSION_QUEUE:pass-submission}
+      deposit: ${PASS_CORE_DEPOSIT_QUEUE:pass-deposit}
+      submission-event: ${PASS_CORE_SUBMISSION_EVENT_QUEUE:pass-submission-event}
+    sqs: ${PASS_CORE_USE_SQS:false}
+    embed: ${PASS_CORE_EMBED_JMS_BROKER:true}
+  policy:
+    institution: ${PASS_CORE_POLICY_INSTITUTION:johnshopkins.edu}
+    institutional_policy_title: ${PASS_CORE_POLICY_INSTITUTIONAL_POLICY_TITLE:Johns Hopkins University (JHU) Open Access Policy}
+    institutional_repository_name: ${PASS_CORE_POLICY_INSTITUTIONAL_REPOSITORY_NAME:JScholarship}
+  usertoken:
+    key: ${PASS_CORE_USERTOKEN_KEY:}
+
+---
+elide:
+  aggregation-store:
+    default-dialect: Postgres
+
+spring:
+  config:
+    activate:
+      on-profile: "production"
+  jpa:
+    hibernate:
+      show_sql: true
+      naming:
+        physical-strategy: 'org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl'
+      dialect: 'org.hibernate.dialect.PostgreSQLDialect'
+      jdbc:
+        use_scrollable_resultset: true
+  datasource:
+    url: ${PASS_CORE_DATABASE_URL}
+    username: ${PASS_CORE_DATABASE_USERNAME}
+    password: ${PASS_CORE_DATABASE_PASSWORD}
+    driver-class-name: 'org.postgresql.Driver'
+  security:
+    user:
+      name: ${PASS_CORE_BACKEND_USER}
+      password: ${PASS_CORE_BACKEND_PASSWORD}
+      roles: BACKEND
+
+server:
+  port: ${PASS_CORE_PORT}
+
+pass:
+  jms:
+    sqs: ${PASS_CORE_USE_SQS:true}
+    embed: ${PASS_CORE_EMBED_JMS_BROKER:false}
+  file-service:
+    storage-type: ${PASS_CORE_FILE_SERVICE_TYPE:FILE_SYSTEM}
+    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR:}
+    s3-bucket-name: ${PASS_CORE_S3_BUCKET_NAME:pass-core-file}
+    s3-repo-prefix: ${PASS_CORE_S3_REPO_PREFIX:pass-core-file}
+    s3-endpoint: ${PASS_CORE_S3_ENDPOINT:}
+ 

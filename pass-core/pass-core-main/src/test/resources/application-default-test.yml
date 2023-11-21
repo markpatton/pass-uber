@@ -1,0 +1,9 @@
+aws:
+  region: us-east-1
+
+pass:
+  jms:
+    embed: false
+  file-service:
+    storage-type: FILE_SYSTEM
+    root-dir: ${PASS_CORE_FILE_SERVICE_ROOT_DIR:}

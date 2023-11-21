@@ -1,0 +1,26 @@
+{
+    "a": "1",
+    "b": "2",
+    "c": "3",
+    "d": "4",
+    "x": {
+        "title": "x",
+        "$comment": "displays nicely",
+        "description": "an awesome letter",
+        "type": "letter"
+    },
+    "array": ["a", "b", "c", "d", "e", "f"],
+    "complexarray": [{"a": ["b", {"c": "d"}]}, "e", "f", {"g": "h"}],
+    "aa": "b",
+	"cc": ["d", "e", "f", "g"],
+	"h": {
+		"i": "j",
+		"k": ["l", "m", "m'"],
+		"n": {
+			"o": "p",
+			"q": "r"
+		}
+	},
+    "copySchemaName": "http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference",
+    "k": ["l", "m", "m'"]
+}

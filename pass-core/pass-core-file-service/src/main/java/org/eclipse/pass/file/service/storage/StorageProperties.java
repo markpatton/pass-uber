@@ -1,0 +1,161 @@
+/*
+ *
+ * Copyright 2023 Johns Hopkins University
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+package org.eclipse.pass.file.service.storage;
+
+import java.util.Optional;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * StorageProperties are the File Service configuration properties indicating where and what type of storage is used
+ * for persistence. The StorageProperties are managed by the StorageConfiguration.
+ * Important: The OCFL root and working directory must be on the same mount.
+ *
+ * @author Tim Sanders
+ * @see StorageConfiguration
+ */
+@ConfigurationProperties(prefix = "pass.file-service")
+public class StorageProperties {
+    private final static String OCFL_DIR = "ocfl";
+    private final static String OCFL_WORK_DIR = "ocfl-work";
+    private final static String TEMP_DIR = "temp";
+    private String rootDir;
+    private StorageServiceType storageType;
+    private String s3BucketName;
+    private String s3Endpoint;
+    private String s3RepoPrefix;
+
+    /**
+     * Get the root directory for the File Service. This is the absolute path of the root directory.
+     *
+     * @return The root directory of the File Service storage
+     */
+    public String getStorageRootDir() {
+        return rootDir;
+    }
+
+    /**
+     * Get the relative path of the OCFL storage directory. This directory is a child of the root directory.
+     *
+     * @return The logical path of the OCFL storage directory
+     */
+    public String getStorageOcflDir() {
+        return OCFL_DIR;
+    }
+
+    /**
+     * Get the relative path of the OCFL working directory. This directory must be on the same
+     * mount as the OCFL root directory. This directory is a child of the root directory.
+     *
+     * @return The logical path of the OCFL working directory
+     */
+    public String getStorageWorkDir() {
+        return OCFL_WORK_DIR;
+    }
+
+    /**
+     * Get the relative path of the temp directory. This directory is a child of the root directory.
+     *
+     * @return The logical path of the temp directory
+     */
+    public String getStorageTempDir() {
+        return TEMP_DIR;
+    }
+
+    /**
+     * Get the storage type that is configured for the File Service
+     *
+     * @return The StorageServiceType of the File Service
+     * @see StorageServiceType
+     */
+    public StorageServiceType getStorageType() {
+        return storageType;
+    }
+
+    /**
+     * Get the S3 repo prefix that is configured for the File Service
+     *
+     * @return The S3 bucket name of the File Service
+     */
+    public Optional<String> getS3RepoPrefix() {
+        return Optional.ofNullable(s3RepoPrefix);
+    }
+
+    /**
+     * Get the S3 bucket name that is configured for the File Service
+     *
+     * @return The S3 bucket name of the File Service
+     */
+    public Optional<String> getBucketName() {
+        return Optional.of(s3BucketName);
+    }
+
+    /**
+     * Get the S3 endpoint that is configured for the File Service
+     *
+     * @return The S3 endpoint of the File Service
+     */
+    public Optional<String> getS3Endpoint() {
+        return Optional.ofNullable(s3Endpoint);
+    }
+
+    /**
+     * Set the root directory for the File Service. This is the absolute path of the root directory.
+     * Important: The OCFL root and working directory must be on the same mount.
+     *
+     * @param rootDir The root directory of the File Service storage
+     */
+    public void setRootDir(String rootDir) {
+        this.rootDir = rootDir;
+    }
+
+    /**
+     * Set the storage type that is configured for the File Service
+     *
+     * @param storageType The StorageServiceType of the File Service
+     */
+    public void setStorageType(StorageServiceType storageType) {
+        this.storageType = storageType;
+    }
+
+    /**
+     * Set the S3 bucket name that is configured for the File Service
+     *
+     * @param bucketName The S3 bucket name of the File Service
+     */
+    public void setS3BucketName(String bucketName) {
+        this.s3BucketName = bucketName;
+    }
+
+    /**
+     * Set the S3 repo prefix that is configured for the File Service
+     *
+     * @param s3RepoPrefix The S3 repo prefix of the File Service.
+     */
+    public void setS3RepoPrefix(String s3RepoPrefix) {
+        this.s3RepoPrefix = s3RepoPrefix;
+    }
+
+    /**
+     * Set the S3 endpoint that is configured for the File Service
+     *
+     * @param endpoint The S3 endpoint of the File Service
+     */
+    public void setS3Endpoint(String endpoint) {
+        this.s3Endpoint = endpoint;
+    }
+}

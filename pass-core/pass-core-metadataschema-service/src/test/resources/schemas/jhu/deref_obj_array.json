@@ -1,0 +1,11 @@
+{
+  "$schema": "http://example.org/metadata-schemas/schemas/jhu/deref_obj_array",
+  "$id": "http://example.org/metadata-schemas/schemas/jhu/deref_obj_array",
+  "definitions": {
+    "form": {
+      "type": "string",
+      "title": "Deref this"
+    }
+  },
+  "allOf": [{"$ref": "#/definitions/form"}]
+}

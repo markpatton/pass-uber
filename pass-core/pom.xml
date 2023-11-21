@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.pass</groupId>
+    <artifactId>eclipse-pass-parent</artifactId>
+    <version>1.2.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>pass-core</artifactId>
+  <version>1.2.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>PASS backend</name>
+  <description>PASS REST API implementation</description>
+  <url>https://github.com/eclipse-pass/pass-core</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Jim Martino</name>
+      <email>jrm@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+    <developer>
+      <name>Mark Patton</name>
+      <email>mpatton@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins University</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+    <developer>
+      <name>John Abrahams</name>
+      <email>jabrah20@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins University</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+    <developer>
+      <name>Tim Sanders</name>
+      <email>tsande16@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins University</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>pass-core-doi-service</module>
+    <module>pass-core-object-service</module>
+    <module>pass-core-file-service</module>
+    <module>pass-core-user-service</module>
+    <module>pass-core-main</module>
+    <module>pass-core-metadataschema-service</module>
+    <module>pass-core-policy-service</module>
+    <module>pass-core-usertoken</module>
+  </modules>
+
+  <scm>
+    <connection>scm:git:https://github.com/eclipse-pass/pass-core.git</connection>
+    <developerConnection>scm:git:https://github.com/eclipse-pass/pass-core.git</developerConnection>
+    <url>https://github.com/eclipse-pass/pass-core</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <properties>
+    <javax.json.version>1.1.4</javax.json.version>
+    <javax.json.api.version>1.1.4</javax.json.api.version>
+    <h2.version>2.1.210</h2.version>
+    <liquibase.version>4.8.0</liquibase.version>
+    <postgres.version>42.3.3</postgres.version>
+    <rest-assured.version>2.9.0</rest-assured.version>
+    <ocfl.java.core.version>1.5.0</ocfl.java.core.version>
+    <ocfl.java.aws.version>1.5.0</ocfl.java.aws.version>
+    <apache.commons.io.version>2.8.0</apache.commons.io.version>
+    <apache.commons-lang.version>2.4</apache.commons-lang.version>
+    <s3mock.version>0.2.6</s3mock.version>
+    <jsoup.version>1.15.3</jsoup.version>
+    <mockito.core.version>4.8.1</mockito.core.version>
+    <commons.codec.version>1.13</commons.codec.version>
+    <spring.boot.version>2.7.5</spring.boot.version>
+    <amazon.sqs.version>1.0.4</amazon.sqs.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Test dependencies -->
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${junit.jupiter.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${junit.jupiter.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <repositories>
+    <repository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${maven.spring.plugin.version}</version>
+          <configuration>
+            <mainClass>org.eclipse.pass.main.Main</mainClass>
+            <finalName>pass-core-main</finalName>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>repackage</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <source>17</source>
+          <detectJavaApiLink>false</detectJavaApiLink>
+          <tags>
+          <tag>
+            <name>CreatePermission</name>
+            <placement>a</placement>
+          </tag>
+            <tag>
+              <name>ReadPermission</name>
+              <placement>a</placement>
+            </tag>
+            <tag>
+              <name>UpdatePermission</name>
+              <placement>a</placement>
+            </tag>
+            <tag>
+              <name>DeletePermission</name>
+              <placement>a</placement>
+            </tag>
+          </tags>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

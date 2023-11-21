@@ -1,0 +1,133 @@
+# Release artifact will be pushed to Sonatype, which is synced to Maven Central
+# Build artifacts get pushed to Sonatype and non-SNAPSHOT versions are then
+# auto-synced to Maven Central
+name: Publish a release to Maven Central
+
+on:
+  # We can use very similiar workflow to manually trigger a full publish
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
+  workflow_dispatch:
+    inputs:
+      releaseversion:
+        description: 'Release version'
+        required: true
+      nextversion:
+        description: 'Next dev version'
+        required: true
+
+# Will need to have someone with admin permissions to add some secrets:
+# Credentials for Sonatype, needs a Sonatype account.
+#   - OSSRH_USERNAME
+#   - OSSRH_PASSWORD
+# Will need GPG key + passphrase to sign artifacts for Maven Central
+#   - MAVEN_GPG_PASSPHRASE
+#   - MAVEN_GPG_KEY
+# 
+# Should be able to use secrets.GITHUB_TOKEN to push images to GHCR, this
+# secret is provided automatically to the workflow
+# 
+# May need a GH PAT (likely fine-grained) in order to update pass-docker with
+# new image refs
+# (Not yet used)
+#   - GH_USER
+#   - GH_PAT
+# 
+# Using maven with arguments:
+#   -B (--batch-mode) non-interactive batch mode
+#   -U force dependency SNAPSHOT update
+#   -V print maven version without stopping build
+#   -ntp (--no-transfer-progress) do not show download progress
+
+env:
+  RELEASE: ${{ inputs.releaseversion }}
+  NEXT: ${{ inputs.nextversion}}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Can we check to make sure $NEXT doesn't already exist as a tag?
+    steps:
+      # =============================================================================
+      # Setup
+      # =============================================================================
+      # Automatically checks out the repo and branch where the workflow was triggered
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Config git user
+        run: |
+          git config user.name ${{ github.actor }}
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Setup Java & Maven
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          server-id: ossrh
+          # User/pass refer to ENV VARs set below
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      # =============================================================================
+      # Start the work
+      # =============================================================================
+      # This versions:update-parent will grab the specified release (non-snapshot)
+      - name: Bump version to release
+        run: mvn -B -U -V -ntp versions:update-parent -DparentVersion=$RELEASE
+
+      - name: Commit release version bump
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: pom.xml **/pom.xml
+          message: "Update parent version to $RELEASE"
+          push: false
+
+      # Will publish and create new Docker image for release version
+      - name: Publish release
+        run: |
+          mvn -B -U -V -ntp release:prepare -DreleaseVersion=$RELEASE -Dtag=$RELEASE -DdevelopmentVersion=$NEXT -DautoVersionSubmodules=true
+          mvn -B -U -V -ntp release:perform -P release
+        env:
+          # Add OSSRH_USERNAME and OSSRH_PASSWORD as GH secrets
+          # https://docs.github.com/en/actions/security-guides/encrypted-secrets
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+      # Project and submodule versions _should_ already be updated in the release step above
+      - name: Update parent POM to new dev version
+        run: mvn -B -U -V -ntp versions:update-parent -DallowSnapshots=true -DparentVersion=$NEXT
+
+      - name: Commit snapshot version bump
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: pom.xml **/pom.xml
+          message: "Update parent version to $NEXT"
+          push: true
+
+      # Will produce a new Docker image for the new dev version
+      - name: Build and publish new dev version
+        run: mvn -B -U -V -ntp deploy -P release
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+      - name: Push new release tag GH
+        run: git push origin --tags
+
+      # Handle Docker images
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Docker image to GHCR
+        run: |
+          docker push ghcr.io/eclipse-pass/pass-core-main:$RELEASE
+          docker push ghcr.io/eclipse-pass/pass-core-main:$NEXT

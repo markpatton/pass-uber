@@ -1,0 +1,7 @@
+databaseChangeLog:
+  -  include:
+       file: db/changelog/changelog.yaml
+  -  include:
+       file: ${institution-changelog-file}
+       errorIfMissing: false
+

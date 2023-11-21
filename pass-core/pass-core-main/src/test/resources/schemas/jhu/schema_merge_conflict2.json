@@ -1,0 +1,19 @@
+{
+    "$schema": "http://example.org/metadata-schemas/schemas/jhu",
+    "$id": "http://example.org/metadata-schemas/schemas/jhu/foo",
+    "title": "foo",
+    "description": "foo schema",
+    "$comment": "one",
+    "a": "1",
+    "x": {
+        "title": "X",
+        "description": "a letter",
+        "$comment": "displays good",
+        "type": "letter"
+    },
+    "array": {
+        "title": "Not Array"
+    },
+    "aa": "b",
+	"cc": ["d", "e"]
+}

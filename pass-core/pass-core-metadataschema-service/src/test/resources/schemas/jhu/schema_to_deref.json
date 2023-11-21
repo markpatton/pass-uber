@@ -1,0 +1,10 @@
+{
+  "$schema": "http://example.org/metadata-schemas/schemas/jhu/schema_to_dereference",
+  "$id": "http://example.org/metadata-schemas/schemas/jhu/deref",
+  "copySchemaName": {"$ref": "#/$schema"},
+  "title": {"$ref": "schema1.json#/x/title"},
+  "x": {"$ref": "schema2.json#/x"},
+  "array": {"$ref": "schema3.json#/array"},
+  "complexarray": {"$ref": "schema4.json#/complexarray"},
+  "k": {"$ref": "schema4.json#/h/k"}
+}
