@@ -1,0 +1,75 @@
+<!--
+  ~ Copyright 2018 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<configuration>
+  <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>
+        %d{HH:mm:ss.SSS} [%20.20thread] %-5level [%30.-30C{0}] - %msg%n
+      </pattern>
+    </encoder>
+    <target>System.err</target>
+  </appender>
+  <root level="WARN">
+    <appender-ref ref="STDERR"/>
+  </root>
+  <logger name="org.springframework" additivity="false" level="${org.springframework.level:-WARN}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+  <logger name="org.eclipse" additivity="false" level="${org.eclipse.level:-WARN}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+  <logger name="org.eclipse.pass.deposit" additivity="false"
+          level="${org.eclipse.pass.deposit.level:-WARN}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+  <logger name="org.eclipse.pass.client" additivity="false"
+          level="${org.eclipse.pass.client.level:-WARN}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+
+  <logger name="org.eclipse.pass.deposit.service.SubmissionProcessor" additivity="false"
+          level="${org.eclipse.pass.deposit.service.SubmissionProcessor.level:-INFO}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+
+  <logger name="org.eclipse.pass.deposit.service.DepositProcessor" additivity="false"
+          level="${org.eclipse.pass.deposit.service.DepositProcessor.level:-INFO}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+
+  <!-- DEBUG level will show FTP session opening and closing, TRACE will log more details of a session. -->
+
+  <logger name="org.eclipse.pass.deposit.transport.ftp" additivity="false"
+          level="{org.eclipse.pass.deposit.transport.ftp.level:-INFO}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+
+  <!-- DEBUG level will show logs for sword client requests/responses. -->
+  <logger name="org.swordapp.client" additivity="false" level="${org.swordapp.client:-WARN}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+  <logger name="org.apache.commons.httpclient" additivity="false" level="${org.apache.commons.httpclient:-WARN}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+
+  <!-- Cross-cutting loggers -->
+
+  <logger name="WORKERS_LOGGER" additivity="false"
+          level="${WORKERS_LOGGER.level:-INFO}">
+    <appender-ref ref="STDERR"/>
+  </logger>
+
+</configuration>

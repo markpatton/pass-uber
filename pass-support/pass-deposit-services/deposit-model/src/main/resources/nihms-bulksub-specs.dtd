@@ -1,0 +1,124 @@
+<!ELEMENT manuscript-submit (journal-meta, manuscript-title, citation?, contacts, grants?, permissions?, disclaimer?, custom-meta-group?) >
+<!ATTLIST manuscript-submit
+            	agency				CDATA				#IMPLIED  
+            manuscript-id CDATA #IMPLIED
+            embargo-months (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12)    #IMPLIED
+            pmid CDATA #IMPLIED
+            pmcid CDATA #IMPLIED
+            doi CDATA #IMPLIED
+            xmlns:xlink			CDATA		     #FIXED 'http://www.w3.org/1999/xlink'  
+>
+
+<!--  ================================================================  -->
+<!--          JOURNAL METADATA    information about the journal         -->
+<!--  ================================================================  -->
+<!ELEMENT journal-meta ( (nlm-ta | issn), issn*, journal-title?) >
+
+<!ELEMENT nlm-ta (#PCDATA) > <!--  Holds the NLM Title Abbreviation for the journal -->
+
+<!ELEMENT issn (#PCDATA) >
+<!ATTLIST issn
+	    issn-type (print | electronic | linking) #REQUIRED >
+	    
+<!ELEMENT journal-title (#PCDATA) >
+
+
+
+<!--  ================================================================  -->
+<!--            CITATION     information about the article              -->
+<!--  ================================================================  -->
+<!ELEMENT manuscript-title  (#PCDATA | sub| sup | b | i)*   >
+
+<!ELEMENT citation (pub-date+, volume, issue, (fpage | elocation-id), lpage?, URL*) >
+
+<!ELEMENT pub-date ( ((day?, month?) | season?), year) >
+<!ATTLIST pub-date
+            pub-date-type (issue | article)	#REQUIRED >
+
+<!ELEMENT day (#PCDATA) >
+
+<!ELEMENT month (#PCDATA) >
+
+<!ELEMENT season (#PCDATA) >
+
+<!ELEMENT year (#PCDATA) >
+
+<!ELEMENT volume (#PCDATA) >
+
+<!ELEMENT issue (#PCDATA) >
+
+<!ELEMENT fpage (#PCDATA) >
+
+<!ELEMENT elocation-id (#PCDATA) >
+
+<!ELEMENT lpage (#PCDATA) >
+
+<!ELEMENT URL   (#PCDATA)  >
+<!ATTLIST   URL 
+            url-type        (citation | full-text)       #REQUIRED>
+            
+            
+<!--  ================================================================  -->
+<!--    PERMISSIONS  information about the ownership and use rights     -->
+<!--  ================================================================  -->
+<!ELEMENT permissions	(copyright-statement?) >
+
+<!ELEMENT copyright-statement (#PCDATA | sub| sup | b | i)*   >
+
+
+
+<!--  ================================================================  -->
+<!--   CONTACT  information about the people (at least one is required) -->
+<!--  ================================================================  -->
+<!ELEMENT contacts (person+)>
+
+<!ELEMENT person EMPTY>
+<!ATTLIST person
+            fname CDATA #REQUIRED
+            mname CDATA #IMPLIED
+            lname CDATA #REQUIRED
+            email CDATA #REQUIRED
+            person-type (author | reviewer)   #REQUIRED
+>
+<!ELEMENT grants    (grant+)>
+
+<!ELEMENT grant (PI?) >
+<!ATTLIST grant
+  id CDATA #IMPLIED	
+  funder ( nih | ahrq | aspr | cdc | epa | fda | hhmi | nasa | nist | va ) #REQUIRED
+  center CDATA #IMPLIED 
+>
+
+<!ELEMENT PI    EMPTY >
+<!ATTLIST PI
+            fname CDATA #REQUIRED
+            lname CDATA #REQUIRED
+            email CDATA #IMPLIED
+   >
+   
+<!ELEMENT custom-meta-group  (custom-meta+)>
+		
+<!ELEMENT custom-meta (#PCDATA | sub| sup | b | i)*   >
+<!ATTLIST custom-meta 
+	name		CDATA		#REQUIRED>
+
+
+<!ELEMENT disclaimer (#PCDATA | sub| sup | b | i)*   >
+
+
+
+<!--  ================================================================  -->
+<!--                             FORMATTING                             -->
+<!--  ================================================================  -->
+<!ELEMENT sub   (#PCDATA | sub| sup | b | i)*   > <!--  subscript  -->
+
+<!ELEMENT sup   (#PCDATA | sub| sup | b | i)*   > <!--  superscript -->
+
+<!ELEMENT b  (#PCDATA | sub| sup | b | i)*   > <!-- boldface -->
+
+<!ELEMENT i  (#PCDATA | sub| sup | b | i)*   > <!--  italic -->
+
+
+
+
+
